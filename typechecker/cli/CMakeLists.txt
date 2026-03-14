@@ -1,0 +1,1 @@
+add_executable(typechecker src/main.cpp)
