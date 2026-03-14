@@ -1,3 +1,6 @@
 build
 .cache
 .vscode
+**/stella-grammar/*
+!**/stella-grammar/*.g4
+antlr4-output
