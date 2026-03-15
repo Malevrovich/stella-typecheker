@@ -7,9 +7,9 @@ namespace ast {
 
 class NodeExprVar final : public NodeExpr {
 public:
-    NodeExprVar(std::string name)
-        : name_(std::move(name)) {}
-    void OutputTo(std::ostream& out) const override { out << name_; }
+    NodeExprVar(std::shared_ptr<SourceInfo> source_info, std::string name)
+        : NodeExpr(std::move(source_info)),
+          name_(std::move(name)) {}
 
     std::string_view GetName() const { return name_; }
 

@@ -7,20 +7,20 @@ namespace ast {
 
 class NodeExprConstTrue final : public NodeExpr {
 public:
-    void OutputTo(std::ostream& out) const override { out << "true"; }
+    explicit NodeExprConstTrue(std::shared_ptr<SourceInfo> source_info)
+        : NodeExpr(std::move(source_info)) {}
 };
 
 class NodeExprConstFalse final : public NodeExpr {
 public:
-    void OutputTo(std::ostream& out) const override { out << "false"; }
+    explicit NodeExprConstFalse(std::shared_ptr<SourceInfo> source_info)
+        : NodeExpr(std::move(source_info)) {}
 };
 
 class NodeExprIf final : public NodeExpr {
 public:
-    NodeExprIf(std::shared_ptr<NodeExpr> condition, std::shared_ptr<NodeExpr> then_branch,
-               std::shared_ptr<NodeExpr> else_branch);
-
-    void OutputTo(std::ostream& out) const override;
+    NodeExprIf(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> condition,
+               std::shared_ptr<NodeExpr> then_branch, std::shared_ptr<NodeExpr> else_branch);
 
 private:
     std::shared_ptr<NodeExpr> condition_;

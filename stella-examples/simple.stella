@@ -5,6 +5,7 @@ fn increment_twice(n : Nat)-> Nat {
     return succ(succ(n))
 }
 
+// наличие main обязательно
 fn main(n : Nat)-> Nat {
     return increment_twice( if Nat::iszero(n) then false else true )
 }

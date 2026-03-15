@@ -12,27 +12,26 @@ std::string Type::ToString() const {
     return oss.str();
 }
 
-std::string NodeBase::ToString() {
+std::string NodeBase::ToString() const {
     std::ostringstream oss;
     OutputTo(oss);
     return oss.str();
 }
 
-NodeProgram::NodeProgram(std::vector<std::shared_ptr<NodeDecl>> decls)
-    : decls_(std::move(decls)) {
-    for (const auto& decl : decls_) {
-        CHECK_F(decl != nullptr);
+void NodeBase::OutputTo(std::ostream& out) const {
+    if (!source_info_) {
+        out << "<unknown location>";
+    } else {
+        out << source_info_->GetLocation() << ": " << source_info_->ToString();
     }
 }
 
-void NodeProgram::OutputTo(std::ostream& out) const {
-    bool first = true;
+NodeProgram::NodeProgram(std::shared_ptr<SourceInfo> source_info,
+                         std::vector<std::shared_ptr<NodeDecl>> decls)
+    : NodeBase(std::move(source_info)),
+      decls_(std::move(decls)) {
     for (const auto& decl : decls_) {
-        if (!first) {
-            out << '\n';
-        }
-        first = false;
-        decl->OutputTo(out);
+        CHECK_F(decl != nullptr);
     }
 }
 

@@ -8,9 +8,8 @@ namespace ast {
 
 class NodeParamDecl final : public NodeBase {
 public:
-    NodeParamDecl(std::string name, std::shared_ptr<Type> type);
-
-    void OutputTo(std::ostream& out) const override;
+    NodeParamDecl(std::shared_ptr<SourceInfo> source_info, std::string name,
+                  std::shared_ptr<Type> type);
 
     std::string_view GetName() const { return name_; }
     const Type& GetType() const { return *type_; }
@@ -22,9 +21,8 @@ private:
 
 class NodeExprAbstraction final : public NodeExpr {
 public:
-    NodeExprAbstraction(std::shared_ptr<NodeParamDecl> param, std::shared_ptr<NodeExpr> body);
-
-    void OutputTo(std::ostream& out) const override;
+    NodeExprAbstraction(std::shared_ptr<SourceInfo> source_info,
+                        std::shared_ptr<NodeParamDecl> param, std::shared_ptr<NodeExpr> body);
 
     const NodeParamDecl& GetParam() const { return *param_; }
     const NodeExpr& GetBody() const { return *body_; }
@@ -36,10 +34,9 @@ private:
 
 class NodeDeclFun final : public NodeDecl {
 public:
-    NodeDeclFun(std::string name, std::shared_ptr<Type> return_type,
+    NodeDeclFun(std::shared_ptr<SourceInfo> source_info, std::string name,
+                std::shared_ptr<Type> return_type,
                 std::shared_ptr<NodeExprAbstraction> abstraction);
-
-    void OutputTo(std::ostream& out) const override;
 
     std::string_view GetName() const { return name_; }
     const Type& GetReturnType() const { return *return_type_; }
@@ -53,9 +50,8 @@ private:
 
 class NodeExprApplication final : public NodeExpr {
 public:
-    NodeExprApplication(std::shared_ptr<NodeExpr> function, std::shared_ptr<NodeExpr> argument);
-
-    void OutputTo(std::ostream& out) const override;
+    NodeExprApplication(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> function,
+                        std::shared_ptr<NodeExpr> argument);
 
     const NodeExpr& GetFunction() const { return *function_; }
     const NodeExpr& GetArgument() const { return *argument_; }

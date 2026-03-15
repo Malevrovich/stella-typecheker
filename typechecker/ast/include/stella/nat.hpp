@@ -7,10 +7,9 @@ namespace ast {
 
 class NodeExprConstInt final : public NodeExpr {
 public:
-    NodeExprConstInt(int value)
-        : value_(value) {}
-
-    void OutputTo(std::ostream& out) const override { out << value_; }
+    explicit NodeExprConstInt(std::shared_ptr<SourceInfo> source_info, int value)
+        : NodeExpr(std::move(source_info)),
+          value_(value) {}
 
     int GetValue() const { return value_; }
 
@@ -20,9 +19,8 @@ private:
 
 class NodeExprSucc final : public NodeExpr {
 public:
-    NodeExprSucc(std::shared_ptr<NodeExpr> operand);
+    NodeExprSucc(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
 
-    void OutputTo(std::ostream& out) const override { out << "succ(" << *operand_ << ")"; }
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
@@ -31,9 +29,8 @@ private:
 
 class NodeExprPred final : public NodeExpr {
 public:
-    NodeExprPred(std::shared_ptr<NodeExpr> operand);
+    NodeExprPred(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
 
-    void OutputTo(std::ostream& out) const override { out << "pred(" << *operand_ << ")"; }
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
@@ -42,9 +39,8 @@ private:
 
 class NodeExprIsZero final : public NodeExpr {
 public:
-    NodeExprIsZero(std::shared_ptr<NodeExpr> operand);
+    NodeExprIsZero(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
 
-    void OutputTo(std::ostream& out) const override { out << "iszero(" << *operand_ << ")"; }
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:

@@ -1,4 +1,3 @@
-#include <fstream>
 #include <iostream>
 
 #include "stella/parser.hpp"
@@ -9,16 +8,9 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    std::ifstream file(argv[1]);
-    if (!file.is_open()) {
-        std::cerr << "Error: cannot open file '" << argv[1] << "'" << std::endl;
-        return 1;
-    }
-
     try {
-        std::string input((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-        auto program = stella::ParseProgram(input);
+        std::string filename = argv[1];
+        auto program = stella::ParseProgramFile(filename);
 
         std::cout << *program << std::endl;
 

@@ -8,12 +8,28 @@
 namespace stella {
 namespace ast {
 
+class SourceInfo {
+public:
+    virtual ~SourceInfo() = default;
+
+    virtual std::string ToString() const = 0;
+    virtual std::string GetLocation() const = 0;
+};
+
 class NodeBase {
 public:
     virtual ~NodeBase() = default;
 
-    virtual void OutputTo(std::ostream& out) const = 0;
-    std::string ToString();
+    virtual void OutputTo(std::ostream& out) const;
+    std::string ToString() const;
+
+    const SourceInfo& GetSourceInfo() const { return *source_info_; }
+
+protected:
+    explicit NodeBase(std::shared_ptr<SourceInfo> source_info)
+        : source_info_(std::move(source_info)) {}
+
+    const std::shared_ptr<SourceInfo> source_info_;
 };
 
 class Type {
@@ -25,20 +41,17 @@ public:
 };
 
 class NodeExpr : public NodeBase {
-public:
-    void OutputTo(std::ostream& out) const = 0;
+    using NodeBase::NodeBase;
 };
 
 class NodeDecl : public NodeBase {
-public:
-    void OutputTo(std::ostream& out) const = 0;
+    using NodeBase::NodeBase;
 };
 
 class NodeProgram final : public NodeBase {
 public:
-    NodeProgram(std::vector<std::shared_ptr<NodeDecl>> decls);
-
-    void OutputTo(std::ostream& out) const override;
+    NodeProgram(std::shared_ptr<SourceInfo> source_info,
+                std::vector<std::shared_ptr<NodeDecl>> decls);
 
     const std::vector<std::shared_ptr<NodeDecl>>& GetDeclarations() const { return decls_; }
 
