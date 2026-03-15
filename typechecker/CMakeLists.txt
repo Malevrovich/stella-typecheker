@@ -1,3 +1,4 @@
+add_subdirectory(ast)
 add_subdirectory(checker)
 add_subdirectory(cli)
 add_subdirectory(parser)
