@@ -1,7 +1,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "stella/parser.hpp"
+#include <antlr4-runtime.h>
+
+#include "StellaLexer.h"
+#include "StellaParser.h"
 
 int main(int argc, const char* argv[]) {
     if (argc < 2) {
@@ -16,11 +19,17 @@ int main(int argc, const char* argv[]) {
     }
 
     try {
-        std::string input((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        antlr4::ANTLRInputStream stream(file);
 
-        auto program = stella::ParseProgram(input);
+        antlr4_stella::StellaLexer lexer(&stream);
 
-        std::cout << *program << std::endl;
+        antlr4::CommonTokenStream tokens(&lexer);
+
+        antlr4_stella::StellaParser parser(&tokens);
+
+        antlr4_stella::StellaParser::Start_ProgramContext* tree = parser.start_Program();
+
+        std::cout << antlr4::tree::Trees::toStringTree(tree, &parser) << std::endl;
 
     } catch (const std::exception& e) {
         std::cerr << "Parsing error: " << e.what() << std::endl;

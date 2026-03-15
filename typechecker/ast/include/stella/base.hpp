@@ -18,7 +18,7 @@ public:
 
 class Type {
 public:
-    virtual ~Type() = 0;
+    virtual ~Type() = default;
 
     virtual void OutputTo(std::ostream& out) const = 0;
     std::string ToString() const;

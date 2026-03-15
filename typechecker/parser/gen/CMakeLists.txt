@@ -49,3 +49,6 @@ target_link_libraries(antlr4-stella antlr4_static)
 target_include_directories(
   antlr4-stella INTERFACE ${ANTLR_StellaGrammarLexer_OUTPUT_DIR}
                           ${ANTLR_StellaGrammarParser_OUTPUT_DIR})
+
+add_executable(parse-tree-printer parse_tree_printer.cpp)
+target_link_libraries(parse-tree-printer antlr4-stella)

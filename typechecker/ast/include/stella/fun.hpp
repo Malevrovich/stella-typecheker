@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stella/base.hpp"
+#include <memory>
 
 namespace stella {
 namespace ast {
@@ -19,48 +20,48 @@ private:
     std::shared_ptr<Type> type_;
 };
 
-class NodeAbstraction final : public NodeBase {
+class NodeExprAbstraction final : public NodeExpr {
 public:
-    NodeAbstraction(NodeParamDecl param, std::shared_ptr<Type> return_type,
-                    std::shared_ptr<NodeExpr> body);
+    NodeExprAbstraction(std::shared_ptr<NodeParamDecl> param, std::shared_ptr<NodeExpr> body);
 
     void OutputTo(std::ostream& out) const override;
 
-    const NodeParamDecl& GetParam() const { return param_; }
-    const Type& GetReturnType() const { return *return_type_; }
+    const NodeParamDecl& GetParam() const { return *param_; }
     const NodeExpr& GetBody() const { return *body_; }
 
 private:
-    NodeParamDecl param_;
-    std::shared_ptr<Type> return_type_;
+    std::shared_ptr<NodeParamDecl> param_;
     std::shared_ptr<NodeExpr> body_;
 };
 
 class NodeDeclFun final : public NodeDecl {
 public:
-    NodeDeclFun(std::string name, NodeAbstraction abstraction);
+    NodeDeclFun(std::string name, std::shared_ptr<Type> return_type,
+                std::shared_ptr<NodeExprAbstraction> abstraction);
 
     void OutputTo(std::ostream& out) const override;
 
     std::string_view GetName() const { return name_; }
-    const NodeAbstraction& GetAbstraction() const { return abstraction_; }
+    const Type& GetReturnType() const { return *return_type_; }
+    const NodeExprAbstraction& GetAbstraction() const { return *abstraction_; }
 
 private:
     std::string name_;
-    NodeAbstraction abstraction_;
+    std::shared_ptr<Type> return_type_;
+    std::shared_ptr<NodeExprAbstraction> abstraction_;
 };
 
 class NodeExprApplication final : public NodeExpr {
 public:
-    NodeExprApplication(std::string function, std::shared_ptr<NodeExpr> argument);
+    NodeExprApplication(std::shared_ptr<NodeExpr> function, std::shared_ptr<NodeExpr> argument);
 
     void OutputTo(std::ostream& out) const override;
 
-    std::string_view GetFunction() const { return function_; }
+    const NodeExpr& GetFunction() const { return *function_; }
     const NodeExpr& GetArgument() const { return *argument_; }
 
 private:
-    std::string function_;
+    std::shared_ptr<NodeExpr> function_;
     std::shared_ptr<NodeExpr> argument_;
 };
 
