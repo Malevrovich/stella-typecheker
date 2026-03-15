@@ -22,7 +22,7 @@ void NodeBase::OutputTo(std::ostream& out) const {
     if (!source_info_) {
         out << "<unknown location>";
     } else {
-        out << source_info_->GetLocation() << ": " << source_info_->ToString();
+        out << source_info_->GetLocation() << ":\n" << source_info_->ToString();
     }
 }
 

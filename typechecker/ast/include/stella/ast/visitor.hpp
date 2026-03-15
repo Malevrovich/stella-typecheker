@@ -9,6 +9,8 @@ class NodeVisitor {
 public:
     virtual ~NodeVisitor() = default;
 
+    void Visit(const NodeBase& node);
+
     virtual void VisitProgram(const NodeProgram& node) = 0;
 
     virtual void VisitParamDecl(const NodeParamDecl& node) = 0;
@@ -32,6 +34,8 @@ public:
 class TypeVisitor {
 public:
     virtual ~TypeVisitor() = default;
+
+    void Visit(const Type& type);
 
     virtual void VisitTypeFun(const TypeFun& type) = 0;
     virtual void VisitTypeBool(const TypeBool& type) = 0;

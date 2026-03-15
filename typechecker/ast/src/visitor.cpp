@@ -1,9 +1,14 @@
 #include "stella/ast/visitor.hpp"
 
 #include "stella/ast/ast.hpp"
+#include "stella/ast/base.hpp"
 
 namespace stella {
 namespace ast {
+
+void NodeVisitor::Visit(const NodeBase& node) { node.Accept(*this); }
+
+void TypeVisitor::Visit(const Type& type) { type.Accept(*this); }
 
 void NodeProgram::Accept(NodeVisitor& visitor) const { visitor.VisitProgram(*this); }
 
