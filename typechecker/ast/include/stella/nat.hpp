@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stella/ast_fwd.hpp"
 #include "stella/base.hpp"
 
 namespace stella {
@@ -11,6 +12,8 @@ public:
         : NodeExpr(std::move(source_info)),
           value_(value) {}
 
+    void Accept(NodeVisitor& visitor) const override;
+
     int GetValue() const { return value_; }
 
 private:
@@ -20,6 +23,8 @@ private:
 class NodeExprSucc final : public NodeExpr {
 public:
     NodeExprSucc(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
+
+    void Accept(NodeVisitor& visitor) const override;
 
     const NodeExpr& GetOperand() const { return *operand_; }
 
@@ -31,6 +36,8 @@ class NodeExprPred final : public NodeExpr {
 public:
     NodeExprPred(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
 
+    void Accept(NodeVisitor& visitor) const override;
+
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
@@ -41,6 +48,8 @@ class NodeExprIsZero final : public NodeExpr {
 public:
     NodeExprIsZero(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
 
+    void Accept(NodeVisitor& visitor) const override;
+
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
@@ -48,7 +57,9 @@ private:
 };
 
 class TypeNat final : public Type {
+public:
     void OutputTo(std::ostream& out) const override { out << "Nat"; }
+    void Accept(TypeVisitor& visitor) const override;
 };
 
 } // namespace ast

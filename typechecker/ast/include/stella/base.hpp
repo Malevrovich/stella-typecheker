@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "stella/ast_fwd.hpp"
+
 namespace stella {
 namespace ast {
 
@@ -21,6 +23,7 @@ public:
     virtual ~NodeBase() = default;
 
     virtual void OutputTo(std::ostream& out) const;
+    virtual void Accept(NodeVisitor& visitor) const = 0;
     std::string ToString() const;
 
     const SourceInfo& GetSourceInfo() const { return *source_info_; }
@@ -37,6 +40,7 @@ public:
     virtual ~Type() = default;
 
     virtual void OutputTo(std::ostream& out) const = 0;
+    virtual void Accept(TypeVisitor& visitor) const = 0;
     std::string ToString() const;
 };
 
@@ -52,6 +56,8 @@ class NodeProgram final : public NodeBase {
 public:
     NodeProgram(std::shared_ptr<SourceInfo> source_info,
                 std::vector<std::shared_ptr<NodeDecl>> decls);
+
+    void Accept(NodeVisitor& visitor) const override;
 
     const std::vector<std::shared_ptr<NodeDecl>>& GetDeclarations() const { return decls_; }
 

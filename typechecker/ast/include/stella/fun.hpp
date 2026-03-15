@@ -1,7 +1,7 @@
 #pragma once
 
+#include "stella/ast_fwd.hpp"
 #include "stella/base.hpp"
-#include <memory>
 
 namespace stella {
 namespace ast {
@@ -10,6 +10,8 @@ class NodeParamDecl final : public NodeBase {
 public:
     NodeParamDecl(std::shared_ptr<SourceInfo> source_info, std::string name,
                   std::shared_ptr<Type> type);
+
+    void Accept(NodeVisitor& visitor) const override;
 
     std::string_view GetName() const { return name_; }
     const Type& GetType() const { return *type_; }
@@ -24,6 +26,8 @@ public:
     NodeExprAbstraction(std::shared_ptr<SourceInfo> source_info,
                         std::shared_ptr<NodeParamDecl> param, std::shared_ptr<NodeExpr> body);
 
+    void Accept(NodeVisitor& visitor) const override;
+
     const NodeParamDecl& GetParam() const { return *param_; }
     const NodeExpr& GetBody() const { return *body_; }
 
@@ -37,6 +41,8 @@ public:
     NodeDeclFun(std::shared_ptr<SourceInfo> source_info, std::string name,
                 std::shared_ptr<Type> return_type,
                 std::shared_ptr<NodeExprAbstraction> abstraction);
+
+    void Accept(NodeVisitor& visitor) const override;
 
     std::string_view GetName() const { return name_; }
     const Type& GetReturnType() const { return *return_type_; }
@@ -53,6 +59,8 @@ public:
     NodeExprApplication(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> function,
                         std::shared_ptr<NodeExpr> argument);
 
+    void Accept(NodeVisitor& visitor) const override;
+
     const NodeExpr& GetFunction() const { return *function_; }
     const NodeExpr& GetArgument() const { return *argument_; }
 
@@ -66,6 +74,7 @@ public:
     TypeFun(std::shared_ptr<Type> arg_type, std::shared_ptr<Type> return_type);
 
     void OutputTo(std::ostream& out) const override;
+    void Accept(TypeVisitor& visitor) const override;
 
     const Type& GetArgType() const { return *arg_type_; }
     const Type& GetReturnType() const { return *return_type_; }
