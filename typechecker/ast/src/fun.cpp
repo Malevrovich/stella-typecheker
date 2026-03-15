@@ -1,4 +1,4 @@
-#include "stella/fun.hpp"
+#include "stella/ast/fun.hpp"
 
 #include <loguru.hpp>
 

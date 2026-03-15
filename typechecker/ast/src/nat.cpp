@@ -1,4 +1,4 @@
-#include "stella/nat.hpp"
+#include "stella/ast/nat.hpp"
 
 #include <loguru.hpp>
 

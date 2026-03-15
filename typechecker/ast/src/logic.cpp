@@ -1,4 +1,4 @@
-#include "stella/logic.hpp"
+#include "stella/ast/logic.hpp"
 
 #include <loguru.hpp>
 

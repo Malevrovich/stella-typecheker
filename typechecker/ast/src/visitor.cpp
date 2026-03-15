@@ -1,10 +1,6 @@
-#include "stella/visitor.hpp"
+#include "stella/ast/visitor.hpp"
 
-#include "stella/base.hpp"
-#include "stella/fun.hpp"
-#include "stella/logic.hpp"
-#include "stella/nat.hpp"
-#include "stella/var.hpp"
+#include "stella/ast/ast.hpp"
 
 namespace stella {
 namespace ast {

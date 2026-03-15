@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stella/ast.hpp"
+#include "stella/ast/ast.hpp"
 
 namespace stella {
 

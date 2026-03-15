@@ -9,12 +9,11 @@
 #include <loguru.hpp>
 #include <misc/Interval.h>
 
-#include "stella/ast.hpp"
+#include "stella/ast/ast.hpp"
 
 #include "StellaLexer.h"
 #include "StellaParser.h"
 #include "StellaParserBaseVisitor.h"
-#include "stella/base.hpp"
 
 namespace stella {
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stella/ast_fwd.hpp"
-#include "stella/base.hpp"
+#include "stella/ast/ast_fwd.hpp"
+#include "stella/ast/base.hpp"
 
 namespace stella {
 namespace ast {
