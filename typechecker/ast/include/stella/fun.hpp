@@ -7,7 +7,7 @@ namespace ast {
 
 class NodeParamDecl final : public NodeBase {
 public:
-    NodeParamDecl(std::string name, std::unique_ptr<Type> type);
+    NodeParamDecl(std::string name, std::shared_ptr<Type> type);
 
     void OutputTo(std::ostream& out) const override;
 
@@ -16,13 +16,13 @@ public:
 
 private:
     std::string name_;
-    std::unique_ptr<Type> type_;
+    std::shared_ptr<Type> type_;
 };
 
 class NodeAbstraction final : public NodeBase {
 public:
-    NodeAbstraction(NodeParamDecl param, std::unique_ptr<Type> return_type,
-                    std::unique_ptr<NodeExpr> body);
+    NodeAbstraction(NodeParamDecl param, std::shared_ptr<Type> return_type,
+                    std::shared_ptr<NodeExpr> body);
 
     void OutputTo(std::ostream& out) const override;
 
@@ -32,8 +32,8 @@ public:
 
 private:
     NodeParamDecl param_;
-    std::unique_ptr<Type> return_type_;
-    std::unique_ptr<NodeExpr> body_;
+    std::shared_ptr<Type> return_type_;
+    std::shared_ptr<NodeExpr> body_;
 };
 
 class NodeDeclFun final : public NodeDecl {
@@ -52,7 +52,7 @@ private:
 
 class NodeExprApplication final : public NodeExpr {
 public:
-    NodeExprApplication(std::string function, std::unique_ptr<NodeExpr> argument);
+    NodeExprApplication(std::string function, std::shared_ptr<NodeExpr> argument);
 
     void OutputTo(std::ostream& out) const override;
 
@@ -61,12 +61,12 @@ public:
 
 private:
     std::string function_;
-    std::unique_ptr<NodeExpr> argument_;
+    std::shared_ptr<NodeExpr> argument_;
 };
 
 class TypeFun final : public Type {
 public:
-    TypeFun(std::unique_ptr<Type> arg_type, std::unique_ptr<Type> return_type);
+    TypeFun(std::shared_ptr<Type> arg_type, std::shared_ptr<Type> return_type);
 
     void OutputTo(std::ostream& out) const override;
 
@@ -74,8 +74,8 @@ public:
     const Type& GetReturnType() const { return *return_type_; }
 
 private:
-    std::unique_ptr<Type> arg_type_;
-    std::unique_ptr<Type> return_type_;
+    std::shared_ptr<Type> arg_type_;
+    std::shared_ptr<Type> return_type_;
 };
 
 } // namespace ast

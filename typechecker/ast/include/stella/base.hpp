@@ -36,14 +36,14 @@ public:
 
 class NodeProgram final : public NodeBase {
 public:
-    NodeProgram(std::vector<std::unique_ptr<NodeDecl>> decls);
+    NodeProgram(std::vector<std::shared_ptr<NodeDecl>> decls);
 
     void OutputTo(std::ostream& out) const override;
 
-    const std::vector<std::unique_ptr<NodeDecl>>& GetDeclarations() const { return decls_; }
+    const std::vector<std::shared_ptr<NodeDecl>>& GetDeclarations() const { return decls_; }
 
 private:
-    std::vector<std::unique_ptr<NodeDecl>> decls_;
+    std::vector<std::shared_ptr<NodeDecl>> decls_;
 };
 
 } // namespace ast

@@ -5,17 +5,17 @@
 namespace stella {
 namespace ast {
 
-NodeExprSucc::NodeExprSucc(std::unique_ptr<NodeExpr> operand)
+NodeExprSucc::NodeExprSucc(std::shared_ptr<NodeExpr> operand)
     : operand_(std::move(operand)) {
     CHECK_F(operand_ != nullptr);
 }
 
-NodeExprPred::NodeExprPred(std::unique_ptr<NodeExpr> operand)
+NodeExprPred::NodeExprPred(std::shared_ptr<NodeExpr> operand)
     : operand_(std::move(operand)) {
     CHECK_F(operand_ != nullptr);
 }
 
-NodeExprIsZero::NodeExprIsZero(std::unique_ptr<NodeExpr> operand)
+NodeExprIsZero::NodeExprIsZero(std::shared_ptr<NodeExpr> operand)
     : operand_(std::move(operand)) {
     CHECK_F(operand_ != nullptr);
 }

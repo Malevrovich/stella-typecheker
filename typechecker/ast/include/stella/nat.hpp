@@ -20,35 +20,35 @@ private:
 
 class NodeExprSucc final : public NodeExpr {
 public:
-    NodeExprSucc(std::unique_ptr<NodeExpr> operand);
+    NodeExprSucc(std::shared_ptr<NodeExpr> operand);
 
     void OutputTo(std::ostream& out) const override { out << "succ(" << *operand_ << ")"; }
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
-    std::unique_ptr<NodeExpr> operand_;
+    std::shared_ptr<NodeExpr> operand_;
 };
 
 class NodeExprPred final : public NodeExpr {
 public:
-    NodeExprPred(std::unique_ptr<NodeExpr> operand);
+    NodeExprPred(std::shared_ptr<NodeExpr> operand);
 
     void OutputTo(std::ostream& out) const override { out << "pred(" << *operand_ << ")"; }
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
-    std::unique_ptr<NodeExpr> operand_;
+    std::shared_ptr<NodeExpr> operand_;
 };
 
 class NodeExprIsZero final : public NodeExpr {
 public:
-    NodeExprIsZero(std::unique_ptr<NodeExpr> operand);
+    NodeExprIsZero(std::shared_ptr<NodeExpr> operand);
 
     void OutputTo(std::ostream& out) const override { out << "iszero(" << *operand_ << ")"; }
     const NodeExpr& GetOperand() const { return *operand_; }
 
 private:
-    std::unique_ptr<NodeExpr> operand_;
+    std::shared_ptr<NodeExpr> operand_;
 };
 
 class TypeNat final : public Type {

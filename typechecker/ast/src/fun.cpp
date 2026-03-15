@@ -5,7 +5,7 @@
 namespace stella {
 namespace ast {
 
-NodeParamDecl::NodeParamDecl(std::string name, std::unique_ptr<Type> type)
+NodeParamDecl::NodeParamDecl(std::string name, std::shared_ptr<Type> type)
     : name_(std::move(name)),
       type_(std::move(type)) {
     CHECK_F(type_ != nullptr);
@@ -13,8 +13,8 @@ NodeParamDecl::NodeParamDecl(std::string name, std::unique_ptr<Type> type)
 
 void NodeParamDecl::OutputTo(std::ostream& out) const { out << name_ << " : " << *type_; }
 
-NodeAbstraction::NodeAbstraction(NodeParamDecl param, std::unique_ptr<Type> return_type,
-                                 std::unique_ptr<NodeExpr> body)
+NodeAbstraction::NodeAbstraction(NodeParamDecl param, std::shared_ptr<Type> return_type,
+                                 std::shared_ptr<NodeExpr> body)
     : param_(std::move(param)),
       return_type_(std::move(return_type)),
       body_(std::move(body)) {
@@ -35,7 +35,7 @@ void NodeDeclFun::OutputTo(std::ostream& out) const {
         << ") : " << abstraction_.GetReturnType() << " { " << abstraction_.GetBody() << " }";
 }
 
-NodeExprApplication::NodeExprApplication(std::string function, std::unique_ptr<NodeExpr> argument)
+NodeExprApplication::NodeExprApplication(std::string function, std::shared_ptr<NodeExpr> argument)
     : function_(std::move(function)),
       argument_(std::move(argument)) {
     CHECK_F(argument_ != nullptr);
@@ -45,7 +45,7 @@ void NodeExprApplication::OutputTo(std::ostream& out) const {
     out << function_ << "(" << *argument_ << ")";
 }
 
-TypeFun::TypeFun(std::unique_ptr<Type> arg_type, std::unique_ptr<Type> return_type)
+TypeFun::TypeFun(std::shared_ptr<Type> arg_type, std::shared_ptr<Type> return_type)
     : arg_type_(std::move(arg_type)),
       return_type_(std::move(return_type)) {
     CHECK_F(arg_type_ != nullptr);

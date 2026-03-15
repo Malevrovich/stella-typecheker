@@ -18,7 +18,7 @@ std::string NodeBase::ToString() {
     return oss.str();
 }
 
-NodeProgram::NodeProgram(std::vector<std::unique_ptr<NodeDecl>> decls)
+NodeProgram::NodeProgram(std::vector<std::shared_ptr<NodeDecl>> decls)
     : decls_(std::move(decls)) {
     for (const auto& decl : decls_) {
         CHECK_F(decl != nullptr);

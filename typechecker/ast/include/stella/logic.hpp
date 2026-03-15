@@ -17,15 +17,15 @@ public:
 
 class NodeExprIf final : public NodeExpr {
 public:
-    NodeExprIf(std::unique_ptr<NodeExpr> condition, std::unique_ptr<NodeExpr> then_branch,
-               std::unique_ptr<NodeExpr> else_branch);
+    NodeExprIf(std::shared_ptr<NodeExpr> condition, std::shared_ptr<NodeExpr> then_branch,
+               std::shared_ptr<NodeExpr> else_branch);
 
     void OutputTo(std::ostream& out) const override;
 
 private:
-    std::unique_ptr<NodeExpr> condition_;
-    std::unique_ptr<NodeExpr> then_branch_;
-    std::unique_ptr<NodeExpr> else_branch_;
+    std::shared_ptr<NodeExpr> condition_;
+    std::shared_ptr<NodeExpr> then_branch_;
+    std::shared_ptr<NodeExpr> else_branch_;
 };
 
 class TypeBool final : public Type {
