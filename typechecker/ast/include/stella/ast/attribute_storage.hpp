@@ -109,11 +109,11 @@ public:
      * @param node Pointer to the node.
      * @param value The value to insert if the attribute does not exist. Passed by universal
      * reference.
-     * @return Reference to the existing attribute (if it already existed) or the newly inserted
-     * attribute.
+     * @return Pair containing a pointer to the attribute and a boolean. The boolean is true if the
+     * attribute was inserted, false if it already existed.
      */
     template <typename Attr>
-    Attr& trySet(const void* node, Attr&& value);
+    std::pair<std::remove_cvref_t<Attr>*, bool> trySet(const void* node, Attr&& value);
 
     /**
      * @brief Remove an attribute from the given node.
@@ -233,10 +233,11 @@ void AttributeStorage<Attrs...>::set(const void* node, Attr&& value) {
 
 template <typename... Attrs>
 template <typename Attr>
-Attr& AttributeStorage<Attrs...>::trySet(const void* node, Attr&& value) {
+std::pair<std::remove_cvref_t<Attr>*, bool> AttributeStorage<Attrs...>::trySet(const void* node,
+                                                                               Attr&& value) {
     auto& map = getMap<std::remove_cvref_t<Attr>>();
     auto result = map.emplace(node, std::forward<Attr>(value));
-    return result.first->second;
+    return {&result.first->second, result.second};
 }
 
 template <typename... Attrs>

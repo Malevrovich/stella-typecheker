@@ -135,21 +135,24 @@ TEST_F(AttributeStorageTest, SetWithMoveSemantics) {
 
 // Test trySet()
 TEST_F(AttributeStorageTest, TrySetInsertsNewAttribute) {
-    auto& ref = storage.trySet(node1, TypeInfo{900});
-    EXPECT_EQ(ref.value, 900);
+    auto [ptr, inserted] = storage.trySet(node1, TypeInfo{900});
+    EXPECT_EQ(ptr->value, 900);
+    EXPECT_TRUE(inserted);
     EXPECT_TRUE(storage.has<TypeInfo>(node1));
 }
 
 TEST_F(AttributeStorageTest, TrySetDoesNotReplaceExistingAttribute) {
     storage.set(node1, TypeInfo{111});
-    auto& ref = storage.trySet(node1, TypeInfo{222});
-    EXPECT_EQ(ref.value, 111);
+    auto [ptr, inserted] = storage.trySet(node1, TypeInfo{222});
+    EXPECT_EQ(ptr->value, 111);
+    EXPECT_FALSE(inserted);
 }
 
 TEST_F(AttributeStorageTest, TrySetReturnsReferenceToExisting) {
     storage.set(node1, TypeInfo{333});
-    auto& ref = storage.trySet(node1, TypeInfo{444});
+    auto [ptr, inserted] = storage.trySet(node1, TypeInfo{444});
     EXPECT_EQ(storage.get<TypeInfo>(node1).value, 333);
+    EXPECT_FALSE(inserted);
 }
 
 // Test remove()
@@ -280,8 +283,9 @@ TEST_F(AttributeStorageTest, NonConstGetDefaultAndConstAccess) {
 }
 
 TEST_F(AttributeStorageTest, TrySetThenConstAccess) {
-    auto& ref = storage.trySet(node1, TypeInfo{888});
-    EXPECT_EQ(ref.value, 888);
+    auto [ptr, inserted] = storage.trySet(node1, TypeInfo{888});
+    EXPECT_EQ(ptr->value, 888);
+    EXPECT_TRUE(inserted);
 
     const TestStorage& const_storage = storage;
     EXPECT_TRUE(const_storage.has<TypeInfo>(node1));
@@ -303,10 +307,9 @@ TEST_F(AttributeStorageTest, ConstQualifiedTypeUsesSharedStorage) {
 
 TEST_F(AttributeStorageTest, TrySetWithConstValue) {
     const TypeInfo const_val{400};
-    auto& ref = storage.trySet(node1, const_val);
-    EXPECT_EQ(ref.value, 400);
-
-    // Verify non-const access sees same value
+    auto [ptr, inserted] = storage.trySet(node1, const_val);
+    EXPECT_EQ(ptr->value, 400);
+    EXPECT_TRUE(inserted);
     EXPECT_EQ(storage.get<TypeInfo>(node1).value, 400);
 }
 
