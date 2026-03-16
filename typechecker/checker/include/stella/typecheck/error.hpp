@@ -40,7 +40,6 @@ enum class ErrorCode {
     ERROR_DUPLICATE_VARIANT_TYPE_FIELDS,
     ERROR_DUPLICATE_FUNCTION_DECLARATION,
     ERROR_UNKNOWN = -1,
-    ERROR_NOT_SUPPORTED = -2,
 };
 
 class TypeCheckError : public std::exception {
@@ -59,6 +58,12 @@ private:
 class InternalTypeCheckError : public TypeCheckError {
 public:
     InternalTypeCheckError(std::string_view message);
+};
+
+class NotSupportedError : public InternalTypeCheckError {
+public:
+    NotSupportedError(const ast::NodeBase& node);
+    NotSupportedError(const ast::Type& type);
 };
 
 class TypeCheckNodeError : public TypeCheckError {

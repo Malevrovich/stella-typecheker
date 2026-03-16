@@ -15,12 +15,8 @@ public:
 
     void VisitDeclFun(const ast::NodeDeclFun& node) override;
 
-    void VisitDefaultNode(const ast::NodeBase& node) override {
-        throw TypeCheckNodeError(ErrorCode::ERROR_NOT_SUPPORTED, node);
-    }
-    void VisitDefaultType(const ast::Type& type) override {
-        throw TypeCheckTypeError(ErrorCode::ERROR_NOT_SUPPORTED, type);
-    }
+    void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
+    void VisitDefaultType(const ast::Type& type) override { throw NotSupportedError(type); }
 
 private:
     struct ExpectedType {

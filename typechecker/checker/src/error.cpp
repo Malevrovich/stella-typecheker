@@ -19,6 +19,12 @@ const char* TypeCheckError::what() const noexcept { return what_.c_str(); }
 InternalTypeCheckError::InternalTypeCheckError(std::string_view message)
     : TypeCheckError(ErrorCode::ERROR_UNKNOWN, message) {}
 
+NotSupportedError::NotSupportedError(const ast::NodeBase& node)
+    : InternalTypeCheckError(std::format("Not supported node type at: {}", node.ToString())) {}
+
+NotSupportedError::NotSupportedError(const ast::Type& type)
+    : InternalTypeCheckError(std::format("Not supported type: {}", type.ToString())) {}
+
 TypeCheckNodeError::TypeCheckNodeError(ErrorCode error_code, const ast::NodeBase& node,
                                        std::string_view message)
     : TypeCheckError(error_code, std::format("Error occured at {}\n{}", node.ToString(), message)) {
