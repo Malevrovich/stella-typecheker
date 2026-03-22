@@ -5,8 +5,10 @@
 namespace stella {
 namespace ast {
 
-NodeExprIf::NodeExprIf(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> condition,
-                       std::shared_ptr<NodeExpr> then_branch, std::shared_ptr<NodeExpr> else_branch)
+NodeExprIf::NodeExprIf(std::shared_ptr<SourceInfo> source_info,
+                       std::shared_ptr<const NodeExpr> condition,
+                       std::shared_ptr<const NodeExpr> then_branch,
+                       std::shared_ptr<const NodeExpr> else_branch)
     : NodeExpr(std::move(source_info)),
       condition_(std::move(condition)),
       then_branch_(std::move(then_branch)),

@@ -24,19 +24,20 @@ public:
 
 class NodeExprIf final : public NodeExpr {
 public:
-    NodeExprIf(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> condition,
-               std::shared_ptr<NodeExpr> then_branch, std::shared_ptr<NodeExpr> else_branch);
+    NodeExprIf(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeExpr> condition,
+               std::shared_ptr<const NodeExpr> then_branch,
+               std::shared_ptr<const NodeExpr> else_branch);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<NodeExpr> GetCondition() const { return condition_; }
-    std::shared_ptr<NodeExpr> GetThenBranch() const { return then_branch_; }
-    std::shared_ptr<NodeExpr> GetElseBranch() const { return else_branch_; }
+    std::shared_ptr<const NodeExpr> GetCondition() const { return condition_; }
+    std::shared_ptr<const NodeExpr> GetThenBranch() const { return then_branch_; }
+    std::shared_ptr<const NodeExpr> GetElseBranch() const { return else_branch_; }
 
 private:
-    std::shared_ptr<NodeExpr> condition_;
-    std::shared_ptr<NodeExpr> then_branch_;
-    std::shared_ptr<NodeExpr> else_branch_;
+    std::shared_ptr<const NodeExpr> condition_;
+    std::shared_ptr<const NodeExpr> then_branch_;
+    std::shared_ptr<const NodeExpr> else_branch_;
 };
 
 class TypeBool final : public BaseTypeImpl<TypeBool, Type> {

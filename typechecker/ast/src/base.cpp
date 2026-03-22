@@ -27,7 +27,7 @@ void NodeBase::OutputTo(std::ostream& out) const {
 }
 
 NodeProgram::NodeProgram(std::shared_ptr<SourceInfo> source_info,
-                         std::vector<std::shared_ptr<NodeDecl>> decls)
+                         std::vector<std::shared_ptr<const NodeDecl>> decls)
     : NodeBase(std::move(source_info)),
       decls_(std::move(decls)) {
     for (const auto& decl : decls_) {

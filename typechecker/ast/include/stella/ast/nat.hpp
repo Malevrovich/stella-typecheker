@@ -22,38 +22,39 @@ private:
 
 class NodeExprSucc final : public NodeExpr {
 public:
-    NodeExprSucc(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
+    NodeExprSucc(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeExpr> operand);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<NodeExpr> GetOperand() const { return operand_; }
+    std::shared_ptr<const NodeExpr> GetOperand() const { return operand_; }
 
 private:
-    std::shared_ptr<NodeExpr> operand_;
+    std::shared_ptr<const NodeExpr> operand_;
 };
 
 class NodeExprPred final : public NodeExpr {
 public:
-    NodeExprPred(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
+    NodeExprPred(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeExpr> operand);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<NodeExpr> GetOperand() const { return operand_; }
+    std::shared_ptr<const NodeExpr> GetOperand() const { return operand_; }
 
 private:
-    std::shared_ptr<NodeExpr> operand_;
+    std::shared_ptr<const NodeExpr> operand_;
 };
 
 class NodeExprIsZero final : public NodeExpr {
 public:
-    NodeExprIsZero(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<NodeExpr> operand);
+    NodeExprIsZero(std::shared_ptr<SourceInfo> source_info,
+                   std::shared_ptr<const NodeExpr> operand);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<NodeExpr> GetOperand() const { return operand_; }
+    std::shared_ptr<const NodeExpr> GetOperand() const { return operand_; }
 
 private:
-    std::shared_ptr<NodeExpr> operand_;
+    std::shared_ptr<const NodeExpr> operand_;
 };
 
 class TypeNat final : public BaseTypeImpl<TypeNat, Type> {

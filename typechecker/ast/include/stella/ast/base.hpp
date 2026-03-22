@@ -84,16 +84,14 @@ class NodeDecl : public NodeBase {
 class NodeProgram final : public NodeBase {
 public:
     NodeProgram(std::shared_ptr<SourceInfo> source_info,
-                std::vector<std::shared_ptr<NodeDecl>> decls);
+                std::vector<std::shared_ptr<const NodeDecl>> decls);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<const std::vector<std::shared_ptr<NodeDecl>>> GetDeclarations() const {
-        return std::make_shared<const std::vector<std::shared_ptr<NodeDecl>>>(decls_);
-    }
+    const std::vector<std::shared_ptr<const NodeDecl>>& GetDeclarations() const { return decls_; }
 
 private:
-    std::vector<std::shared_ptr<NodeDecl>> decls_;
+    std::vector<std::shared_ptr<const NodeDecl>> decls_;
 };
 
 } // namespace ast
