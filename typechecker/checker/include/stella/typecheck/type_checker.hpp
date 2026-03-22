@@ -34,6 +34,7 @@ public:
     void VisitExprIsZero(const ast::NodeExprIsZero& node) override;
     void VisitExprSucc(const ast::NodeExprSucc& node) override;
     void VisitExprPred(const ast::NodeExprPred& node) override;
+    void VisitExprNatRec(const ast::NodeExprNatRec& node) override;
 
     void VisitExprConstFalse(const ast::NodeExprConstFalse& node) override;
     void VisitExprConstTrue(const ast::NodeExprConstTrue& node) override;

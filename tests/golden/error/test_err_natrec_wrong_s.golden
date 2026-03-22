@@ -4,13 +4,16 @@ language core;
 
 fn main(n : Nat) -> Nat {
   // s должен иметь тип fn (Nat) -> fn (Nat) -> Nat, но здесь не функция
-  return Nat::rec(n, 0, 42)(0)
+  return Nat::rec(n, 0, 42)
 }
 
 STDOUT:
 (empty)
 
 STDERR:
-Parsing error: Unexpected node in AST builder: Nat::rec(n,0,42)
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/error/test_err_natrec_wrong_s.stella:6:24:
+42
+Expected type (Nat -> (Nat -> Nat)), but expr has type Nat
 
 EXIT_CODE: 1

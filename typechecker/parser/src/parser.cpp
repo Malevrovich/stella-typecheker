@@ -164,6 +164,13 @@ private:
         return make_expr<ast::NodeExprIsZero>(ctx, operand);
     }
 
+    antlrcpp::Any visitNatRec(antlr4_stella::StellaParser::NatRecContext* ctx) override {
+        auto n = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->n));
+        auto initial = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->initial));
+        auto step = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->step));
+        return make_expr<ast::NodeExprNatRec>(ctx, n, initial, step);
+    }
+
     antlrcpp::Any visitApplication(antlr4_stella::StellaParser::ApplicationContext* ctx) override {
         if (ctx->args.size() > 1) {
             throw std::runtime_error(

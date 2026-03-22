@@ -32,6 +32,8 @@ void NodeExprPred::Accept(NodeVisitor& visitor) const { visitor.VisitExprPred(*t
 
 void NodeExprIsZero::Accept(NodeVisitor& visitor) const { visitor.VisitExprIsZero(*this); }
 
+void NodeExprNatRec::Accept(NodeVisitor& visitor) const { visitor.VisitExprNatRec(*this); }
+
 void NodeExprConstTrue::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstTrue(*this); }
 
 void NodeExprConstFalse::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstFalse(*this); }
@@ -61,6 +63,8 @@ void BaseNodeVisitor::VisitExprSucc(const NodeExprSucc& node) { VisitDefaultNode
 void BaseNodeVisitor::VisitExprPred(const NodeExprPred& node) { VisitDefaultNode(node); }
 
 void BaseNodeVisitor::VisitExprIsZero(const NodeExprIsZero& node) { VisitDefaultNode(node); }
+
+void BaseNodeVisitor::VisitExprNatRec(const NodeExprNatRec& node) { VisitDefaultNode(node); }
 
 void BaseNodeVisitor::VisitExprConstTrue(const NodeExprConstTrue& node) { VisitDefaultNode(node); }
 

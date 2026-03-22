@@ -3,5 +3,5 @@ language core;
 
 fn main(n : Nat) -> Nat {
   // s должен иметь тип fn (Nat) -> fn (Nat) -> Nat, но здесь не функция
-  return Nat::rec(n, 0, 42)(0)
+  return Nat::rec(n, 0, 42)
 }

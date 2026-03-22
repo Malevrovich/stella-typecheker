@@ -57,6 +57,25 @@ private:
     std::shared_ptr<const NodeExpr> operand_;
 };
 
+class NodeExprNatRec final : public NodeExpr {
+public:
+    NodeExprNatRec(std::shared_ptr<SourceInfo> source_info,
+                   std::shared_ptr<const NodeExpr> n,
+                   std::shared_ptr<const NodeExpr> initial,
+                   std::shared_ptr<const NodeExpr> step);
+
+    void Accept(NodeVisitor& visitor) const override;
+
+    std::shared_ptr<const NodeExpr> GetN() const { return n_; }
+    std::shared_ptr<const NodeExpr> GetInitial() const { return initial_; }
+    std::shared_ptr<const NodeExpr> GetStep() const { return step_; }
+
+private:
+    std::shared_ptr<const NodeExpr> n_;
+    std::shared_ptr<const NodeExpr> initial_;
+    std::shared_ptr<const NodeExpr> step_;
+};
+
 class TypeNat final : public BaseTypeImpl<TypeNat, Type> {
 public:
     void OutputTo(std::ostream& out) const override { out << "Nat"; }

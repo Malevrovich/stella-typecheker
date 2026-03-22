@@ -5,5 +5,5 @@ fn main(n : Nat) -> Nat {
   // z должен быть Nat, но передаётся Bool
   return Nat::rec(n, false, fn (prev : Nat) {
     return fn (acc : Nat) { return acc }
-  })(0)
+  })
 }

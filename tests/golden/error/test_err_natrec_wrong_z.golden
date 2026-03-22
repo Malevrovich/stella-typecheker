@@ -6,13 +6,16 @@ fn main(n : Nat) -> Nat {
   // z должен быть Nat, но передаётся Bool
   return Nat::rec(n, false, fn (prev : Nat) {
     return fn (acc : Nat) { return acc }
-  })(0)
+  })
 }
 
 STDOUT:
 (empty)
 
 STDERR:
-Parsing error: Unexpected node in AST builder: Nat::rec(n,false,fn(prev:Nat){returnfn(acc:Nat){returnacc}})
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/error/test_err_natrec_wrong_z.stella:6:21:
+false
+Expected type Nat, but expr has type Bool
 
 EXIT_CODE: 1

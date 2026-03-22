@@ -12,6 +12,7 @@ class NodeExprConstInt;
 class NodeExprSucc;
 class NodeExprPred;
 class NodeExprIsZero;
+class NodeExprNatRec;
 class NodeExprConstTrue;
 class NodeExprConstFalse;
 class NodeExprIf;

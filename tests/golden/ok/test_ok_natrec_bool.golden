@@ -1,0 +1,19 @@
+INPUT:
+language core;
+
+fn main(n : Nat) -> Bool {
+  return Nat::rec(n, true, fn(prev : Nat) {
+    return fn (acc : Bool) {
+      return if acc then false else true
+    }
+  })
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

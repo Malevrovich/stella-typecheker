@@ -3,19 +3,20 @@ INPUT:
 language core;
 
 fn main(n : Nat) -> Nat {
-  // Nat::rec(n, z, s) — итератор: возвращает z, если n=0, иначе s(n-1, ...)
-  // Здесь считаем сумму от 1 до n
+  // Nat::rec(n, z, s) — примитивная рекурсия по натуральным числам
+  // Здесь просто считаем n (каждый шаг делаем succ от аккумулятора)
   return Nat::rec(n, 0, fn(prev : Nat) {
     return fn (acc : Nat) {
-      return succ(acc + prev)
+      return succ(acc)
     }
-  })(0)
+  })
 }
 
+
 STDOUT:
-(empty)
+Well-typed
 
 STDERR:
-Parsing error: Unexpected node in AST builder: Nat::rec(n,0,fn(prev:Nat){returnfn(acc:Nat){returnsucc(acc+prev)}})
+(empty)
 
-EXIT_CODE: 1
+EXIT_CODE: 0

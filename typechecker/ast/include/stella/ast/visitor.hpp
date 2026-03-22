@@ -20,6 +20,7 @@ public:
     virtual void VisitExprSucc(const NodeExprSucc& node) = 0;
     virtual void VisitExprPred(const NodeExprPred& node) = 0;
     virtual void VisitExprIsZero(const NodeExprIsZero& node) = 0;
+    virtual void VisitExprNatRec(const NodeExprNatRec& node) = 0;
 
     virtual void VisitExprConstTrue(const NodeExprConstTrue& node) = 0;
     virtual void VisitExprConstFalse(const NodeExprConstFalse& node) = 0;
@@ -55,6 +56,7 @@ public:
     void VisitExprSucc(const NodeExprSucc& node) override;
     void VisitExprPred(const NodeExprPred& node) override;
     void VisitExprIsZero(const NodeExprIsZero& node) override;
+    void VisitExprNatRec(const NodeExprNatRec& node) override;
     void VisitExprConstTrue(const NodeExprConstTrue& node) override;
     void VisitExprConstFalse(const NodeExprConstFalse& node) override;
     void VisitExprIf(const NodeExprIf& node) override;
