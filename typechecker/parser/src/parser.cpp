@@ -8,6 +8,7 @@
 #include <antlr4-runtime.h>
 #include <loguru.hpp>
 #include <misc/Interval.h>
+#include <support/Any.h>
 
 #include "stella/ast/ast.hpp"
 
@@ -69,22 +70,22 @@ private:
     std::shared_ptr<antlr4::CharStream> stream_;
 
     template <typename T>
-    std::shared_ptr<ast::Type> type(const std::shared_ptr<T>& t) {
-        return std::static_pointer_cast<ast::Type>(t);
+    std::shared_ptr<const ast::Type> type(const std::shared_ptr<T>& t) {
+        return std::static_pointer_cast<const ast::Type>(t);
     }
 
     template <typename T, typename... Args>
-    std::shared_ptr<T> make_node(antlr4::ParserRuleContext* ctx, Args&&... args) {
+    std::shared_ptr<const T> make_node(antlr4::ParserRuleContext* ctx, Args&&... args) {
         return std::make_shared<T>(GetSourceInfo(ctx, stream_), std::forward<Args>(args)...);
     }
 
     template <typename T, typename... Args>
-    std::shared_ptr<ast::NodeExpr> make_expr(antlr4::ParserRuleContext* ctx, Args&&... args) {
+    std::shared_ptr<const ast::NodeExpr> make_expr(antlr4::ParserRuleContext* ctx, Args&&... args) {
         return std::make_shared<T>(GetSourceInfo(ctx, stream_), std::forward<Args>(args)...);
     }
 
     template <typename T, typename... Args>
-    std::shared_ptr<ast::NodeDecl> make_decl(antlr4::ParserRuleContext* ctx, Args&&... args) {
+    std::shared_ptr<const ast::NodeDecl> make_decl(antlr4::ParserRuleContext* ctx, Args&&... args) {
         return std::make_shared<T>(GetSourceInfo(ctx, stream_), std::forward<Args>(args)...);
     }
 
@@ -94,20 +95,20 @@ private:
     }
 
     antlrcpp::Any visitProgram(antlr4_stella::StellaParser::ProgramContext* ctx) override {
-        std::vector<std::shared_ptr<ast::NodeDecl>> decls;
+        std::vector<std::shared_ptr<const ast::NodeDecl>> decls;
         for (auto decl_ctx : ctx->decl()) {
-            decls.push_back(try_any_cast<std::shared_ptr<ast::NodeDecl>>(visit(decl_ctx)));
+            decls.push_back(try_any_cast<std::shared_ptr<const ast::NodeDecl>>(visit(decl_ctx)));
         }
 
         return make_node<ast::NodeProgram>(ctx, std::move(decls));
     }
 
     antlrcpp::Any visitTypeNat(antlr4_stella::StellaParser::TypeNatContext* ctx) override {
-        return type(std::make_shared<ast::TypeNat>());
+        return type(std::make_shared<const ast::TypeNat>());
     }
 
     antlrcpp::Any visitTypeBool(antlr4_stella::StellaParser::TypeBoolContext* ctx) override {
-        return type(std::make_shared<ast::TypeBool>());
+        return type(std::make_shared<const ast::TypeBool>());
     }
 
     antlrcpp::Any visitTypeFun(antlr4_stella::StellaParser::TypeFunContext* ctx) override {
@@ -116,10 +117,10 @@ private:
                 "Multiple parameter types in function type are not supported yet");
         }
 
-        auto param_type = try_any_cast<std::shared_ptr<ast::Type>>(visit(ctx->paramTypes[0]));
-        auto return_type = try_any_cast<std::shared_ptr<ast::Type>>(visit(ctx->returnType));
+        auto param_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->paramTypes[0]));
+        auto return_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->returnType));
 
-        return type(std::make_shared<ast::TypeFun>(param_type, return_type));
+        return type(std::make_shared<const ast::TypeFun>(param_type, return_type));
     }
 
     antlrcpp::Any visitConstTrue(antlr4_stella::StellaParser::ConstTrueContext* ctx) override {
@@ -140,25 +141,25 @@ private:
     }
 
     antlrcpp::Any visitIf(antlr4_stella::StellaParser::IfContext* ctx) override {
-        auto condition = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->condition));
-        auto then_expr = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->thenExpr));
-        auto else_expr = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->elseExpr));
+        auto condition = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->condition));
+        auto then_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->thenExpr));
+        auto else_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->elseExpr));
 
         return make_expr<ast::NodeExprIf>(ctx, condition, then_expr, else_expr);
     }
 
     antlrcpp::Any visitSucc(antlr4_stella::StellaParser::SuccContext* ctx) override {
-        auto operand = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->n));
+        auto operand = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->n));
         return make_expr<ast::NodeExprSucc>(ctx, operand);
     }
 
     antlrcpp::Any visitPred(antlr4_stella::StellaParser::PredContext* ctx) override {
-        auto operand = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->n));
+        auto operand = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->n));
         return make_expr<ast::NodeExprPred>(ctx, operand);
     }
 
     antlrcpp::Any visitIsZero(antlr4_stella::StellaParser::IsZeroContext* ctx) override {
-        auto operand = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->n));
+        auto operand = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->n));
         return make_expr<ast::NodeExprIsZero>(ctx, operand);
     }
 
@@ -168,8 +169,8 @@ private:
                 "Multiple arguments in function application are not supported yet");
         }
 
-        auto fun = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->fun));
-        auto arg = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->args[0]));
+        auto fun = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fun));
+        auto arg = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->args[0]));
 
         return make_expr<ast::NodeExprApplication>(ctx, fun, arg);
     }
@@ -180,8 +181,9 @@ private:
                 "Multiple parameters in function abstraction are not supported yet");
         }
 
-        auto param = try_any_cast<std::shared_ptr<ast::NodeParamDecl>>(visit(ctx->paramDecls[0]));
-        auto body = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->returnExpr));
+        auto param =
+            try_any_cast<std::shared_ptr<const ast::NodeParamDecl>>(visit(ctx->paramDecls[0]));
+        auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->returnExpr));
 
         return make_expr<ast::NodeExprAbstraction>(ctx, param, body);
     }
@@ -192,7 +194,7 @@ private:
     }
 
     std::any visitParamDecl(antlr4_stella::StellaParser::ParamDeclContext* ctx) override {
-        auto type = try_any_cast<std::shared_ptr<ast::Type>>(visit(ctx->paramType));
+        auto type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->paramType));
         return make_node<ast::NodeParamDecl>(ctx, ctx->name->getText(), type);
     }
 
@@ -202,21 +204,29 @@ private:
                 "Multiple parameters in function abstraction are not supported yet");
         }
 
-        auto param = try_any_cast<std::shared_ptr<ast::NodeParamDecl>>(visit(ctx->paramDecls[0]));
-        auto return_type = try_any_cast<std::shared_ptr<ast::Type>>(visit(ctx->returnType));
-        auto body = try_any_cast<std::shared_ptr<ast::NodeExpr>>(visit(ctx->returnExpr));
+        auto param =
+            try_any_cast<std::shared_ptr<const ast::NodeParamDecl>>(visit(ctx->paramDecls[0]));
+        auto return_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->returnType));
+        auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->returnExpr));
 
         auto abstr = make_node<ast::NodeExprAbstraction>(ctx, param, body);
 
         return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr);
     }
 
+    std::any visitTerminatingSemicolon(
+        antlr4_stella::StellaParser::TerminatingSemicolonContext* ctx) override {
+        return visit(ctx->expr_);
+    }
+
     antlrcpp::Any visitChildren(antlr4::tree::ParseTree* node) override {
+        DLOG_S(FATAL) << "Parsing error occured at node: " << node->getText();
         throw std::runtime_error("Unexpected node in AST builder: " + node->getText());
     }
 };
 
-std::shared_ptr<ast::NodeProgram> ParseProgram(std::shared_ptr<antlr4::ANTLRInputStream> stream) {
+std::shared_ptr<const ast::NodeProgram>
+ParseProgram(std::shared_ptr<antlr4::ANTLRInputStream> stream) {
     antlr4_stella::StellaLexer lexer(stream.get());
 
     antlr4::CommonTokenStream tokens(&lexer);
@@ -228,16 +238,16 @@ std::shared_ptr<ast::NodeProgram> ParseProgram(std::shared_ptr<antlr4::ANTLRInpu
     ASTBuilder builder{stream};
     auto result = builder.visit(tree);
 
-    return try_any_cast<std::shared_ptr<ast::NodeProgram>>(result);
+    return try_any_cast<std::shared_ptr<const ast::NodeProgram>>(result);
 }
 
 } // namespace
 
-std::shared_ptr<ast::NodeProgram> ParseProgramText(std::string_view input) {
+std::shared_ptr<const ast::NodeProgram> ParseProgramText(std::string_view input) {
     return ParseProgram(std::make_shared<antlr4::ANTLRInputStream>(input));
 }
 
-std::shared_ptr<ast::NodeProgram> ParseProgramFile(const std::string& filename) {
+std::shared_ptr<const ast::NodeProgram> ParseProgramFile(const std::string& filename) {
     auto file_stream = std::make_shared<antlr4::ANTLRFileStream>();
     file_stream->loadFromFile(filename);
     return ParseProgram(file_stream);
