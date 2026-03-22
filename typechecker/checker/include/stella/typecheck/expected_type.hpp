@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 #include <typeinfo>
@@ -32,6 +33,8 @@ public:
 
     std::string ToString() const { return name_; }
 
+    std::shared_ptr<const ast::Type> TryGetType() const { return stored_type_; }
+
 private:
     using TypeCompatibilityChecker = bool(const ast::Type&);
     using TypeInfoCompatibilityChecker = bool(const std::type_info&);
@@ -41,12 +44,14 @@ private:
     template <typename TypeCompatibilityCheck, typename TypeInfoCompatibilityCheck>
     ExpectedType(TypeCompatibilityCheck&& type_compat_check,
                  TypeInfoCompatibilityCheck&& type_info_compat_check,
-                 std::optional<ErrorCode> conflict_error_code, std::string name)
+                 std::optional<ErrorCode> conflict_error_code, std::string name,
+                 std::shared_ptr<const ast::Type> stored_type)
         : type_compatibility_checker_(std::forward<TypeCompatibilityCheck>(type_compat_check)),
           type_info_compatibility_checker_(
               std::forward<TypeInfoCompatibilityCheck>(type_info_compat_check)),
           conflict_error_code_(conflict_error_code),
-          name_(std::move(name)) {}
+          name_(std::move(name)),
+          stored_type_(std::move(stored_type)) {}
 
     ErrorCode DetermineErrorCode(std::optional<ErrorCode> conflict_error_code) const;
 
@@ -54,6 +59,7 @@ private:
     std::function<TypeInfoCompatibilityChecker> type_info_compatibility_checker_;
     std::string name_;
     std::optional<ErrorCode> conflict_error_code_{std::nullopt};
+    std::shared_ptr<const ast::Type> stored_type_{nullptr};
 };
 
 template <typename T>
@@ -65,6 +71,7 @@ ExpectedType ExpectedType::EqualsTo(std::shared_ptr<T> type,
         [type = type](const std::type_info& info) { return type->DynamicIsCompatibleWith(info); },
         conflict_error_code,
         type->ToString(),
+        type,
     };
 }
 
@@ -76,6 +83,7 @@ ExpectedType ExpectedType::CompatibleWith(std::optional<ErrorCode> conflict_erro
         [](const std::type_info& info) { return T::StaticIsCompatibleWith(info); },
         conflict_error_code,
         typeid(T).name(),
+        nullptr,
     };
 }
 

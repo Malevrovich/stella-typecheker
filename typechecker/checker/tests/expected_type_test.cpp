@@ -265,4 +265,80 @@ TEST_F(ExpectedTypeTest, EqualsToTypeErasedWithCustomErrorCode) {
     EXPECT_EQ(result.value(), ErrorCode::ERROR_NOT_A_RECORD);
 }
 
+// Test TryGetType with typed shared_ptr
+TEST_F(ExpectedTypeTest, TryGetTypeReturnsStoredType) {
+    auto nat_type = std::make_shared<ast::TypeNat>();
+    auto expected = ExpectedType::EqualsTo(nat_type);
+
+    auto retrieved = expected.TryGetType();
+    EXPECT_TRUE(retrieved);
+    EXPECT_EQ(retrieved, nat_type);
+}
+
+TEST_F(ExpectedTypeTest, TryGetTypeWithDifferentType) {
+    auto bool_type = std::make_shared<ast::TypeBool>();
+    auto expected = ExpectedType::EqualsTo(bool_type);
+
+    auto retrieved = expected.TryGetType();
+    EXPECT_TRUE(retrieved);
+    EXPECT_EQ(retrieved, bool_type);
+}
+
+TEST_F(ExpectedTypeTest, TryGetTypeWithTypeErasedPointer) {
+    std::shared_ptr<ast::Type> type_erased = std::make_shared<ast::TypeNat>();
+    auto expected = ExpectedType::EqualsTo(type_erased);
+
+    auto retrieved = expected.TryGetType();
+    EXPECT_TRUE(retrieved);
+    EXPECT_EQ(retrieved, type_erased);
+}
+
+TEST_F(ExpectedTypeTest, TryGetTypeWithCompatibleWith) {
+    // CompatibleWith doesn't store a type, so TryGetType should return nullopt
+    auto expected = ExpectedType::CompatibleWith<ast::TypeNat>();
+    auto retrieved = expected.TryGetType();
+    EXPECT_FALSE(retrieved);
+}
+
+TEST_F(ExpectedTypeTest, TryGetTypeMultipleInstances) {
+    auto nat_type1 = std::make_shared<ast::TypeNat>();
+    auto nat_type2 = std::make_shared<ast::TypeNat>();
+    auto bool_type = std::make_shared<ast::TypeBool>();
+
+    auto expected_nat1 = ExpectedType::EqualsTo(nat_type1);
+    auto expected_nat2 = ExpectedType::EqualsTo(nat_type2);
+    auto expected_bool = ExpectedType::EqualsTo(bool_type);
+
+    auto retrieved_nat1 = expected_nat1.TryGetType();
+    auto retrieved_nat2 = expected_nat2.TryGetType();
+    auto retrieved_bool = expected_bool.TryGetType();
+
+    EXPECT_TRUE(retrieved_nat1);
+    EXPECT_TRUE(retrieved_nat2);
+    EXPECT_TRUE(retrieved_bool);
+
+    EXPECT_EQ(retrieved_nat1, nat_type1);
+    EXPECT_EQ(retrieved_nat2, nat_type2);
+    EXPECT_EQ(retrieved_bool, bool_type);
+}
+
+TEST_F(ExpectedTypeTest, TryGetTypePointerComparison) {
+    auto nat_type = std::make_shared<ast::TypeNat>();
+    auto expected = ExpectedType::EqualsTo(nat_type);
+
+    auto retrieved = expected.TryGetType();
+    EXPECT_TRUE(retrieved);
+    // Should be the same pointer
+    EXPECT_EQ(retrieved.get(), nat_type.get());
+}
+
+TEST_F(ExpectedTypeTest, TryGetTypeWithErrorCode) {
+    auto nat_type = std::make_shared<ast::TypeNat>();
+    auto expected = ExpectedType::EqualsTo(nat_type, ErrorCode::ERROR_NOT_A_TUPLE);
+
+    auto retrieved = expected.TryGetType();
+    EXPECT_TRUE(retrieved);
+    EXPECT_EQ(retrieved, nat_type);
+}
+
 } // namespace stella::typecheck::test
