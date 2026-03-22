@@ -13,6 +13,8 @@ FetchContent_Declare(
 set(LOGURU_WITH_STREAMS TRUE)
 FetchContent_MakeAvailable(LoguruGitRepo)
 
+add_compile_definitions(LOGURU_WITH_STREAMS=1)
+
 FetchContent_Declare(
   magic_enum
   GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
