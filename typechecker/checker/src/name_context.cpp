@@ -3,6 +3,8 @@
 #include <format>
 #include <utility>
 
+#include <loguru.hpp>
+
 #include "stella/ast/ast_fwd.hpp"
 #include "stella/typecheck/error.hpp"
 
@@ -49,12 +51,15 @@ NameContext::NameContextGuard NameContext::PushUnique(std::string name, const as
 }
 
 NameContext::NameContextGuard NameContext::Push(std::string name, const ast::NodeBase& node) {
+    DLOG_S(INFO) << "Pushing name to context '" << name << "'";
     auto [it, _] = context_.emplace(std::move(name), std::stack<const ast::NodeBase*>{});
     it->second.push(&node);
     return NameContextGuard{*this, it->first};
 }
 
 void NameContext::Pop(std::string_view name) {
+    DLOG_S(INFO) << "Poping name from context '" << name << "'";
+
     auto it = context_.find(name);
     if (it == context_.end()) {
         throw InternalTypeCheckError(std::format("Name not found for pop: {}", name));

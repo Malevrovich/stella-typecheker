@@ -1,5 +1,6 @@
 #include "stella/typecheck/type_checker.hpp"
 
+#include <exception>
 #include <format>
 #include <memory>
 
@@ -7,7 +8,6 @@
 
 #include "stella/ast/base.hpp"
 #include "stella/ast/fun.hpp"
-#include "stella/ast/visitor.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
@@ -24,20 +24,32 @@ constexpr std::string_view kMain = "main";
 TypeChecker::~TypeChecker() = default;
 
 void TypeChecker::Visit(const ast::NodeBase& node) {
+    DLOG_S(INFO) << std::format("Visiting node {} {}", static_cast<const void*>(&node),
+                                node.ToString());
     if (!types_storage_.has<DeducedType>(&node)) {
-        node.Accept(*this);
+        try {
+            node.Accept(*this);
+        } catch (const std::exception& exc) {
+            DLOG_S(ERROR) << "Exception occured during processing of node\n" << node.ToString();
+            DLOG_S(ERROR) << "Exception: " << exc.what();
+            throw;
+        }
         DCHECK_F(types_storage_.has<DeducedType>(&node));
+        DLOG_S(INFO) << std::format("Node {} got type {}", static_cast<const void*>(&node),
+                                    types_storage_.get<DeducedType>(&node).type->ToString());
     } // else nothing to do, goal of this visitor is to get DeducedType
+    DLOG_S(INFO) << std::format("Exited node {} {}", static_cast<const void*>(&node),
+                                node.ToString());
 }
 
 void TypeChecker::CheckCompatibility(const ast::NodeBase& node, const ExpectedType& expected_type,
                                      const DeducedType& deduced_type) const {
-    auto conflict_error_code = expected_type.Check(deduced_type.type);
+    auto conflict_error_code = expected_type.Check(*deduced_type.type);
     if (conflict_error_code) {
         OnError(TypeCheckNodeError{*conflict_error_code, node,
                                    std::format("Expected type {}, but expr has type {}",
                                                expected_type.ToString(),
-                                               deduced_type.type.ToString())});
+                                               deduced_type.type->ToString())});
     }
 }
 
@@ -52,7 +64,7 @@ void TypeChecker::SetDeducedType(const ast::NodeBase& node, DeducedType&& deduce
     if (!was_set) {
         OnInternalError(std::format(
             "At: {}\n Unable to set deduced type to {}. Type is already set to {}", node.ToString(),
-            deduced_type.type.ToString(), result_type->type.ToString()));
+            deduced_type.type->ToString(), result_type->type->ToString()));
     }
 }
 
@@ -73,13 +85,20 @@ void TypeChecker::ExpectType(const ast::NodeBase& node, ExpectedType&& expected_
     }
 }
 
+void TypeChecker::PropagateExpectedType(const ast::NodeBase& src, const ast::NodeBase& dst) {
+    const auto expected_type = types_storage_.tryGet<ExpectedType>(&src);
+    if (expected_type) {
+        ExpectType(dst, ExpectedType{*expected_type});
+    }
+}
+
 void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
     std::vector<NameContext::NameContextGuard> name_guards;
     auto declarations = node.GetDeclarations();
-    name_guards.reserve(declarations->size());
+    name_guards.reserve(declarations.size());
 
-    for (auto& decl : *declarations) {
-        auto func_decl = std::dynamic_pointer_cast<ast::NodeDeclFun>(decl);
+    for (auto& decl : declarations) {
+        auto func_decl = std::dynamic_pointer_cast<const ast::NodeDeclFun>(decl);
 
         if (!func_decl) {
             OnError(NotSupportedError(*decl));
@@ -87,18 +106,16 @@ void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
 
         name_guards.push_back(
             name_context_.PushUnique(std::string{func_decl->GetName()}, *func_decl));
-
-        ExpectType(*func_decl, ExpectedType::EqualsTo(func_decl->GetReturnType()));
     }
 
-    const ast::Type* main_type = nullptr;
+    std::shared_ptr<const ast::Type> main_type = nullptr;
 
-    for (auto& decl : *node.GetDeclarations()) {
-        ast::BaseNodeVisitor::Visit(*decl);
+    for (auto& decl : node.GetDeclarations()) {
+        Visit(*decl);
 
-        auto decl_fun = std::dynamic_pointer_cast<ast::NodeDeclFun>(decl);
+        auto decl_fun = std::dynamic_pointer_cast<const ast::NodeDeclFun>(decl);
         if (decl_fun && decl_fun->GetName() == kMain) {
-            main_type = &types_storage_.get<DeducedType>(decl_fun.get()).type;
+            main_type = types_storage_.get<DeducedType>(decl_fun.get()).type;
         }
     }
 
@@ -106,10 +123,8 @@ void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
         OnError(TypeCheckError{ErrorCode::ERROR_MISSING_MAIN});
     }
 
-    SetDeducedType(node, {*main_type});
+    SetDeducedType(node, {main_type});
 }
-
-void TypeChecker::VisitDeclFun(const ast::NodeDeclFun& node) {}
 
 } // namespace typecheck
 } // namespace stella
