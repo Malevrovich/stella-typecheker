@@ -236,7 +236,7 @@ template <typename Attr>
 std::pair<std::remove_cvref_t<Attr>*, bool> AttributeStorage<Attrs...>::trySet(const void* node,
                                                                                Attr&& value) {
     auto& map = getMap<std::remove_cvref_t<Attr>>();
-    auto result = map.emplace(node, std::forward<Attr>(value));
+    auto result = map.try_emplace(node, std::forward<Attr>(value));
     return {&result.first->second, result.second};
 }
 
