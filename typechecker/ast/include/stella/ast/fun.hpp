@@ -14,7 +14,7 @@ public:
     void Accept(NodeVisitor& visitor) const override;
 
     std::string_view GetName() const { return name_; }
-    const Type& GetType() const { return *type_; }
+    std::shared_ptr<const Type> GetType() const { return type_; }
 
 private:
     std::string name_;
@@ -28,8 +28,8 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const NodeParamDecl& GetParam() const { return *param_; }
-    const NodeExpr& GetBody() const { return *body_; }
+    std::shared_ptr<const NodeParamDecl> GetParam() const { return param_; }
+    std::shared_ptr<const NodeExpr> GetBody() const { return body_; }
 
 private:
     std::shared_ptr<NodeParamDecl> param_;
@@ -61,8 +61,8 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const NodeExpr& GetFunction() const { return *function_; }
-    const NodeExpr& GetArgument() const { return *argument_; }
+    std::shared_ptr<const NodeExpr> GetFunction() const { return function_; }
+    std::shared_ptr<const NodeExpr> GetArgument() const { return argument_; }
 
 private:
     std::shared_ptr<NodeExpr> function_;
@@ -76,8 +76,8 @@ public:
     void OutputTo(std::ostream& out) const override;
     void Accept(TypeVisitor& visitor) const override;
 
-    const Type& GetArgType() const { return *arg_type_; }
-    const Type& GetReturnType() const { return *return_type_; }
+    std::shared_ptr<const Type> GetArgType() const { return arg_type_; }
+    std::shared_ptr<const Type> GetReturnType() const { return return_type_; }
 
     bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
 

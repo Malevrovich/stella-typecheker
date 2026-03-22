@@ -27,7 +27,7 @@ public:
     virtual void Accept(NodeVisitor& visitor) const = 0;
     std::string ToString() const;
 
-    const SourceInfo& GetSourceInfo() const { return *source_info_; }
+    std::shared_ptr<const SourceInfo> GetSourceInfo() const { return source_info_; }
 
 protected:
     explicit NodeBase(std::shared_ptr<SourceInfo> source_info)
@@ -88,7 +88,9 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const std::vector<std::shared_ptr<NodeDecl>>& GetDeclarations() const { return decls_; }
+    std::shared_ptr<const std::vector<std::shared_ptr<NodeDecl>>> GetDeclarations() const {
+        return std::make_shared<const std::vector<std::shared_ptr<NodeDecl>>>(decls_);
+    }
 
 private:
     std::vector<std::shared_ptr<NodeDecl>> decls_;

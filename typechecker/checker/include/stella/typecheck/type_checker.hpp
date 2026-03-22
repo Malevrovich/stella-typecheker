@@ -1,9 +1,5 @@
 #pragma once
 
-#include <concepts>
-#include <optional>
-#include <typeinfo>
-
 #include "stella/ast/ast.hpp"
 #include "stella/ast/attribute_storage.hpp"
 #include "stella/ast/base.hpp"

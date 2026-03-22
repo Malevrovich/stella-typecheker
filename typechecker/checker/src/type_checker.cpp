@@ -35,7 +35,7 @@ void TypeChecker::CheckCompatibility(const ast::NodeBase& node, const ExpectedTy
     auto conflict_error_code = expected_type.Check(deduced_type.type);
     if (conflict_error_code) {
         OnError(TypeCheckNodeError{*conflict_error_code, node,
-                                   std::format("Expected type {}, but expr has type of {}",
+                                   std::format("Expected type {}, but expr has type {}",
                                                expected_type.ToString(),
                                                deduced_type.type.ToString())});
     }
@@ -75,9 +75,10 @@ void TypeChecker::ExpectType(const ast::NodeBase& node, ExpectedType&& expected_
 
 void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
     std::vector<NameContext::NameContextGuard> name_guards;
-    name_guards.reserve(node.GetDeclarations().size());
+    auto declarations = node.GetDeclarations();
+    name_guards.reserve(declarations->size());
 
-    for (auto& decl : node.GetDeclarations()) {
+    for (auto& decl : *declarations) {
         auto func_decl = std::dynamic_pointer_cast<ast::NodeDeclFun>(decl);
 
         if (!func_decl) {
@@ -92,7 +93,7 @@ void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
 
     const ast::Type* main_type = nullptr;
 
-    for (auto& decl : node.GetDeclarations()) {
+    for (auto& decl : *node.GetDeclarations()) {
         ast::BaseNodeVisitor::Visit(*decl);
 
         auto decl_fun = std::dynamic_pointer_cast<ast::NodeDeclFun>(decl);

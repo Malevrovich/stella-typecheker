@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-#include <typeinfo>
 
 #include "stella/ast/logic.hpp"
 #include "stella/ast/nat.hpp"
