@@ -9,6 +9,7 @@
 #include "stella/ast/fun.hpp"
 #include "stella/ast/visitor.hpp"
 #include "stella/typecheck/error.hpp"
+#include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
 
 namespace stella {
