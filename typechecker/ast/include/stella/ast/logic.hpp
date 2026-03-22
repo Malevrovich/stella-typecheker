@@ -29,9 +29,9 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const NodeExpr& GetCondition() const { return *condition_; }
-    const NodeExpr& GetThenBranch() const { return *then_branch_; }
-    const NodeExpr& GetElseBranch() const { return *else_branch_; }
+    std::shared_ptr<NodeExpr> GetCondition() const { return condition_; }
+    std::shared_ptr<NodeExpr> GetThenBranch() const { return then_branch_; }
+    std::shared_ptr<NodeExpr> GetElseBranch() const { return else_branch_; }
 
 private:
     std::shared_ptr<NodeExpr> condition_;
@@ -39,10 +39,13 @@ private:
     std::shared_ptr<NodeExpr> else_branch_;
 };
 
-class TypeBool final : public Type {
+class TypeBool final : public BaseTypeImpl<TypeBool, Type> {
 public:
     void OutputTo(std::ostream& out) const override { out << "Bool"; }
     void Accept(TypeVisitor& visitor) const override;
+
+    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
+    bool operator==(const TypeBool&) const { return true; }
 };
 
 } // namespace ast

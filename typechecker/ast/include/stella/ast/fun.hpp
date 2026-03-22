@@ -45,8 +45,8 @@ public:
     void Accept(NodeVisitor& visitor) const override;
 
     std::string_view GetName() const { return name_; }
-    const Type& GetReturnType() const { return *return_type_; }
-    const NodeExprAbstraction& GetAbstraction() const { return *abstraction_; }
+    std::shared_ptr<const Type> GetReturnType() const { return return_type_; }
+    std::shared_ptr<NodeExprAbstraction> GetAbstraction() const { return abstraction_; }
 
 private:
     std::string name_;
@@ -69,7 +69,7 @@ private:
     std::shared_ptr<NodeExpr> argument_;
 };
 
-class TypeFun final : public Type {
+class TypeFun final : public BaseTypeImpl<TypeFun, Type> {
 public:
     TypeFun(std::shared_ptr<Type> arg_type, std::shared_ptr<Type> return_type);
 
@@ -78,6 +78,12 @@ public:
 
     const Type& GetArgType() const { return *arg_type_; }
     const Type& GetReturnType() const { return *return_type_; }
+
+    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
+
+    bool operator==(const TypeFun& other) const {
+        return arg_type_->Equals(*other.arg_type_) && return_type_->Equals(*other.return_type_);
+    }
 
 private:
     std::shared_ptr<Type> arg_type_;

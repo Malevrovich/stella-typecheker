@@ -26,7 +26,7 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const NodeExpr& GetOperand() const { return *operand_; }
+    std::shared_ptr<NodeExpr> GetOperand() const { return operand_; }
 
 private:
     std::shared_ptr<NodeExpr> operand_;
@@ -38,7 +38,7 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const NodeExpr& GetOperand() const { return *operand_; }
+    std::shared_ptr<NodeExpr> GetOperand() const { return operand_; }
 
 private:
     std::shared_ptr<NodeExpr> operand_;
@@ -50,16 +50,19 @@ public:
 
     void Accept(NodeVisitor& visitor) const override;
 
-    const NodeExpr& GetOperand() const { return *operand_; }
+    std::shared_ptr<NodeExpr> GetOperand() const { return operand_; }
 
 private:
     std::shared_ptr<NodeExpr> operand_;
 };
 
-class TypeNat final : public Type {
+class TypeNat final : public BaseTypeImpl<TypeNat, Type> {
 public:
     void OutputTo(std::ostream& out) const override { out << "Nat"; }
     void Accept(TypeVisitor& visitor) const override;
+
+    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
+    bool operator==(const TypeNat&) const { return true; }
 };
 
 } // namespace ast

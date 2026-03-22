@@ -3,6 +3,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 #include "stella/ast/ast_fwd.hpp"
@@ -35,13 +36,41 @@ protected:
     const std::shared_ptr<SourceInfo> source_info_;
 };
 
-class Type {
+template <typename T, typename... Ancestors>
+class BaseTypeImpl : public Ancestors... {
+public:
+    static bool StaticIsCompatibleWith(const std::type_info& info) {
+        return ((typeid(T) == info) || ... || Ancestors::StaticIsCompatibleWith(info));
+    }
+
+    virtual bool DynamicIsCompatibleWith(const std::type_info& info) const {
+        return ((typeid(T) == info) || ... || Ancestors::DynamicIsCompatibleWith(info));
+    }
+
+private:
+    // use only as CRTP
+    BaseTypeImpl() = default;
+
+    static bool DefaultEquals(const T& current, const Type& other) {
+        const T* derived = dynamic_cast<const T*>(&other);
+        if (!derived)
+            return false;
+        return current == *derived;
+    };
+
+    friend T;
+};
+
+class Type : public BaseTypeImpl<Type> {
 public:
     virtual ~Type() = default;
 
     virtual void OutputTo(std::ostream& out) const = 0;
     virtual void Accept(TypeVisitor& visitor) const = 0;
     std::string ToString() const;
+
+    virtual bool Equals(const Type& other) const = 0;
+    bool operator==(const Type& other) const = delete;
 };
 
 class NodeExpr : public NodeBase {
@@ -73,16 +102,6 @@ template <typename Node>
 std::ostream& operator<<(std::ostream& out, const Node& node) {
     node.OutputTo(out);
     return out;
-}
-
-template <typename DstType>
-    requires std::derived_from<DstType, stella::ast::Type>
-bool operator==(const stella::ast::Type& lhs, const DstType& rhs) {
-    auto* lhs_ptr = dynamic_cast<const DstType*>(&lhs);
-    if (!lhs_ptr) {
-        return false;
-    }
-    return *lhs_ptr == rhs;
 }
 
 template <typename Type>
