@@ -1,3 +1,15 @@
+INPUT:
+// Ожидание: успех (код 0)
+language core;
+
+fn double(n : Nat) -> Nat {
+  return succ(succ(n))
+}
+
+fn main(n : Nat) -> Nat {
+  return double(n)
+}
+
 STDOUT:
 Well-typed
 

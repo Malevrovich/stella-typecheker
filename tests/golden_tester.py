@@ -21,6 +21,7 @@ class TestOutput:
     stdout: str
     stderr: str
     exit_code: int
+    input_code: str = ""  # Содержимое исходного .stella файла
     stderr_without_logs: str = ""
     
     def __str__(self) -> str:
@@ -51,6 +52,13 @@ def run_typechecker(binary_path: str, stella_file: str, strip_logs: bool = False
         stderr = result.stderr.strip() if result.stderr.strip() else "(empty)"
         stdout = result.stdout.strip() if result.stdout.strip() else "(empty)"
         
+        # Читаем содержимое исходного файла
+        try:
+            with open(stella_file, 'r') as f:
+                input_code = f.read()
+        except:
+            input_code = ""
+        
         if strip_logs:
             stderr_clean = strip_debug_logs(result.stderr)
             stderr = stderr_clean
@@ -58,7 +66,8 @@ def run_typechecker(binary_path: str, stella_file: str, strip_logs: bool = False
         return TestOutput(
             stdout=stdout,
             stderr=stderr,
-            exit_code=result.returncode
+            exit_code=result.returncode,
+            input_code=input_code
         )
     except subprocess.TimeoutExpired:
         return TestOutput(
@@ -94,44 +103,61 @@ def load_golden_file(golden_path: str) -> TestOutput:
         content = f.read()
     
     sections = {}
+    in_input = False
     in_stdout = False
     in_stderr = False
+    input_lines = []
     stdout_lines = []
     stderr_lines = []
     
     for line in content.split('\n'):
-        if line.startswith('STDOUT:'):
+        if line.startswith('INPUT:'):
+            in_input = True
+            in_stdout = False
+            in_stderr = False
+        elif line.startswith('STDOUT:'):
+            in_input = False
             in_stdout = True
             in_stderr = False
         elif line.startswith('STDERR:'):
+            in_input = False
             in_stdout = False
             in_stderr = True
         elif line.startswith('EXIT_CODE:'):
+            in_input = False
             in_stdout = False
             in_stderr = False
             sections['exit_code'] = int(line.split(':', 1)[1].strip())
+        elif in_input:
+            input_lines.append(line)
         elif in_stdout:
             stdout_lines.append(line)
         elif in_stderr:
             stderr_lines.append(line)
     
     # Убираем пустые строки в начале и конце
+    input_content = '\n'.join(input_lines).strip()
     stdout_content = '\n'.join(stdout_lines).strip()
     stderr_content = '\n'.join(stderr_lines).strip()
     
     return TestOutput(
         stdout=stdout_content,
         stderr=stderr_content,
-        exit_code=sections.get('exit_code', 0)
+        exit_code=sections.get('exit_code', 0),
+        input_code=input_content
     )
 
 
 def save_golden_file(golden_path: str, output: TestOutput) -> None:
     """Сохраняет результат в золотой файл."""
+    input_code = output.input_code if output.input_code.strip() else "(empty)"
     stdout = output.stdout if output.stdout.strip() else "(empty)"
     stderr = output.stderr if output.stderr.strip() else "(empty)"
     
-    content = f"""STDOUT:
+    content = f"""INPUT:
+{input_code}
+
+STDOUT:
 {stdout}
 
 STDERR:
@@ -157,21 +183,15 @@ Actual:
 def compare_outputs(expected: TestOutput, actual: TestOutput) -> Tuple[bool, str]:
     """
     Сравнивает ожидаемый и фактический результаты.
-    Нормализует вывод перед сравнением.
     
     Returns:
         (passed, error_message)
     """
-    exp_stdout = expected.stdout
-    act_stdout = actual.stdout
-    exp_stderr = expected.stderr
-    act_stderr = actual.stderr
+    if expected.stdout != actual.stdout:
+        return False, f"STDOUT mismatch:{format_diff(expected.stdout, actual.stdout)}"
     
-    if exp_stdout != act_stdout:
-        return False, f"STDOUT mismatch:{format_diff(exp_stdout, act_stdout)}"
-    
-    if exp_stderr != act_stderr:
-        return False, f"STDERR mismatch:{format_diff(exp_stderr, act_stderr)}"
+    if expected.stderr != actual.stderr:
+        return False, f"STDERR mismatch:{format_diff(expected.stderr, actual.stderr)}"
     
     if expected.exit_code != actual.exit_code:
         return False, f"EXIT_CODE mismatch: expected {expected.exit_code}, got {actual.exit_code}"

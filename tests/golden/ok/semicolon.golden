@@ -1,3 +1,17 @@
+INPUT:
+language core;
+
+extend with
+  #unit-type,
+  #references,
+  #arithmetic-operators,
+  #sequencing,
+  #natural-literals;
+
+fn main(n : Nat) -> Nat {
+  return succ(n);
+}
+
 STDOUT:
 Well-typed
 

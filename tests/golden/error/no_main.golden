@@ -1,3 +1,10 @@
+INPUT:
+language core;
+
+fn foo(n : Nat) -> Nat {
+    return n
+}
+
 STDOUT:
 (empty)
 
