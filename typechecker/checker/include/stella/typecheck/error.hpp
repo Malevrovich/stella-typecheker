@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <source_location>
 #include <string>
 
 #include "stella/ast/base.hpp"
@@ -75,6 +76,9 @@ class TypeCheckTypeError : public TypeCheckError {
 public:
     TypeCheckTypeError(ErrorCode code, const ast::Type& type, std::string_view message = "");
 };
+
+void OnError(TypeCheckError&& error);
+void OnInternalError(std::string_view message, std::source_location location = {});
 
 } // namespace typecheck
 } // namespace stella

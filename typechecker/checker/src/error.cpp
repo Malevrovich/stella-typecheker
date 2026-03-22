@@ -34,5 +34,14 @@ TypeCheckTypeError::TypeCheckTypeError(ErrorCode error_code, const ast::Type& ty
                                        std::string_view message)
     : TypeCheckError(error_code, std::format("Error type: {}\n{}", type.ToString(), message)) {}
 
+void OnError(TypeCheckError&& error) { throw error; }
+
+void OnInternalError(std::string_view message, std::source_location location) {
+    const auto error_message = std::format("Internal error occured at: {}:{}.\n Message: {}",
+                                           location.file_name(), location.line(), message);
+    DLOG_S(FATAL) << error_message;
+    throw InternalTypeCheckError{error_message};
+}
+
 } // namespace typecheck
 } // namespace stella
