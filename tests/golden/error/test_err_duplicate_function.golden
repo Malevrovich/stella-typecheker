@@ -1,0 +1,15 @@
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_FUNCTION_DECLARATION:
+Error occured at stella-examples/error/test_err_duplicate_function.stella:8:0:
+fn main(y : Nat) -> Nat {
+  return y
+}
+Previous declaration at stella-examples/error/test_err_duplicate_function.stella:4:0:
+fn main(x : Nat) -> Nat {
+  return x
+}
+
+EXIT_CODE: 1

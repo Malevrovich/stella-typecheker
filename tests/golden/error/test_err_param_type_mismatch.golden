@@ -1,0 +1,10 @@
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_PARAMETER:
+Error occured at stella-examples/error/test_err_param_type_mismatch.stella:10:19:
+b : Bool
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

@@ -1,0 +1,10 @@
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/error/test_err_succ_on_bool.stella:5:14:
+b
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

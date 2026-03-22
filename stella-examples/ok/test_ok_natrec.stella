@@ -1,0 +1,12 @@
+// Ожидание: успех (код 0)
+language core;
+
+fn main(n : Nat) -> Nat {
+  // Nat::rec(n, z, s) — итератор: возвращает z, если n=0, иначе s(n-1, ...)
+  // Здесь считаем сумму от 1 до n
+  return Nat::rec(n, 0, fn(prev : Nat) {
+    return fn (acc : Nat) {
+      return succ(acc + prev)
+    }
+  })(0)
+}

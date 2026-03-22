@@ -1,0 +1,10 @@
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_LAMBDA:
+Error occured at stella-examples/error/test_err_unexpected_lambda.stella:6:10:
+fn (y : Nat) { return y }
+Expected type Nat, but node has type stella::ast::TypeFun
+
+EXIT_CODE: 1

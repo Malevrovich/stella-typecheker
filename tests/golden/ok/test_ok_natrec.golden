@@ -1,0 +1,7 @@
+STDOUT:
+(empty)
+
+STDERR:
+Parsing error: Unexpected node in AST builder: Nat::rec(n,0,fn(prev:Nat){returnfn(acc:Nat){returnsucc(acc+prev)}})
+
+EXIT_CODE: 1

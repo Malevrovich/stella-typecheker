@@ -1,0 +1,10 @@
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_FUNCTION:
+Error occured at stella-examples/error/test_err_not_a_function.stella:5:9:
+x
+Expected type stella::ast::TypeFun, but expr has type Nat
+
+EXIT_CODE: 1

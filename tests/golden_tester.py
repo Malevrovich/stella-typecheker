@@ -199,16 +199,15 @@ def run_tests(
     Returns:
         0 если все тесты прошли, 1 если есть ошибки
     """
-    stella_files = sorted(Path(stella_dir).glob('*.stella'))
+    stella_files = sorted(Path(stella_dir).glob('**/*.stella'))
     
     if filter_pattern:
-        stella_files = [f for f in stella_files if filter_pattern in f.name]
+        stella_files = [f for f in stella_files if filter_pattern in str(f.relative_to(stella_dir))]
     
     if not stella_files:
         print(f"❌ Не найдено .stella файлов в {stella_dir}")
         return 1
     
-    os.makedirs(golden_dir, exist_ok=True)
     passed = 0
     failed = 0
     updated = 0
@@ -216,33 +215,43 @@ def run_tests(
     print(f"🧪 Запуск {len(stella_files)} тестов...\n")
     
     for stella_file in stella_files:
-        test_name = stella_file.stem
-        golden_file = os.path.join(golden_dir, f"{test_name}.golden")
+        # Сохраняем относительный путь для организации golden файлов
+        rel_path = stella_file.relative_to(stella_dir)
+        rel_dir = rel_path.parent
+        test_name = rel_path.stem
+        
+        # Создаем путь к golden файлу с сохранением структуры подпапок
+        golden_subdir = os.path.join(golden_dir, str(rel_dir))
+        golden_file = os.path.join(golden_subdir, f"{test_name}.golden")
         
         # Запускаем типчекер
         actual = run_typechecker(typechecker_binary, str(stella_file))
         
         if update_golden:
             # Обновляем золотой файл
+            os.makedirs(golden_subdir, exist_ok=True)
             save_golden_file(golden_file, actual)
-            print(f"📝 {test_name}: обновлен")
+            display_name = str(rel_path.with_suffix(''))
+            print(f"📝 {display_name}: обновлен")
             updated += 1
         else:
             # Сравниваем с золотым файлом
             expected = load_golden_file(golden_file)
+            display_name = str(rel_path.with_suffix(''))
             
             if expected is None:
-                print(f"⚠️  {test_name}: золотой файл не найден. Создан новый.")
+                print(f"⚠️  {display_name}: золотой файл не найден. Создан новый.")
+                os.makedirs(golden_subdir, exist_ok=True)
                 save_golden_file(golden_file, actual)
                 updated += 1
             else:
                 passed_test, error_msg = compare_outputs(expected, actual)
                 
                 if passed_test:
-                    print(f"✅ {test_name}: OK")
+                    print(f"✅ {display_name}: OK")
                     passed += 1
                 else:
-                    print(f"❌ {test_name}: FAILED")
+                    print(f"❌ {display_name}: FAILED")
                     print(error_msg)
                     failed += 1
     
