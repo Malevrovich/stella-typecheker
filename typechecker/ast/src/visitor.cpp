@@ -46,6 +46,8 @@ void TypeBool::Accept(TypeVisitor& visitor) const { visitor.VisitTypeBool(*this)
 
 void TypeNat::Accept(TypeVisitor& visitor) const { visitor.VisitTypeNat(*this); }
 
+void BaseNodeVisitor::VisitDefaultNode(const NodeBase& node) {}
+
 void BaseNodeVisitor::VisitProgram(const NodeProgram& node) { VisitDefaultNode(node); }
 
 void BaseNodeVisitor::VisitParamDecl(const NodeParamDecl& node) { VisitDefaultNode(node); }
@@ -77,6 +79,8 @@ void BaseNodeVisitor::VisitExprAbstraction(const NodeExprAbstraction& node) {
 void BaseNodeVisitor::VisitExprApplication(const NodeExprApplication& node) {
     VisitDefaultNode(node);
 }
+
+void BaseTypeVisitor::VisitDefaultType(const Type& type) {}
 
 void BaseTypeVisitor::VisitTypeFun(const TypeFun& type) { VisitDefaultType(type); }
 
