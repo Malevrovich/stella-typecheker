@@ -35,6 +35,18 @@ The binary will be at `build/typechecker/cli/typechecker`.
 
 ---
 
+## Building with VSCode (CMake Tools extension)
+
+The project includes `.vscode/settings.json` that configures the [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) extension automatically:
+
+- Toolchain: `cmake/toolchains/clang-libc++.cmake` (clang-18 + libc++)
+- Build directory: `build/`
+- Parallel jobs: auto-detected (all available CPU cores)
+
+Just open the project folder in VSCode, install the **CMake Tools** extension, and click **Build** (or press `F7`). No additional configuration needed.
+
+---
+
 ## Building with Docker
 
 ```bash

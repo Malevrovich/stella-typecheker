@@ -1,0 +1,6 @@
+{
+    "cmake.configureArgs": [
+        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/toolchains/clang-libc++.cmake"
+    ],
+    "cmake.buildDirectory": "${workspaceFolder}/build"
+}
