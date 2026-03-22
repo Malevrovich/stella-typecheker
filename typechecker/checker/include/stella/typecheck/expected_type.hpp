@@ -9,6 +9,7 @@
 
 #include "stella/ast/base.hpp"
 #include "stella/typecheck/error.hpp"
+#include "stella/utils.hpp"
 
 namespace stella {
 namespace typecheck {
@@ -82,7 +83,7 @@ ExpectedType ExpectedType::CompatibleWith(std::optional<ErrorCode> conflict_erro
         [](const ast::Type& other) { return T::StaticIsCompatibleWith(typeid(other)); },
         [](const std::type_info& info) { return T::StaticIsCompatibleWith(info); },
         conflict_error_code,
-        typeid(T).name(),
+        tryDemangle(typeid(T).name()),
         nullptr,
     };
 }
