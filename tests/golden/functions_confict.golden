@@ -1,0 +1,15 @@
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_FUNCTION_DECLARATION:
+Error occured at stella-examples/functions_confict.stella:8:0:
+fn increment_twice(n : Nat)-> Nat {
+    return succ(n)
+}
+Previous declaration at stella-examples/functions_confict.stella:4:0:
+fn increment_twice(n : Nat)-> Nat {
+    return succ(succ(n))
+}
+
+EXIT_CODE: 1
