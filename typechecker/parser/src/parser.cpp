@@ -15,6 +15,7 @@
 #include "StellaLexer.h"
 #include "StellaParser.h"
 #include "StellaParserBaseVisitor.h"
+#include "stella/utils.hpp"
 
 namespace stella {
 
@@ -55,8 +56,9 @@ auto try_any_cast(const std::any& operand) -> T {
     try {
         return std::any_cast<T>(operand);
     } catch (const std::bad_any_cast&) {
-        DLOG_F(ERROR, "Bad any_cast in AST builder. Expected %s, got %s at: %s", typeid(T).name(),
-               operand.type().name(), loguru::stacktrace().c_str());
+        DLOG_F(ERROR, "Bad any_cast in AST builder. Expected %s, got %s at: %s",
+               tryDemangle(typeid(T).name()).c_str(), tryDemangle(operand.type().name()).c_str(),
+               loguru::stacktrace().c_str());
         throw std::runtime_error("Unexpected type in AST builder");
     }
 }
