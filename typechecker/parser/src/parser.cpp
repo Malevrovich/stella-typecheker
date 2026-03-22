@@ -1,21 +1,20 @@
 #include "stella/parser.hpp"
 
-#include <ANTLRFileStream.h>
-#include <ANTLRInputStream.h>
 #include <any>
 #include <format>
 
+#include <ANTLRFileStream.h>
+#include <ANTLRInputStream.h>
 #include <antlr4-runtime.h>
+
 #include <loguru.hpp>
-#include <misc/Interval.h>
-#include <support/Any.h>
 
 #include "stella/ast/ast.hpp"
+#include "stella/utils.hpp"
 
 #include "StellaLexer.h"
 #include "StellaParser.h"
 #include "StellaParserBaseVisitor.h"
-#include "stella/utils.hpp"
 
 namespace stella {
 
