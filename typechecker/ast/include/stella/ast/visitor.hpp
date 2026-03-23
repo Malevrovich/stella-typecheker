@@ -33,6 +33,8 @@ public:
     virtual void VisitExprFix(const NodeExprFix& node) = 0;
 
     virtual void VisitExprConstUnit(const NodeExprConstUnit& node) = 0;
+
+    virtual void VisitExprTypeAsc(const NodeExprTypeAsc& node) = 0;
 };
 
 class TypeVisitor {
@@ -69,6 +71,7 @@ public:
     void VisitExprApplication(const NodeExprApplication& node) override;
     void VisitExprFix(const NodeExprFix& node) override;
     void VisitExprConstUnit(const NodeExprConstUnit& node) override;
+    void VisitExprTypeAsc(const NodeExprTypeAsc& node) override;
 };
 
 class BaseTypeVisitor : public TypeVisitor {

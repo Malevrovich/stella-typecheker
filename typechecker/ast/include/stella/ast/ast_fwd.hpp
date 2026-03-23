@@ -29,6 +29,8 @@ class TypeUnit;
 
 class NodeExprConstUnit;
 
+class NodeExprTypeAsc;
+
 class NodeVisitor;
 class TypeVisitor;
 

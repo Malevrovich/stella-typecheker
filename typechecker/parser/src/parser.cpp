@@ -9,6 +9,7 @@
 
 #include <loguru.hpp>
 
+#include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
 #include "stella/utils.hpp"
 
@@ -233,6 +234,13 @@ private:
         auto abstr = make_node<ast::NodeExprAbstraction>(ctx, param, body);
 
         return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr);
+    }
+
+    antlrcpp::Any visitTypeAsc(antlr4_stella::StellaParser::TypeAscContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        auto asc_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+
+        return make_expr<ast::NodeExprTypeAsc>(ctx, expr, asc_type);
     }
 
     std::any visitTerminatingSemicolon(

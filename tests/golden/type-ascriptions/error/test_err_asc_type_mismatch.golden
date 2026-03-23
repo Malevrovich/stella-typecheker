@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #type-ascriptions;
+
+fn main(n : Nat) -> Bool {
+  return n as Bool
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/type-ascriptions/error/test_err_asc_type_mismatch.stella:5:9:
+n
+Expected type Bool, but expr has type Nat
+
+EXIT_CODE: 1

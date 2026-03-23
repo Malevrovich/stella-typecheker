@@ -1,5 +1,6 @@
 #include "stella/ast/visitor.hpp"
 
+#include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
 #include "stella/ast/unit.hpp"
@@ -88,12 +89,12 @@ void BaseNodeVisitor::VisitExprApplication(const NodeExprApplication& node) {
 }
 
 void BaseNodeVisitor::VisitExprFix(const NodeExprFix& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprConstUnit(const NodeExprConstUnit& node) { VisitDefaultNode(node); }
 
-void BaseNodeVisitor::VisitExprConstUnit(const NodeExprConstUnit& node) {
-    VisitDefaultNode(node);
-}
-
+void BaseNodeVisitor::VisitExprTypeAsc(const NodeExprTypeAsc& node) { VisitDefaultNode(node); }
 void NodeExprConstUnit::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstUnit(*this); }
+
+void NodeExprTypeAsc::Accept(NodeVisitor& visitor) const { visitor.VisitExprTypeAsc(*this); }
 
 void TypeUnit::Accept(TypeVisitor& visitor) const { visitor.VisitTypeUnit(*this); }
 

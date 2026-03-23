@@ -2,6 +2,7 @@ set(TYPE_CHECK_SOURCES
     src/error.cpp
     src/check.cpp
     src/name_context.cpp
+    src/type_checker_asc.cpp
     src/type_checker_bool.cpp
     src/type_checker_fun.cpp
     src/type_checker_nat.cpp
