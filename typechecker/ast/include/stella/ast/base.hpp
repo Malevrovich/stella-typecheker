@@ -81,6 +81,10 @@ class NodeDecl : public NodeBase {
     using NodeBase::NodeBase;
 };
 
+class NodePattern : public NodeBase {
+    using NodeBase::NodeBase;
+};
+
 class NodeProgram final : public NodeBase {
 public:
     NodeProgram(std::shared_ptr<SourceInfo> source_info,

@@ -6,10 +6,10 @@
 namespace stella {
 namespace ast {
 
-class NodePatternVar final : public NodeBase {
+class NodePatternVar final : public NodePattern {
 public:
     NodePatternVar(std::shared_ptr<SourceInfo> source_info, std::string name)
-        : NodeBase(std::move(source_info)),
+        : NodePattern(std::move(source_info)),
           name_(std::move(name)) {}
 
     void Accept(NodeVisitor& visitor) const override;

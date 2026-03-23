@@ -2,9 +2,9 @@
 
 #include "stella/ast/ast_fwd.hpp"
 #include "stella/ast/base.hpp"
+#include "stella/ast/match.hpp" // IWYU pragma: export
 
 #include <memory>
-#include <vector>
 
 namespace stella {
 namespace ast {
@@ -33,60 +33,30 @@ private:
     std::shared_ptr<const NodeExpr> expr_;
 };
 
-class NodePatternInl final : public NodeBase {
+class NodePatternInl final : public NodePattern {
 public:
     NodePatternInl(std::shared_ptr<SourceInfo> source_info,
-                   std::shared_ptr<const NodeBase> pattern);
+                   std::shared_ptr<const NodePattern> pattern);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<const NodeBase> GetPattern() const { return pattern_; }
+    std::shared_ptr<const NodePattern> GetPattern() const { return pattern_; }
 
 private:
-    std::shared_ptr<const NodeBase> pattern_;
+    std::shared_ptr<const NodePattern> pattern_;
 };
 
-class NodePatternInr final : public NodeBase {
+class NodePatternInr final : public NodePattern {
 public:
     NodePatternInr(std::shared_ptr<SourceInfo> source_info,
-                   std::shared_ptr<const NodeBase> pattern);
+                   std::shared_ptr<const NodePattern> pattern);
 
     void Accept(NodeVisitor& visitor) const override;
 
-    std::shared_ptr<const NodeBase> GetPattern() const { return pattern_; }
+    std::shared_ptr<const NodePattern> GetPattern() const { return pattern_; }
 
 private:
-    std::shared_ptr<const NodeBase> pattern_;
-};
-
-class NodeMatchCase final : public NodeBase {
-public:
-    NodeMatchCase(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeBase> pattern,
-                  std::shared_ptr<const NodeExpr> expr);
-
-    void Accept(NodeVisitor& visitor) const override;
-
-    std::shared_ptr<const NodeBase> GetPattern() const { return pattern_; }
-    std::shared_ptr<const NodeExpr> GetExpr() const { return expr_; }
-
-private:
-    std::shared_ptr<const NodeBase> pattern_;
-    std::shared_ptr<const NodeExpr> expr_;
-};
-
-class NodeExprMatch final : public NodeExpr {
-public:
-    NodeExprMatch(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeExpr> expr,
-                  std::vector<std::shared_ptr<const NodeMatchCase>> cases);
-
-    void Accept(NodeVisitor& visitor) const override;
-
-    std::shared_ptr<const NodeExpr> GetExpr() const { return expr_; }
-    const std::vector<std::shared_ptr<const NodeMatchCase>>& GetCases() const { return cases_; }
-
-private:
-    std::shared_ptr<const NodeExpr> expr_;
-    std::vector<std::shared_ptr<const NodeMatchCase>> cases_;
+    std::shared_ptr<const NodePattern> pattern_;
 };
 
 class TypeSum final : public BaseTypeImpl<TypeSum, Type> {

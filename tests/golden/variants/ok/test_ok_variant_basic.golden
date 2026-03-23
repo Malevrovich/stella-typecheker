@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn main(x : <| a : Nat, b : Bool |>) -> Nat {
+  return match x {
+    <| a = n |> => n
+  | <| b = f |> => 0
+  }
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

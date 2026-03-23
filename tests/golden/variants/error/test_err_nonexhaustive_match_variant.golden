@@ -1,0 +1,25 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn main(x : <| a : Nat, b : Bool, c : Nat |>) -> Nat {
+  return match x {
+    <| a = n |> => n
+  | <| b = f |> => 0
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
+Error occured at stella-examples/variants/error/test_err_nonexhaustive_match_variant.stella:5:9:
+match x {
+    <| a = n |> => n
+  | <| b = f |> => 0
+  }
+Variant label 'c' not covered in match
+
+EXIT_CODE: 1

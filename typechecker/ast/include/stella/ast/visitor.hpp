@@ -57,6 +57,9 @@ public:
     virtual void VisitPatternInr(const NodePatternInr& node) = 0;
     virtual void VisitMatchCase(const NodeMatchCase& node) = 0;
     virtual void VisitExprMatch(const NodeExprMatch& node) = 0;
+
+    virtual void VisitExprVariant(const NodeExprVariant& node) = 0;
+    virtual void VisitPatternVariant(const NodePatternVariant& node) = 0;
 };
 
 class TypeVisitor {
@@ -73,6 +76,7 @@ public:
     virtual void VisitTypeTuple(const TypeTuple& type) = 0;
     virtual void VisitTypeRecord(const TypeRecord& type) = 0;
     virtual void VisitTypeSum(const TypeSum& type) = 0;
+    virtual void VisitTypeVariant(const TypeVariant& type) = 0;
 };
 
 class BaseNodeVisitor : public NodeVisitor {
@@ -116,6 +120,9 @@ public:
     void VisitPatternInr(const NodePatternInr& node) override;
     void VisitMatchCase(const NodeMatchCase& node) override;
     void VisitExprMatch(const NodeExprMatch& node) override;
+
+    void VisitExprVariant(const NodeExprVariant& node) override;
+    void VisitPatternVariant(const NodePatternVariant& node) override;
 };
 
 class BaseTypeVisitor : public TypeVisitor {
@@ -132,6 +139,7 @@ public:
     void VisitTypeTuple(const TypeTuple& type) override;
     void VisitTypeRecord(const TypeRecord& type) override;
     void VisitTypeSum(const TypeSum& type) override;
+    void VisitTypeVariant(const TypeVariant& type) override;
 };
 
 } // namespace ast

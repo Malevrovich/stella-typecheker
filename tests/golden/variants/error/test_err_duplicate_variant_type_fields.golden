@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn main(x : <| a : Nat, a : Bool |>) -> Nat {
+  return match x {
+    <| a = n |> => n
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_VARIANT_TYPE_FIELDS:
+Error type: <|a : Nat, a : Bool|>
+Duplicate field 'a' in variant type
+
+EXIT_CODE: 1

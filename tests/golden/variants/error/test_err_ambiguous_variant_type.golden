@@ -1,0 +1,21 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn main(n : Nat) -> Nat {
+  return match <| a = n |> {
+    <| a = x |> => x
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_AMBIGUOUS_VARIANT_TYPE:
+Error occured at stella-examples/variants/error/test_err_ambiguous_variant_type.stella:5:15:
+<| a = n |>
+Cannot determine variant type for label 'a': no expected type provided
+
+EXIT_CODE: 1

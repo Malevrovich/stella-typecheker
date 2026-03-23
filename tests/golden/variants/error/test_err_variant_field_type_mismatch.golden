@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn main(n : Nat) -> <| a : Nat, b : Bool |> {
+  return <| a = true |>
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/variants/error/test_err_variant_field_type_mismatch.stella:5:16:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

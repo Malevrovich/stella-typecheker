@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn main(n : Nat) -> <| a : Nat, b : Bool |> {
+  return <| c = n |>
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_VARIANT_LABEL:
+Error occured at stella-examples/variants/error/test_err_unexpected_variant_label.stella:5:9:
+<| c = n |>
+Variant label 'c' not found in expected type
+
+EXIT_CODE: 1

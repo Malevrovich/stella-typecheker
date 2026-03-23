@@ -9,10 +9,12 @@ set(TYPE_CHECK_SOURCES
     src/type_checker_list.cpp
     src/type_checker_nat.cpp
     src/type_checker_record.cpp
+    src/type_checker_match.cpp
     src/type_checker_sum.cpp
     src/type_checker_tuple.cpp
     src/type_checker_unit.cpp
     src/type_checker_var.cpp
+    src/type_checker_variant.cpp
     src/type_checker.cpp
     src/expected_type.cpp)
 

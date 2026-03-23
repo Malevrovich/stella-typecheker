@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #variants;
+
+fn make_nat(n : Nat) -> <| a : Nat, b : Bool |> {
+  return <| a = n |>
+}
+
+fn main(n : Nat) -> <| a : Nat, b : Bool |> {
+  return make_nat(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -4,6 +4,7 @@ namespace stella {
 namespace ast {
 
 class NodeBase;
+class NodePattern;
 class Type;
 
 class NodeProgram;
@@ -56,6 +57,10 @@ class NodePatternInr;
 class NodeMatchCase;
 class NodeExprMatch;
 class TypeSum;
+
+class NodeExprVariant;
+class NodePatternVariant;
+class TypeVariant;
 
 class NodeVisitor;
 class TypeVisitor;

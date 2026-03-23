@@ -5,10 +5,12 @@
 #include "stella/ast/base.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
+#include "stella/ast/match.hpp"
 #include "stella/ast/record.hpp"
 #include "stella/ast/sum.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/ast/unit.hpp"
+#include "stella/ast/variant.hpp"
 
 namespace stella {
 namespace ast {
@@ -172,13 +174,16 @@ void NodePatternInl::Accept(NodeVisitor& visitor) const { visitor.VisitPatternIn
 
 void NodePatternInr::Accept(NodeVisitor& visitor) const { visitor.VisitPatternInr(*this); }
 
-void NodeMatchCase::Accept(NodeVisitor& visitor) const { visitor.VisitMatchCase(*this); }
-
-void NodeExprMatch::Accept(NodeVisitor& visitor) const { visitor.VisitExprMatch(*this); }
-
 void TypeSum::Accept(TypeVisitor& visitor) const { visitor.VisitTypeSum(*this); }
 
 void BaseTypeVisitor::VisitTypeSum(const TypeSum& type) { VisitDefaultType(type); }
+
+void BaseNodeVisitor::VisitExprVariant(const NodeExprVariant& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitPatternVariant(const NodePatternVariant& node) {
+    VisitDefaultNode(node);
+}
+
+void BaseTypeVisitor::VisitTypeVariant(const TypeVariant& type) { VisitDefaultType(type); }
 
 } // namespace ast
 } // namespace stella
