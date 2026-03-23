@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #sum-types;
+
+fn main(s : Nat + Bool) -> Nat {
+  return match s {
+      inl(n) => n
+    | inr(b) => b
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/sum-types/error/test_err_match_case_type_mismatch.stella:7:16:
+b
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

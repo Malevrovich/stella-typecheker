@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #sum-types, #let-bindings;
+
+fn main(n : Nat) -> Nat {
+  return let x = inl(n) in 0
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_AMBIGUOUS_SUM_TYPE:
+Error occured at stella-examples/sum-types/error/test_err_ambiguous_sum_type_inl.stella:5:17:
+inl(n)
+Cannot determine sum type for inl injection: no expected type provided
+
+EXIT_CODE: 1

@@ -14,17 +14,7 @@ namespace typecheck {
 void TypeChecker::VisitExprTuple(const ast::NodeExprTuple& node) {
     SetDeducedTypeFamily<ast::TypeTuple>(node, ErrorCode::ERROR_UNEXPECTED_TUPLE);
 
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    std::shared_ptr<const ast::TypeTuple> expected_tuple_type = nullptr;
-
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            expected_tuple_type = std::dynamic_pointer_cast<const ast::TypeTuple>(exp.TryGetType());
-            if (expected_tuple_type) {
-                break;
-            }
-        }
-    }
+    const auto expected_tuple_type = TryGetExpectedType<ast::TypeTuple>(node);
 
     if (expected_tuple_type) {
         if (expected_tuple_type->GetElementTypes().size() != node.GetElements().size()) {

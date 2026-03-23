@@ -49,6 +49,14 @@ class NodeExprRecord;
 class NodeExprDotRecord;
 class TypeRecord;
 
+class NodeExprInl;
+class NodeExprInr;
+class NodePatternInl;
+class NodePatternInr;
+class NodeMatchCase;
+class NodeExprMatch;
+class TypeSum;
+
 class NodeVisitor;
 class TypeVisitor;
 

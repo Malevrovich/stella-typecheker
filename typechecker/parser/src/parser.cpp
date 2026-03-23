@@ -15,6 +15,7 @@
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
 #include "stella/ast/record.hpp"
+#include "stella/ast/sum.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/utils.hpp"
 
@@ -329,6 +330,49 @@ private:
         return make_expr<ast::NodeExprDotRecord>(ctx, expr, ctx->label->getText());
     }
 
+    antlrcpp::Any visitTypeSum(antlr4_stella::StellaParser::TypeSumContext* ctx) override {
+        auto left = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->left));
+        auto right = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->right));
+        return type(std::make_shared<const ast::TypeSum>(left, right));
+    }
+
+    antlrcpp::Any visitInl(antlr4_stella::StellaParser::InlContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprInl>(ctx, expr);
+    }
+
+    antlrcpp::Any visitInr(antlr4_stella::StellaParser::InrContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprInr>(ctx, expr);
+    }
+
+    antlrcpp::Any visitPatternInl(antlr4_stella::StellaParser::PatternInlContext* ctx) override {
+        auto pattern = try_any_cast<std::shared_ptr<const ast::NodeBase>>(visit(ctx->pattern_));
+        return std::static_pointer_cast<const ast::NodeBase>(
+            make_node<ast::NodePatternInl>(ctx, pattern));
+    }
+
+    antlrcpp::Any visitPatternInr(antlr4_stella::StellaParser::PatternInrContext* ctx) override {
+        auto pattern = try_any_cast<std::shared_ptr<const ast::NodeBase>>(visit(ctx->pattern_));
+        return std::static_pointer_cast<const ast::NodeBase>(
+            make_node<ast::NodePatternInr>(ctx, pattern));
+    }
+
+    antlrcpp::Any visitMatch(antlr4_stella::StellaParser::MatchContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+
+        std::vector<std::shared_ptr<const ast::NodeMatchCase>> cases;
+        for (auto case_ctx : ctx->cases) {
+            auto pattern =
+                try_any_cast<std::shared_ptr<const ast::NodeBase>>(visit(case_ctx->pattern_));
+            auto case_expr =
+                try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(case_ctx->expr_));
+            cases.push_back(make_node<ast::NodeMatchCase>(case_ctx, pattern, case_expr));
+        }
+
+        return make_expr<ast::NodeExprMatch>(ctx, expr, std::move(cases));
+    }
+
     antlrcpp::Any visitTypeAsc(antlr4_stella::StellaParser::TypeAscContext* ctx) override {
         auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
         auto asc_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
@@ -337,7 +381,8 @@ private:
     }
 
     antlrcpp::Any visitPatternVar(antlr4_stella::StellaParser::PatternVarContext* ctx) override {
-        return make_node<ast::NodePatternVar>(ctx, ctx->name->getText());
+        return std::static_pointer_cast<const ast::NodeBase>(
+            make_node<ast::NodePatternVar>(ctx, ctx->name->getText()));
     }
 
     antlrcpp::Any visitLet(antlr4_stella::StellaParser::LetContext* ctx) override {
@@ -346,8 +391,11 @@ private:
         }
 
         auto binding = ctx->patternBindings[0];
-        auto pattern =
-            try_any_cast<std::shared_ptr<const ast::NodePatternVar>>(visit(binding->pat));
+        auto pattern_base = try_any_cast<std::shared_ptr<const ast::NodeBase>>(visit(binding->pat));
+        auto pattern = std::dynamic_pointer_cast<const ast::NodePatternVar>(pattern_base);
+        if (!pattern) {
+            throw std::runtime_error("Only PatternVar is supported in let bindings");
+        }
         auto init = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(binding->rhs));
         auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->body));
 

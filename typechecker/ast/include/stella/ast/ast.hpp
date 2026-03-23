@@ -9,6 +9,7 @@
 #include "stella/ast/logic.hpp"   // IWYU pragma: export
 #include "stella/ast/nat.hpp"     // IWYU pragma: export
 #include "stella/ast/record.hpp"  // IWYU pragma: export
+#include "stella/ast/sum.hpp"     // IWYU pragma: export
 #include "stella/ast/tuple.hpp"   // IWYU pragma: export
 #include "stella/ast/unit.hpp"    // IWYU pragma: export
 #include "stella/ast/var.hpp"     // IWYU pragma: export

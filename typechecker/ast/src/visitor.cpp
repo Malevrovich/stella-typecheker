@@ -6,6 +6,7 @@
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
 #include "stella/ast/record.hpp"
+#include "stella/ast/sum.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/ast/unit.hpp"
 
@@ -107,6 +108,12 @@ void BaseNodeVisitor::VisitExprTuple(const NodeExprTuple& node) { VisitDefaultNo
 void BaseNodeVisitor::VisitExprDotTuple(const NodeExprDotTuple& node) { VisitDefaultNode(node); }
 void BaseNodeVisitor::VisitExprRecord(const NodeExprRecord& node) { VisitDefaultNode(node); }
 void BaseNodeVisitor::VisitExprDotRecord(const NodeExprDotRecord& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprInl(const NodeExprInl& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprInr(const NodeExprInr& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitPatternInl(const NodePatternInl& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitPatternInr(const NodePatternInr& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitMatchCase(const NodeMatchCase& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprMatch(const NodeExprMatch& node) { VisitDefaultNode(node); }
 
 void NodeExprConstUnit::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstUnit(*this); }
 
@@ -156,6 +163,22 @@ void NodeExprDotRecord::Accept(NodeVisitor& visitor) const { visitor.VisitExprDo
 void TypeRecord::Accept(TypeVisitor& visitor) const { visitor.VisitTypeRecord(*this); }
 
 void BaseTypeVisitor::VisitTypeRecord(const TypeRecord& type) { VisitDefaultType(type); }
+
+void NodeExprInl::Accept(NodeVisitor& visitor) const { visitor.VisitExprInl(*this); }
+
+void NodeExprInr::Accept(NodeVisitor& visitor) const { visitor.VisitExprInr(*this); }
+
+void NodePatternInl::Accept(NodeVisitor& visitor) const { visitor.VisitPatternInl(*this); }
+
+void NodePatternInr::Accept(NodeVisitor& visitor) const { visitor.VisitPatternInr(*this); }
+
+void NodeMatchCase::Accept(NodeVisitor& visitor) const { visitor.VisitMatchCase(*this); }
+
+void NodeExprMatch::Accept(NodeVisitor& visitor) const { visitor.VisitExprMatch(*this); }
+
+void TypeSum::Accept(TypeVisitor& visitor) const { visitor.VisitTypeSum(*this); }
+
+void BaseTypeVisitor::VisitTypeSum(const TypeSum& type) { VisitDefaultType(type); }
 
 } // namespace ast
 } // namespace stella

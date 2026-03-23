@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #sum-types;
+
+fn main(n : Nat) -> Nat + Bool {
+  return inl(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

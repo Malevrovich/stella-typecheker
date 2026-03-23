@@ -41,18 +41,7 @@ void TypeChecker::VisitExprRecord(const ast::NodeExprRecord& node) {
         }
     }
 
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    std::shared_ptr<const ast::TypeRecord> expected_record_type = nullptr;
-
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            expected_record_type =
-                std::dynamic_pointer_cast<const ast::TypeRecord>(exp.TryGetType());
-            if (expected_record_type) {
-                break;
-            }
-        }
-    }
+    const auto expected_record_type = TryGetExpectedType<ast::TypeRecord>(node);
 
     if (expected_record_type) {
         std::unordered_set<std::string> expected_labels;

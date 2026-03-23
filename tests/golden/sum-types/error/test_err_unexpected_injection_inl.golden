@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #sum-types;
+
+fn main(n : Nat) -> Nat {
+  return inl(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_INJECTION:
+Error occured at stella-examples/sum-types/error/test_err_unexpected_injection_inl.stella:5:9:
+inl(n)
+Expected type Nat, but node has type stella::ast::TypeSum
+
+EXIT_CODE: 1

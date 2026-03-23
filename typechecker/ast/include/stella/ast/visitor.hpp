@@ -50,6 +50,13 @@ public:
 
     virtual void VisitExprRecord(const NodeExprRecord& node) = 0;
     virtual void VisitExprDotRecord(const NodeExprDotRecord& node) = 0;
+
+    virtual void VisitExprInl(const NodeExprInl& node) = 0;
+    virtual void VisitExprInr(const NodeExprInr& node) = 0;
+    virtual void VisitPatternInl(const NodePatternInl& node) = 0;
+    virtual void VisitPatternInr(const NodePatternInr& node) = 0;
+    virtual void VisitMatchCase(const NodeMatchCase& node) = 0;
+    virtual void VisitExprMatch(const NodeExprMatch& node) = 0;
 };
 
 class TypeVisitor {
@@ -65,6 +72,7 @@ public:
     virtual void VisitTypeList(const TypeList& type) = 0;
     virtual void VisitTypeTuple(const TypeTuple& type) = 0;
     virtual void VisitTypeRecord(const TypeRecord& type) = 0;
+    virtual void VisitTypeSum(const TypeSum& type) = 0;
 };
 
 class BaseNodeVisitor : public NodeVisitor {
@@ -101,6 +109,13 @@ public:
     void VisitExprDotTuple(const NodeExprDotTuple& node) override;
     void VisitExprRecord(const NodeExprRecord& node) override;
     void VisitExprDotRecord(const NodeExprDotRecord& node) override;
+
+    void VisitExprInl(const NodeExprInl& node) override;
+    void VisitExprInr(const NodeExprInr& node) override;
+    void VisitPatternInl(const NodePatternInl& node) override;
+    void VisitPatternInr(const NodePatternInr& node) override;
+    void VisitMatchCase(const NodeMatchCase& node) override;
+    void VisitExprMatch(const NodeExprMatch& node) override;
 };
 
 class BaseTypeVisitor : public TypeVisitor {
@@ -116,6 +131,7 @@ public:
     void VisitTypeList(const TypeList& type) override;
     void VisitTypeTuple(const TypeTuple& type) override;
     void VisitTypeRecord(const TypeRecord& type) override;
+    void VisitTypeSum(const TypeSum& type) override;
 };
 
 } // namespace ast

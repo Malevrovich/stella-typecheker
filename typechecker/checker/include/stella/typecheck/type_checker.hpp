@@ -65,6 +65,15 @@ public:
 
     void VisitTypeRecord(const ast::TypeRecord& type) override;
 
+    void VisitExprInl(const ast::NodeExprInl& node) override;
+    void VisitExprInr(const ast::NodeExprInr& node) override;
+    void VisitPatternInl(const ast::NodePatternInl& node) override;
+    void VisitPatternInr(const ast::NodePatternInr& node) override;
+    void VisitMatchCase(const ast::NodeMatchCase& node) override;
+    void VisitExprMatch(const ast::NodeExprMatch& node) override;
+
+    void VisitTypeSum(const ast::TypeSum& type) override;
+
     void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
 
 private:
@@ -83,9 +92,39 @@ private:
     void CheckCompatibility(const ast::NodeBase& node, const ExpectedTypeList& expected_types,
                             const DeducedType& deduced_type) const;
 
+    template <typename T>
+        requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
+    std::shared_ptr<const T> TryGetExpectedType(const ast::NodeBase& node) const;
+
+    // Visits one arm of a match-over-sum expression.
+    // inner_pattern  — the NodeBase inside the inl/inr wrapper (shared_ptr)
+    // bound_type     — the type to bind the pattern variable to
+    // match_node     — the enclosing NodeExprMatch (used for error reporting)
+    // case_expr      — the body expression of this arm
+    // result_type    — in/out: first arm sets it, subsequent arms constrain against it
+    void VisitSumMatchArm(std::shared_ptr<const ast::NodeBase> inner_pattern,
+                          std::shared_ptr<const ast::Type> bound_type,
+                          const ast::NodeExprMatch& match_node, const ast::NodeBase& case_expr,
+                          std::shared_ptr<const ast::Type>& result_type);
     NameContext name_context_;
     ast::AttributeStorage<ExpectedTypeList, DeducedType> types_storage_;
 };
+
+template <typename T>
+    requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
+std::shared_ptr<const T> TypeChecker::TryGetExpectedType(const ast::NodeBase& node) const {
+    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
+    if (!expected_types) {
+        return nullptr;
+    }
+    for (const auto& exp : expected_types->All()) {
+        auto t = std::dynamic_pointer_cast<const T>(exp.TryGetType());
+        if (t) {
+            return t;
+        }
+    }
+    return nullptr;
+}
 
 template <typename T>
     requires std::derived_from<std::remove_cvref_t<T>, ast::Type>

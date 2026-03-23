@@ -13,18 +13,9 @@ namespace typecheck {
 void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
     SetDeducedTypeFamily<ast::TypeList>(node, ErrorCode::ERROR_UNEXPECTED_LIST);
 
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
     std::shared_ptr<const ast::Type> element_type = nullptr;
-
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            const auto expected_list_type =
-                std::dynamic_pointer_cast<const ast::TypeList>(exp.TryGetType());
-            if (expected_list_type) {
-                element_type = expected_list_type->GetElementType();
-                break;
-            }
-        }
+    if (const auto expected_list_type = TryGetExpectedType<ast::TypeList>(node)) {
+        element_type = expected_list_type->GetElementType();
     }
 
     if (!element_type && node.GetElements().empty()) {
@@ -49,18 +40,9 @@ void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
 void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
     SetDeducedTypeFamily<ast::TypeList>(node, ErrorCode::ERROR_UNEXPECTED_LIST);
 
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
     std::shared_ptr<const ast::Type> element_type = nullptr;
-
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            const auto expected_list_type =
-                std::dynamic_pointer_cast<const ast::TypeList>(exp.TryGetType());
-            if (expected_list_type) {
-                element_type = expected_list_type->GetElementType();
-                break;
-            }
-        }
+    if (const auto expected_list_type = TryGetExpectedType<ast::TypeList>(node)) {
+        element_type = expected_list_type->GetElementType();
     }
 
     const auto& head = node.GetHead();

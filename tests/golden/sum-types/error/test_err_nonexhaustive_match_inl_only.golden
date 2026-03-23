@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #sum-types;
+
+fn main(s : Nat + Bool) -> Nat {
+  return match s {
+      inl(n) => n
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
+Error occured at stella-examples/sum-types/error/test_err_nonexhaustive_match_inl_only.stella:5:9:
+match s {
+      inl(n) => n
+  }
+
+EXIT_CODE: 1

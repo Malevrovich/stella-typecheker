@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #sum-types;
+
+fn main(s : Nat + Bool) -> Nat {
+  return match s {
+      inl(n) => n
+    | inr(b) => 0
+  }
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0
