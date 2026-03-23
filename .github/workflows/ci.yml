@@ -22,9 +22,10 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}/stella-examples:/workspace/stella-examples:ro" \
             -v "${{ github.workspace }}/tests:/workspace/tests:ro" \
+            -w /workspace \
             --entrypoint python3 \
             stella-typechecker \
-            /workspace/tests/golden_tester.py \
-              --binary /workspace/build/typechecker/cli/typechecker \
-              --stella-dir /workspace/stella-examples \
-              --golden-dir /workspace/tests/golden
+            tests/golden_tester.py \
+              --binary build/typechecker/cli/typechecker \
+              --stella-dir stella-examples \
+              --golden-dir tests/golden
