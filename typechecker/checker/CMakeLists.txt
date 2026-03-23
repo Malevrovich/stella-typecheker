@@ -5,6 +5,7 @@ set(TYPE_CHECK_SOURCES
     src/type_checker_asc.cpp
     src/type_checker_bool.cpp
     src/type_checker_fun.cpp
+    src/type_checker_let.cpp
     src/type_checker_nat.cpp
     src/type_checker_unit.cpp
     src/type_checker_var.cpp

@@ -3,6 +3,7 @@
 #include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
+#include "stella/ast/let.hpp"
 #include "stella/ast/unit.hpp"
 
 namespace stella {
@@ -92,9 +93,16 @@ void BaseNodeVisitor::VisitExprFix(const NodeExprFix& node) { VisitDefaultNode(n
 void BaseNodeVisitor::VisitExprConstUnit(const NodeExprConstUnit& node) { VisitDefaultNode(node); }
 
 void BaseNodeVisitor::VisitExprTypeAsc(const NodeExprTypeAsc& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitPatternVar(const NodePatternVar& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprLet(const NodeExprLet& node) { VisitDefaultNode(node); }
+
 void NodeExprConstUnit::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstUnit(*this); }
 
 void NodeExprTypeAsc::Accept(NodeVisitor& visitor) const { visitor.VisitExprTypeAsc(*this); }
+
+void NodePatternVar::Accept(NodeVisitor& visitor) const { visitor.VisitPatternVar(*this); }
+
+void NodeExprLet::Accept(NodeVisitor& visitor) const { visitor.VisitExprLet(*this); }
 
 void TypeUnit::Accept(TypeVisitor& visitor) const { visitor.VisitTypeUnit(*this); }
 

@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #let-bindings;
+
+fn main(n : Nat) -> Bool {
+  return let n = Nat::iszero(n) in n
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

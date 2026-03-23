@@ -11,6 +11,7 @@
 
 #include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
+#include "stella/ast/let.hpp"
 #include "stella/utils.hpp"
 
 #include "StellaLexer.h"
@@ -241,6 +242,24 @@ private:
         auto asc_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
 
         return make_expr<ast::NodeExprTypeAsc>(ctx, expr, asc_type);
+    }
+
+    antlrcpp::Any visitPatternVar(antlr4_stella::StellaParser::PatternVarContext* ctx) override {
+        return make_node<ast::NodePatternVar>(ctx, ctx->name->getText());
+    }
+
+    antlrcpp::Any visitLet(antlr4_stella::StellaParser::LetContext* ctx) override {
+        if (ctx->patternBindings.size() > 1) {
+            throw std::runtime_error("Multiple pattern bindings in let are not supported yet");
+        }
+
+        auto binding = ctx->patternBindings[0];
+        auto pattern =
+            try_any_cast<std::shared_ptr<const ast::NodePatternVar>>(visit(binding->pat));
+        auto init = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(binding->rhs));
+        auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->body));
+
+        return make_expr<ast::NodeExprLet>(ctx, pattern, init, body);
     }
 
     std::any visitTerminatingSemicolon(

@@ -31,6 +31,9 @@ class NodeExprConstUnit;
 
 class NodeExprTypeAsc;
 
+class NodePatternVar;
+class NodeExprLet;
+
 class NodeVisitor;
 class TypeVisitor;
 
