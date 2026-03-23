@@ -19,6 +19,7 @@ class NodeExprIf;
 class NodeExprVar;
 class NodeExprAbstraction;
 class NodeExprApplication;
+class NodeExprFix;
 class NodeDeclFun;
 
 class TypeFun;

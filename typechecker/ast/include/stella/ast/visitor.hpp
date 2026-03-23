@@ -30,6 +30,7 @@ public:
 
     virtual void VisitExprAbstraction(const NodeExprAbstraction& node) = 0;
     virtual void VisitExprApplication(const NodeExprApplication& node) = 0;
+    virtual void VisitExprFix(const NodeExprFix& node) = 0;
 
     virtual void VisitExprConstUnit(const NodeExprConstUnit& node) = 0;
 };
@@ -66,6 +67,7 @@ public:
     void VisitExprVar(const NodeExprVar& node) override;
     void VisitExprAbstraction(const NodeExprAbstraction& node) override;
     void VisitExprApplication(const NodeExprApplication& node) override;
+    void VisitExprFix(const NodeExprFix& node) override;
     void VisitExprConstUnit(const NodeExprConstUnit& node) override;
 };
 

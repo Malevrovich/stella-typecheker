@@ -29,6 +29,7 @@ public:
     void VisitParamDecl(const ast::NodeParamDecl& node) override;
     void VisitExprAbstraction(const ast::NodeExprAbstraction& node) override;
     void VisitExprApplication(const ast::NodeExprApplication& node) override;
+    void VisitExprFix(const ast::NodeExprFix& node) override;
 
     void VisitExprConstInt(const ast::NodeExprConstInt& node) override;
     void VisitExprIsZero(const ast::NodeExprIsZero& node) override;

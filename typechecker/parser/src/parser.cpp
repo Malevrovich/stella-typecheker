@@ -172,6 +172,11 @@ private:
         return make_expr<ast::NodeExprIsZero>(ctx, operand);
     }
 
+    antlrcpp::Any visitFix(antlr4_stella::StellaParser::FixContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprFix>(ctx, expr);
+    }
+
     antlrcpp::Any visitNatRec(antlr4_stella::StellaParser::NatRecContext* ctx) override {
         auto n = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->n));
         auto initial = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->initial));

@@ -72,6 +72,38 @@ void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
                    {std::make_shared<ast::TypeFun>(std::move(param_type), std::move(body_type))});
 }
 
+void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
+    const auto& expr = node.GetExpr();
+    const auto& expected_type = types_storage_.tryGet<ExpectedType>(&node);
+
+    if (expected_type) {
+        auto expected_type_type = expected_type->TryGetType();
+        if (expected_type_type) {
+            ExpectType(*expr, ExpectedType::EqualsTo(std::make_shared<ast::TypeFun>(
+                                                         expected_type_type, expected_type_type),
+                                                     ErrorCode::ERROR_NOT_A_FUNCTION));
+        } else {
+            ExpectType(*expr,
+                       ExpectedType::CompatibleWith<ast::TypeFun>(ErrorCode::ERROR_NOT_A_FUNCTION));
+        }
+    }
+    Visit(*expr);
+
+    const auto fun_type = std::dynamic_pointer_cast<const ast::TypeFun>(
+        types_storage_.get<DeducedType>(expr.get()).type);
+    if (!fun_type) {
+        OnInternalError("Unexpected fix expression deduction type");
+    }
+
+    if (!fun_type->GetReturnType()->Equals(*fun_type->GetArgType())) {
+        OnError(TypeCheckNodeError(
+            ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION, node,
+            "Mismatched parameter type and return type in fix combinator argument"));
+    }
+
+    SetDeducedType(node, {fun_type->GetReturnType()});
+}
+
 void TypeChecker::VisitExprApplication(const ast::NodeExprApplication& node) {
     const auto& function = node.GetFunction();
     ExpectType(*function,

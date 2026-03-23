@@ -25,6 +25,8 @@ void NodeExprApplication::Accept(NodeVisitor& visitor) const {
     visitor.VisitExprApplication(*this);
 }
 
+void NodeExprFix::Accept(NodeVisitor& visitor) const { visitor.VisitExprFix(*this); }
+
 void NodeExprConstInt::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstInt(*this); }
 
 void NodeExprSucc::Accept(NodeVisitor& visitor) const { visitor.VisitExprSucc(*this); }
@@ -84,6 +86,8 @@ void BaseNodeVisitor::VisitExprAbstraction(const NodeExprAbstraction& node) {
 void BaseNodeVisitor::VisitExprApplication(const NodeExprApplication& node) {
     VisitDefaultNode(node);
 }
+
+void BaseNodeVisitor::VisitExprFix(const NodeExprFix& node) { VisitDefaultNode(node); }
 
 void BaseNodeVisitor::VisitExprConstUnit(const NodeExprConstUnit& node) {
     VisitDefaultNode(node);

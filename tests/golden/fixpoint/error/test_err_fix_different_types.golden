@@ -1,0 +1,27 @@
+INPUT:
+language core;
+extend with #fixpoint-combinator, #integers;
+
+fn main(n : Nat) -> Nat {
+  return fix(fn(self : fn(Bool) -> Nat) {
+    return fn(x : Bool) {
+      return if (x) then true else false
+    }
+  })(false)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/fixpoint/error/test_err_fix_different_types.stella:5:9:
+fix(fn(self : fn(Bool) -> Nat) {
+    return fn(x : Bool) {
+      return if (x) then true else false
+    }
+  })
+Mismatched parameter type and return type in fix combinator argument
+
+EXIT_CODE: 1

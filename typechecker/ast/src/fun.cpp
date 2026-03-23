@@ -39,6 +39,13 @@ NodeExprApplication::NodeExprApplication(std::shared_ptr<SourceInfo> source_info
     CHECK_F(argument_ != nullptr);
 }
 
+NodeExprFix::NodeExprFix(std::shared_ptr<SourceInfo> source_info,
+                         std::shared_ptr<const NodeExpr> expr)
+    : NodeExpr(std::move(source_info)),
+      expr_(std::move(expr)) {
+    CHECK_F(expr_ != nullptr);
+}
+
 TypeFun::TypeFun(std::shared_ptr<const Type> arg_type, std::shared_ptr<const Type> return_type)
     : arg_type_(std::move(arg_type)),
       return_type_(std::move(return_type)) {

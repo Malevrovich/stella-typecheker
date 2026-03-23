@@ -71,6 +71,18 @@ private:
     std::shared_ptr<const NodeExpr> argument_;
 };
 
+class NodeExprFix final : public NodeExpr {
+public:
+    NodeExprFix(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeExpr> expr);
+
+    void Accept(NodeVisitor& visitor) const override;
+
+    std::shared_ptr<const NodeExpr> GetExpr() const { return expr_; }
+
+private:
+    std::shared_ptr<const NodeExpr> expr_;
+};
+
 class TypeFun final : public BaseTypeImpl<TypeFun, Type> {
 public:
     TypeFun(std::shared_ptr<const Type> arg_type, std::shared_ptr<const Type> return_type);
