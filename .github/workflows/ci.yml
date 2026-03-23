@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t stella-typechecker .
+
+      - name: Run golden tests
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/stella-examples:/workspace/stella-examples:ro" \
+            -v "${{ github.workspace }}/tests:/workspace/tests:ro" \
+            --entrypoint python3 \
+            stella-typechecker \
+            /workspace/tests/golden_tester.py \
+              --binary /workspace/build/typechecker/cli/typechecker \
+              --stella-dir /workspace/stella-examples \
+              --golden-dir /workspace/tests/golden
