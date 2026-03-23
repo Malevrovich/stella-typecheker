@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> Nat {
+  return {x = n, y = false}.x
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -16,8 +16,11 @@ namespace typecheck {
 void TypeChecker::VisitDeclFun(const ast::NodeDeclFun& node) {
     SetDeducedTypeFamily<ast::TypeFun>(node);
 
+    Visit(*node.GetReturnType());
+
     const auto& abstraction = *node.GetAbstraction();
     const auto& param = abstraction.GetParam();
+    Visit(*param->GetType());
     Visit(*param);
     auto name_guard = name_context_.Push(std::string{param->GetName()}, *param);
 
@@ -52,6 +55,7 @@ void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
     }
 
     const auto& param = node.GetParam();
+    Visit(*param->GetType());
     if (expected_arg_type) {
         ExpectType(*param, ExpectedType::EqualsTo(expected_arg_type,
                                                   ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_PARAMETER));

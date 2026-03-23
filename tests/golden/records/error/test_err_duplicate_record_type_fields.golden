@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> {x : Nat, x : Bool} {
+  return {x = n}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_RECORD_TYPE_FIELDS:
+Error type: {x : Nat, x : Bool}
+Duplicate field 'x' in record type
+
+EXIT_CODE: 1

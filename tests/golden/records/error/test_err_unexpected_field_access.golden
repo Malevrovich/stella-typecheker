@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> Nat {
+  return {x = n, y = false}.z
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_FIELD_ACCESS:
+Error occured at stella-examples/records/error/test_err_unexpected_field_access.stella:5:9:
+{x = n, y = false}.z
+Record has no field 'z'
+
+EXIT_CODE: 1

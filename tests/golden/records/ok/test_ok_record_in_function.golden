@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #records;
+
+fn get_x(r : {x : Nat, y : Bool}) -> Nat {
+  return r.x
+}
+
+fn main(n : Nat) -> Nat {
+  return get_x({x = n, y = true})
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

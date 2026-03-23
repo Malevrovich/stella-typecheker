@@ -13,6 +13,8 @@ void TypeChecker::VisitExprTypeAsc(const ast::NodeExprTypeAsc& node) {
     const auto& expr = node.GetExpr();
     const auto& asc_type = node.GetAscType();
 
+    Visit(*asc_type);
+
     ExpectType(*expr, ExpectedType::EqualsTo(asc_type));
     Visit(*expr);
 

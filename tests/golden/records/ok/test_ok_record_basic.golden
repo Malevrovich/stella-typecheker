@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> {x : Nat, y : Bool} {
+  return {x = n, y = false}
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

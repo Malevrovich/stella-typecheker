@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> {x : Nat, y : Bool} {
+  return {x = n}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_MISSING_RECORD_FIELDS:
+Error occured at stella-examples/records/error/test_err_missing_record_fields.stella:5:9:
+{x = n}
+Missing record field 'y' required by expected type
+
+EXIT_CODE: 1

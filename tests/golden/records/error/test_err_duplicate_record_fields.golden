@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> {x : Nat} {
+  return {x = n, x = succ(n)}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_RECORD_FIELDS:
+Error occured at stella-examples/records/error/test_err_duplicate_record_fields.stella:5:9:
+{x = n, x = succ(n)}
+Duplicate record field 'x'
+
+EXIT_CODE: 1

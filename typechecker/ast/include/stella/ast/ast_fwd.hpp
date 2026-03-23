@@ -45,6 +45,10 @@ class NodeExprTuple;
 class NodeExprDotTuple;
 class TypeTuple;
 
+class NodeExprRecord;
+class NodeExprDotRecord;
+class TypeRecord;
+
 class NodeVisitor;
 class TypeVisitor;
 

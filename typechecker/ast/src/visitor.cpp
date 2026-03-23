@@ -5,6 +5,7 @@
 #include "stella/ast/base.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
+#include "stella/ast/record.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/ast/unit.hpp"
 
@@ -104,6 +105,8 @@ void BaseNodeVisitor::VisitExprTail(const NodeExprTail& node) { VisitDefaultNode
 void BaseNodeVisitor::VisitExprIsEmpty(const NodeExprIsEmpty& node) { VisitDefaultNode(node); }
 void BaseNodeVisitor::VisitExprTuple(const NodeExprTuple& node) { VisitDefaultNode(node); }
 void BaseNodeVisitor::VisitExprDotTuple(const NodeExprDotTuple& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprRecord(const NodeExprRecord& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprDotRecord(const NodeExprDotRecord& node) { VisitDefaultNode(node); }
 
 void NodeExprConstUnit::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstUnit(*this); }
 
@@ -145,6 +148,14 @@ void NodeExprTuple::Accept(NodeVisitor& visitor) const { visitor.VisitExprTuple(
 void NodeExprDotTuple::Accept(NodeVisitor& visitor) const { visitor.VisitExprDotTuple(*this); }
 
 void TypeTuple::Accept(TypeVisitor& visitor) const { visitor.VisitTypeTuple(*this); }
+
+void NodeExprRecord::Accept(NodeVisitor& visitor) const { visitor.VisitExprRecord(*this); }
+
+void NodeExprDotRecord::Accept(NodeVisitor& visitor) const { visitor.VisitExprDotRecord(*this); }
+
+void TypeRecord::Accept(TypeVisitor& visitor) const { visitor.VisitTypeRecord(*this); }
+
+void BaseTypeVisitor::VisitTypeRecord(const TypeRecord& type) { VisitDefaultType(type); }
 
 } // namespace ast
 } // namespace stella

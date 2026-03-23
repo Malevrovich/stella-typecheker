@@ -2,6 +2,7 @@
 
 #include <any>
 #include <format>
+#include <unordered_set>
 
 #include <ANTLRFileStream.h>
 #include <ANTLRInputStream.h>
@@ -13,6 +14,7 @@
 #include "stella/ast/ast.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
+#include "stella/ast/record.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/utils.hpp"
 
@@ -294,6 +296,37 @@ private:
         auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
         int index = std::stoi(ctx->index->getText());
         return make_expr<ast::NodeExprDotTuple>(ctx, expr, index);
+    }
+
+    antlrcpp::Any visitTypeRecord(antlr4_stella::StellaParser::TypeRecordContext* ctx) override {
+        std::vector<ast::TypeRecord::Field> fields;
+        std::unordered_set<std::string> seen_labels;
+        std::optional<std::string> duplicate_label;
+        for (auto field_ctx : ctx->fieldTypes) {
+            const std::string label = field_ctx->label->getText();
+            if (!seen_labels.insert(label).second && !duplicate_label) {
+                duplicate_label = label;
+            }
+            auto field_type =
+                try_any_cast<std::shared_ptr<const ast::Type>>(visit(field_ctx->type_));
+            fields.push_back({label, std::move(field_type)});
+        }
+        return type(
+            std::make_shared<const ast::TypeRecord>(std::move(fields), std::move(duplicate_label)));
+    }
+
+    antlrcpp::Any visitRecord(antlr4_stella::StellaParser::RecordContext* ctx) override {
+        std::vector<ast::NodeExprRecord::Field> fields;
+        for (auto binding_ctx : ctx->bindings) {
+            auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(binding_ctx->rhs));
+            fields.push_back({binding_ctx->name->getText(), std::move(expr)});
+        }
+        return make_expr<ast::NodeExprRecord>(ctx, std::move(fields));
+    }
+
+    antlrcpp::Any visitDotRecord(antlr4_stella::StellaParser::DotRecordContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprDotRecord>(ctx, expr, ctx->label->getText());
     }
 
     antlrcpp::Any visitTypeAsc(antlr4_stella::StellaParser::TypeAscContext* ctx) override {

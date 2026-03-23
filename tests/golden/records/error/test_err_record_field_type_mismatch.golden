@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #records;
+
+fn main(n : Nat) -> {x : Nat, y : Bool} {
+  return {x = false, y = false}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/records/error/test_err_record_field_type_mismatch.stella:5:14:
+false
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

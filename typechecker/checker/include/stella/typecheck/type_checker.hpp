@@ -17,11 +17,12 @@
 namespace stella {
 namespace typecheck {
 
-class TypeChecker : public ast::BaseNodeVisitor {
+class TypeChecker : public ast::BaseNodeVisitor, public ast::BaseTypeVisitor {
 public:
     virtual ~TypeChecker();
 
     void Visit(const ast::NodeBase& node) override;
+    void Visit(const ast::Type& type) override;
 
     void VisitProgram(const ast::NodeProgram& node) override;
 
@@ -58,6 +59,11 @@ public:
 
     void VisitExprTuple(const ast::NodeExprTuple& node) override;
     void VisitExprDotTuple(const ast::NodeExprDotTuple& node) override;
+
+    void VisitExprRecord(const ast::NodeExprRecord& node) override;
+    void VisitExprDotRecord(const ast::NodeExprDotRecord& node) override;
+
+    void VisitTypeRecord(const ast::TypeRecord& type) override;
 
     void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
 
