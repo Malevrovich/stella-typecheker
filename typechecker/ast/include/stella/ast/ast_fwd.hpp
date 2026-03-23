@@ -34,6 +34,13 @@ class NodeExprTypeAsc;
 class NodePatternVar;
 class NodeExprLet;
 
+class NodeExprList;
+class NodeExprConsList;
+class NodeExprHead;
+class NodeExprTail;
+class NodeExprIsEmpty;
+class TypeList;
+
 class NodeVisitor;
 class TypeVisitor;
 

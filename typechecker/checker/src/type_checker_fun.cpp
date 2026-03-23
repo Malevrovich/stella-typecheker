@@ -41,10 +41,10 @@ void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
     std::shared_ptr<const ast::Type> expected_arg_type = nullptr;
     std::shared_ptr<const ast::Type> expected_body_type = nullptr;
 
-    const auto expected_type = types_storage_.tryGet<ExpectedType>(&node);
-    if (expected_type) {
+    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
+    if (expected_types && !expected_types->Empty()) {
         const auto expected_type_type =
-            std::dynamic_pointer_cast<const ast::TypeFun>(expected_type->TryGetType());
+            std::dynamic_pointer_cast<const ast::TypeFun>(expected_types->Front().TryGetType());
         if (expected_type_type) {
             expected_arg_type = expected_type_type->GetArgType();
             expected_body_type = expected_type_type->GetReturnType();
@@ -74,10 +74,10 @@ void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
 
 void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
     const auto& expr = node.GetExpr();
-    const auto& expected_type = types_storage_.tryGet<ExpectedType>(&node);
+    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
 
-    if (expected_type) {
-        auto expected_type_type = expected_type->TryGetType();
+    if (expected_types && !expected_types->Empty()) {
+        auto expected_type_type = expected_types->Front().TryGetType();
         if (expected_type_type) {
             ExpectType(*expr, ExpectedType::EqualsTo(std::make_shared<ast::TypeFun>(
                                                          expected_type_type, expected_type_type),

@@ -38,6 +38,12 @@ public:
 
     virtual void VisitPatternVar(const NodePatternVar& node) = 0;
     virtual void VisitExprLet(const NodeExprLet& node) = 0;
+
+    virtual void VisitExprList(const NodeExprList& node) = 0;
+    virtual void VisitExprConsList(const NodeExprConsList& node) = 0;
+    virtual void VisitExprHead(const NodeExprHead& node) = 0;
+    virtual void VisitExprTail(const NodeExprTail& node) = 0;
+    virtual void VisitExprIsEmpty(const NodeExprIsEmpty& node) = 0;
 };
 
 class TypeVisitor {
@@ -50,6 +56,7 @@ public:
     virtual void VisitTypeBool(const TypeBool& type) = 0;
     virtual void VisitTypeNat(const TypeNat& type) = 0;
     virtual void VisitTypeUnit(const TypeUnit& type) = 0;
+    virtual void VisitTypeList(const TypeList& type) = 0;
 };
 
 class BaseNodeVisitor : public NodeVisitor {
@@ -77,6 +84,11 @@ public:
     void VisitExprTypeAsc(const NodeExprTypeAsc& node) override;
     void VisitPatternVar(const NodePatternVar& node) override;
     void VisitExprLet(const NodeExprLet& node) override;
+    void VisitExprList(const NodeExprList& node) override;
+    void VisitExprConsList(const NodeExprConsList& node) override;
+    void VisitExprHead(const NodeExprHead& node) override;
+    void VisitExprTail(const NodeExprTail& node) override;
+    void VisitExprIsEmpty(const NodeExprIsEmpty& node) override;
 };
 
 class BaseTypeVisitor : public TypeVisitor {
@@ -89,6 +101,7 @@ public:
     void VisitTypeBool(const TypeBool& type) override;
     void VisitTypeNat(const TypeNat& type) override;
     void VisitTypeUnit(const TypeUnit& type) override;
+    void VisitTypeList(const TypeList& type) override;
 };
 
 } // namespace ast

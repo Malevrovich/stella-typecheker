@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #lists, #let-bindings;
+
+fn main(n : Nat) -> Nat {
+  return let x = [] in n
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_AMBIGUOUS_LIST:
+Error occured at stella-examples/lists/error/test_err_ambiguous_list.stella:5:17:
+[]
+Cannot determine element type of empty list literal
+
+EXIT_CODE: 1

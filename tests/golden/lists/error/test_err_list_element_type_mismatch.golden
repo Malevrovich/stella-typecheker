@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> [Nat] {
+  return [true, false]
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/lists/error/test_err_list_element_type_mismatch.stella:5:10:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

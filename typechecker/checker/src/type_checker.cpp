@@ -45,13 +45,13 @@ void TypeChecker::Visit(const ast::NodeBase& node) {
 void TypeChecker::CheckCompatibility(const ast::NodeBase& node,
                                      const ExpectedTypeList& expected_types,
                                      const DeducedType& deduced_type) const {
-    auto conflict_error_code = expected_types.CheckAll(*deduced_type.type);
-    if (conflict_error_code) {
-        const std::string expected_str =
-            expected_types.Empty() ? "" : expected_types.Front().ToString();
-        OnError(TypeCheckNodeError{*conflict_error_code, node,
-                                   std::format("Expected type {}, but expr has type {}",
-                                               expected_str, deduced_type.type->ToString())});
+    for (const auto& exp : expected_types.All()) {
+        auto conflict_error_code = exp.Check(*deduced_type.type);
+        if (conflict_error_code) {
+            OnError(TypeCheckNodeError{*conflict_error_code, node,
+                                       std::format("Expected type {}, but expr has type {}",
+                                                   exp.ToString(), deduced_type.type->ToString())});
+        }
     }
 }
 

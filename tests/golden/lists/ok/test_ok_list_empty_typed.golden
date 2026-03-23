@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> [Nat] {
+  return ([] as [Nat])
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

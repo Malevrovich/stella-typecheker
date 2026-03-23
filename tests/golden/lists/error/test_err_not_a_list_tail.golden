@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : [Bool]) -> [Nat] {
+  return List::tail(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/lists/error/test_err_not_a_list_tail.stella:5:20:
+n
+Expected type [Nat], but expr has type [Bool]
+
+EXIT_CODE: 1

@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> Bool {
+  return List::isempty([n])
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

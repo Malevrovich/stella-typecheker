@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn prepend(n : Nat) -> [Nat] {
+  return cons(n, ([] as [Nat]))
+}
+
+fn main(n : Nat) -> [Nat] {
+  return prepend(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -12,6 +12,7 @@
 #include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
 #include "stella/ast/let.hpp"
+#include "stella/ast/list.hpp"
 #include "stella/utils.hpp"
 
 #include "StellaLexer.h"
@@ -235,6 +236,40 @@ private:
         auto abstr = make_node<ast::NodeExprAbstraction>(ctx, param, body);
 
         return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr);
+    }
+
+    antlrcpp::Any visitTypeList(antlr4_stella::StellaParser::TypeListContext* ctx) override {
+        auto element_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+        return type(std::make_shared<const ast::TypeList>(element_type));
+    }
+
+    antlrcpp::Any visitList(antlr4_stella::StellaParser::ListContext* ctx) override {
+        std::vector<std::shared_ptr<const ast::NodeExpr>> elements;
+        for (auto expr_ctx : ctx->exprs) {
+            elements.push_back(try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(expr_ctx)));
+        }
+        return make_expr<ast::NodeExprList>(ctx, std::move(elements));
+    }
+
+    antlrcpp::Any visitConsList(antlr4_stella::StellaParser::ConsListContext* ctx) override {
+        auto head = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->head));
+        auto tail = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->tail));
+        return make_expr<ast::NodeExprConsList>(ctx, head, tail);
+    }
+
+    antlrcpp::Any visitHead(antlr4_stella::StellaParser::HeadContext* ctx) override {
+        auto list = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->list));
+        return make_expr<ast::NodeExprHead>(ctx, list);
+    }
+
+    antlrcpp::Any visitTail(antlr4_stella::StellaParser::TailContext* ctx) override {
+        auto list = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->list));
+        return make_expr<ast::NodeExprTail>(ctx, list);
+    }
+
+    antlrcpp::Any visitIsEmpty(antlr4_stella::StellaParser::IsEmptyContext* ctx) override {
+        auto list = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->list));
+        return make_expr<ast::NodeExprIsEmpty>(ctx, list);
     }
 
     antlrcpp::Any visitTypeAsc(antlr4_stella::StellaParser::TypeAscContext* ctx) override {

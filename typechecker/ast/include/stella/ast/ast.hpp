@@ -5,6 +5,7 @@
 #include "stella/ast/asc.hpp"     // IWYU pragma: export
 #include "stella/ast/fun.hpp"     // IWYU pragma: export
 #include "stella/ast/let.hpp"     // IWYU pragma: export
+#include "stella/ast/list.hpp"    // IWYU pragma: export
 #include "stella/ast/logic.hpp"   // IWYU pragma: export
 #include "stella/ast/nat.hpp"     // IWYU pragma: export
 #include "stella/ast/unit.hpp"    // IWYU pragma: export

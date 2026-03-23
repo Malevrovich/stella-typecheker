@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> Nat {
+  return List::head(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_LIST:
+Error occured at stella-examples/lists/error/test_err_mismatched_list_head.stella:5:20:
+n
+Expected type stella::ast::TypeList, but expr has type Nat
+
+EXIT_CODE: 1

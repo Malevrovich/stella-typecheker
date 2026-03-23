@@ -4,6 +4,7 @@
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
 #include "stella/ast/let.hpp"
+#include "stella/ast/list.hpp"
 #include "stella/ast/unit.hpp"
 
 namespace stella {
@@ -95,6 +96,11 @@ void BaseNodeVisitor::VisitExprConstUnit(const NodeExprConstUnit& node) { VisitD
 void BaseNodeVisitor::VisitExprTypeAsc(const NodeExprTypeAsc& node) { VisitDefaultNode(node); }
 void BaseNodeVisitor::VisitPatternVar(const NodePatternVar& node) { VisitDefaultNode(node); }
 void BaseNodeVisitor::VisitExprLet(const NodeExprLet& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprList(const NodeExprList& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprConsList(const NodeExprConsList& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprHead(const NodeExprHead& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprTail(const NodeExprTail& node) { VisitDefaultNode(node); }
+void BaseNodeVisitor::VisitExprIsEmpty(const NodeExprIsEmpty& node) { VisitDefaultNode(node); }
 
 void NodeExprConstUnit::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstUnit(*this); }
 
@@ -115,6 +121,20 @@ void BaseTypeVisitor::VisitTypeBool(const TypeBool& type) { VisitDefaultType(typ
 void BaseTypeVisitor::VisitTypeNat(const TypeNat& type) { VisitDefaultType(type); }
 
 void BaseTypeVisitor::VisitTypeUnit(const TypeUnit& type) { VisitDefaultType(type); }
+
+void BaseTypeVisitor::VisitTypeList(const TypeList& type) { VisitDefaultType(type); }
+
+void NodeExprList::Accept(NodeVisitor& visitor) const { visitor.VisitExprList(*this); }
+
+void NodeExprConsList::Accept(NodeVisitor& visitor) const { visitor.VisitExprConsList(*this); }
+
+void NodeExprHead::Accept(NodeVisitor& visitor) const { visitor.VisitExprHead(*this); }
+
+void NodeExprTail::Accept(NodeVisitor& visitor) const { visitor.VisitExprTail(*this); }
+
+void NodeExprIsEmpty::Accept(NodeVisitor& visitor) const { visitor.VisitExprIsEmpty(*this); }
+
+void TypeList::Accept(TypeVisitor& visitor) const { visitor.VisitTypeList(*this); }
 
 } // namespace ast
 } // namespace stella

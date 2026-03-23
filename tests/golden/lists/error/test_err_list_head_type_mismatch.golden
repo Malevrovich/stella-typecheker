@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> Bool {
+  return List::head([n, succ(n)])
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/lists/error/test_err_list_head_type_mismatch.stella:5:21:
+n
+Expected type Bool, but expr has type Nat
+
+EXIT_CODE: 1

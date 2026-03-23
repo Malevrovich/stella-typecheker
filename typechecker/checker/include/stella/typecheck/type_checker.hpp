@@ -50,6 +50,12 @@ public:
     void VisitPatternVar(const ast::NodePatternVar& node) override;
     void VisitExprLet(const ast::NodeExprLet& node) override;
 
+    void VisitExprList(const ast::NodeExprList& node) override;
+    void VisitExprConsList(const ast::NodeExprConsList& node) override;
+    void VisitExprHead(const ast::NodeExprHead& node) override;
+    void VisitExprTail(const ast::NodeExprTail& node) override;
+    void VisitExprIsEmpty(const ast::NodeExprIsEmpty& node) override;
+
     void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
 
 private:

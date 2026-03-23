@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> Nat {
+  return cons(n, ([] as [Nat]))
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_LIST:
+Error occured at stella-examples/lists/error/test_err_unexpected_list_cons.stella:5:9:
+cons(n, ([] as [Nat]))
+Expected type Nat, but node has type stella::ast::TypeList
+
+EXIT_CODE: 1
