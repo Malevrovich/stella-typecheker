@@ -11,7 +11,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNDEFINED_VARIABLE:
-Error occured at stella-examples/error/test_err_undefined_var.stella:5:9:
+Error occured at stella-examples/core/error/test_err_undefined_var.stella:5:9:
 y
 
 EXIT_CODE: 1

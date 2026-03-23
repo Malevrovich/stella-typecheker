@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/error/test_err_natrec_wrong_s.stella:6:24:
+Error occured at stella-examples/core/error/test_err_natrec_wrong_s.stella:6:24:
 42
 Expected type (Nat -> (Nat -> Nat)), but expr has type Nat
 

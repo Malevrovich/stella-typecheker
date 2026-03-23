@@ -3,7 +3,7 @@ INPUT:
 language core;
 
 fn main(b : Bool) -> Nat {
-  return succ(b)   // succ ожидает Nat
+  return if b then 0 else false   // false имеет тип Bool, а ожидается Nat
 }
 
 STDOUT:
@@ -11,8 +11,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/error/test_err_succ_on_bool.stella:5:14:
-b
+Error occured at stella-examples/core/error/test_err_type_mismatch_if.stella:5:26:
+false
 Expected type Nat, but expr has type Bool
 
 EXIT_CODE: 1

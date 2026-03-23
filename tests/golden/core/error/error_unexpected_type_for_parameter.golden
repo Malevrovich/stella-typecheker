@@ -23,7 +23,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_PARAMETER:
-Error occured at stella-examples/error/error_unexpected_type_for_parameter.stella:15:12:
+Error occured at stella-examples/core/error/error_unexpected_type_for_parameter.stella:15:12:
 n : Bool
 Expected type Nat, but expr has type Bool
 

@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/error/test_err_natrec_wrong_z.stella:6:21:
+Error occured at stella-examples/core/error/test_err_natrec_wrong_z.stella:6:21:
 false
 Expected type Nat, but expr has type Bool
 

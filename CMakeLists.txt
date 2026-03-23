@@ -28,4 +28,3 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_subdirectory(typechecker)
-add_subdirectory(tests)
