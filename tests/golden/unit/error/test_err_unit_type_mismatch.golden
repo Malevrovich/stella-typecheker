@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #unit-type;
+
+fn main(n : Nat) -> Nat {
+  return unit
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/unit/error/test_err_unit_type_mismatch.stella:5:9:
+unit
+Expected type Nat, but expr has type Unit
+
+EXIT_CODE: 1

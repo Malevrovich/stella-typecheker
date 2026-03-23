@@ -124,12 +124,20 @@ private:
         return type(std::make_shared<const ast::TypeFun>(param_type, return_type));
     }
 
+    antlrcpp::Any visitTypeUnit(antlr4_stella::StellaParser::TypeUnitContext* ctx) override {
+        return type(std::make_shared<const ast::TypeUnit>());
+    }
+
     antlrcpp::Any visitConstTrue(antlr4_stella::StellaParser::ConstTrueContext* ctx) override {
         return make_expr<ast::NodeExprConstTrue>(ctx);
     }
 
     antlrcpp::Any visitConstFalse(antlr4_stella::StellaParser::ConstFalseContext* ctx) override {
         return make_expr<ast::NodeExprConstFalse>(ctx);
+    }
+
+    antlrcpp::Any visitConstUnit(antlr4_stella::StellaParser::ConstUnitContext* ctx) override {
+        return make_expr<ast::NodeExprConstUnit>(ctx);
     }
 
     antlrcpp::Any visitConstInt(antlr4_stella::StellaParser::ConstIntContext* ctx) override {

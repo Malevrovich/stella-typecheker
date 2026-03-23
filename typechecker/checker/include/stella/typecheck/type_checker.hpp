@@ -42,6 +42,8 @@ public:
 
     void VisitExprVar(const ast::NodeExprVar& node) override;
 
+    void VisitExprConstUnit(const ast::NodeExprConstUnit& node) override;
+
     void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
 
 private:

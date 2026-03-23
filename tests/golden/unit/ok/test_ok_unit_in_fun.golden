@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #unit-type;
+
+fn ignore(x : Nat) -> Unit {
+  return unit
+}
+
+fn main(n : Nat) -> Unit {
+  return ignore(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

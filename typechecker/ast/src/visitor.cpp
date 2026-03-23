@@ -2,6 +2,7 @@
 
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
+#include "stella/ast/unit.hpp"
 
 namespace stella {
 namespace ast {
@@ -84,6 +85,14 @@ void BaseNodeVisitor::VisitExprApplication(const NodeExprApplication& node) {
     VisitDefaultNode(node);
 }
 
+void BaseNodeVisitor::VisitExprConstUnit(const NodeExprConstUnit& node) {
+    VisitDefaultNode(node);
+}
+
+void NodeExprConstUnit::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstUnit(*this); }
+
+void TypeUnit::Accept(TypeVisitor& visitor) const { visitor.VisitTypeUnit(*this); }
+
 void BaseTypeVisitor::VisitDefaultType(const Type& type) {}
 
 void BaseTypeVisitor::VisitTypeFun(const TypeFun& type) { VisitDefaultType(type); }
@@ -91,6 +100,8 @@ void BaseTypeVisitor::VisitTypeFun(const TypeFun& type) { VisitDefaultType(type)
 void BaseTypeVisitor::VisitTypeBool(const TypeBool& type) { VisitDefaultType(type); }
 
 void BaseTypeVisitor::VisitTypeNat(const TypeNat& type) { VisitDefaultType(type); }
+
+void BaseTypeVisitor::VisitTypeUnit(const TypeUnit& type) { VisitDefaultType(type); }
 
 } // namespace ast
 } // namespace stella

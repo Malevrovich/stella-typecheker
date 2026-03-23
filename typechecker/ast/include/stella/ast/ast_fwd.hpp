@@ -24,6 +24,9 @@ class NodeDeclFun;
 class TypeFun;
 class TypeBool;
 class TypeNat;
+class TypeUnit;
+
+class NodeExprConstUnit;
 
 class NodeVisitor;
 class TypeVisitor;
