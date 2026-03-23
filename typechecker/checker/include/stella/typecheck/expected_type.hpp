@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <typeinfo>
+#include <vector>
 
 #include "stella/ast/base.hpp"
 #include "stella/typecheck/error.hpp"
@@ -61,6 +62,44 @@ private:
     std::string name_;
     std::optional<ErrorCode> conflict_error_code_{std::nullopt};
     std::shared_ptr<const ast::Type> stored_type_{nullptr};
+};
+
+class ExpectedTypeList {
+public:
+    ExpectedTypeList() = default;
+
+    void Push(ExpectedType&& expected_type) { expectations_.push_back(std::move(expected_type)); }
+
+    bool Empty() const { return expectations_.empty(); }
+
+    std::size_t Size() const { return expectations_.size(); }
+
+    const ExpectedType& Front() const { return expectations_.front(); }
+
+    const std::vector<ExpectedType>& All() const { return expectations_; }
+
+    std::optional<ErrorCode> CheckAll(const ast::Type& type) const {
+        for (const auto& exp : expectations_) {
+            if (auto err = exp.Check(type)) {
+                return err;
+            }
+        }
+        return std::nullopt;
+    }
+
+    template <typename T>
+    std::optional<ErrorCode>
+    CheckAllCompatibleWith(std::optional<ErrorCode> conflict_error_code = std::nullopt) const {
+        for (const auto& exp : expectations_) {
+            if (auto err = exp.CheckCompatibleWith<T>(conflict_error_code)) {
+                return err;
+            }
+        }
+        return std::nullopt;
+    }
+
+private:
+    std::vector<ExpectedType> expectations_;
 };
 
 template <typename T>

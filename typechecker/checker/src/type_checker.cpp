@@ -42,21 +42,23 @@ void TypeChecker::Visit(const ast::NodeBase& node) {
                                 node.ToString());
 }
 
-void TypeChecker::CheckCompatibility(const ast::NodeBase& node, const ExpectedType& expected_type,
+void TypeChecker::CheckCompatibility(const ast::NodeBase& node,
+                                     const ExpectedTypeList& expected_types,
                                      const DeducedType& deduced_type) const {
-    auto conflict_error_code = expected_type.Check(*deduced_type.type);
+    auto conflict_error_code = expected_types.CheckAll(*deduced_type.type);
     if (conflict_error_code) {
+        const std::string expected_str =
+            expected_types.Empty() ? "" : expected_types.Front().ToString();
         OnError(TypeCheckNodeError{*conflict_error_code, node,
                                    std::format("Expected type {}, but expr has type {}",
-                                               expected_type.ToString(),
-                                               deduced_type.type->ToString())});
+                                               expected_str, deduced_type.type->ToString())});
     }
 }
 
 void TypeChecker::SetDeducedType(const ast::NodeBase& node, DeducedType&& deduced_type) {
-    const auto expected_type = types_storage_.tryGet<ExpectedType>(&node);
-    if (expected_type) {
-        CheckCompatibility(node, *expected_type, deduced_type);
+    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
+    if (expected_types) {
+        CheckCompatibility(node, *expected_types, deduced_type);
     }
 
     auto [result_type, was_set] =
@@ -70,25 +72,28 @@ void TypeChecker::SetDeducedType(const ast::NodeBase& node, DeducedType&& deduce
 
 void TypeChecker::ExpectType(const ast::NodeBase& node, ExpectedType&& expected_type) {
     const auto deduced_type = types_storage_.tryGet<DeducedType>(&node);
+
+    auto& expected_list = types_storage_.get<ExpectedTypeList>(&node, ExpectedTypeList{});
+
     if (deduced_type) {
-        CheckCompatibility(node, expected_type, *deduced_type);
+        auto conflict_error_code = expected_type.Check(*deduced_type->type);
+        if (conflict_error_code) {
+            OnError(TypeCheckNodeError{*conflict_error_code, node,
+                                       std::format("Expected type {}, but expr has type {}",
+                                                   expected_type.ToString(),
+                                                   deduced_type->type->ToString())});
+        }
     }
 
-    auto [prev_expected_type, was_set] =
-        types_storage_.trySet<ExpectedType>(&node, std::move(expected_type));
-
-    if (!was_set) {
-        OnInternalError(std::format(
-            "At node: {}.\nDouble expectation is not possible in the current version of "
-            "the algorithm",
-            node.ToString()));
-    }
+    expected_list.Push(std::move(expected_type));
 }
 
 void TypeChecker::PropagateExpectedType(const ast::NodeBase& src, const ast::NodeBase& dst) {
-    const auto expected_type = types_storage_.tryGet<ExpectedType>(&src);
-    if (expected_type) {
-        ExpectType(dst, ExpectedType{*expected_type});
+    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&src);
+    if (expected_types) {
+        for (const auto& exp : expected_types->All()) {
+            ExpectType(dst, ExpectedType{exp});
+        }
     }
 }
 

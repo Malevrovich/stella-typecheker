@@ -65,26 +65,28 @@ private:
     void SetDeducedTypeFamily(
         const ast::NodeBase& node,
         std::optional<ErrorCode> conflict_error_code = std::nullopt); // TODO: better name
-    void CheckCompatibility(const ast::NodeBase& node, const ExpectedType& expected_type,
+    void CheckCompatibility(const ast::NodeBase& node, const ExpectedTypeList& expected_types,
                             const DeducedType& deduced_type) const;
 
     NameContext name_context_;
-    ast::AttributeStorage<ExpectedType, DeducedType> types_storage_;
+    ast::AttributeStorage<ExpectedTypeList, DeducedType> types_storage_;
 };
 
 template <typename T>
     requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
 void TypeChecker::SetDeducedTypeFamily(const ast::NodeBase& node,
                                        std::optional<ErrorCode> conflict_error_code) {
-    auto expected_type = types_storage_.tryGet<ExpectedType>(&node);
-    if (expected_type) {
+    auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
+    if (expected_types) {
         auto error_code =
-            expected_type->CheckCompatibleWith<std::remove_cvref_t<T>>(conflict_error_code);
+            expected_types->CheckAllCompatibleWith<std::remove_cvref_t<T>>(conflict_error_code);
         if (error_code) {
+            const std::string expected_str =
+                expected_types->Empty() ? "" : expected_types->Front().ToString();
             OnError(TypeCheckNodeError{
                 *error_code,
                 node,
-                std::format("Expected type {}, but node has type {}", expected_type->ToString(),
+                std::format("Expected type {}, but node has type {}", expected_str,
                             tryDemangle(typeid(T).name())),
             });
         }

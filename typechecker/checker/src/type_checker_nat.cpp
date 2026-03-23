@@ -52,16 +52,15 @@ void TypeChecker::VisitExprNatRec(const ast::NodeExprNatRec& node) {
     Visit(*n);
 
     const auto& initial = node.GetInitial();
-    const auto expected_type = types_storage_.tryGet<ExpectedType>(&node);
     PropagateExpectedType(node, *initial);
     Visit(*initial);
 
     const auto& deduced_type = types_storage_.get<DeducedType>(initial.get()).type;
 
     const auto& step = node.GetStep();
-    const auto& step_type = std::make_shared<ast::TypeFun>(
-        std::make_shared<ast::TypeNat>(),
-        std::make_shared<ast::TypeFun>(deduced_type, deduced_type));
+    const auto& step_type =
+        std::make_shared<ast::TypeFun>(std::make_shared<ast::TypeNat>(),
+                                       std::make_shared<ast::TypeFun>(deduced_type, deduced_type));
     ExpectType(*step, ExpectedType::EqualsTo(step_type));
     Visit(*step);
 
