@@ -56,6 +56,9 @@ public:
     void VisitExprTail(const ast::NodeExprTail& node) override;
     void VisitExprIsEmpty(const ast::NodeExprIsEmpty& node) override;
 
+    void VisitExprTuple(const ast::NodeExprTuple& node) override;
+    void VisitExprDotTuple(const ast::NodeExprDotTuple& node) override;
+
     void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
 
 private:

@@ -41,6 +41,10 @@ class NodeExprTail;
 class NodeExprIsEmpty;
 class TypeList;
 
+class NodeExprTuple;
+class NodeExprDotTuple;
+class TypeTuple;
+
 class NodeVisitor;
 class TypeVisitor;
 

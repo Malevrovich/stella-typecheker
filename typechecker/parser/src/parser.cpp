@@ -13,6 +13,7 @@
 #include "stella/ast/ast.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
+#include "stella/ast/tuple.hpp"
 #include "stella/utils.hpp"
 
 #include "StellaLexer.h"
@@ -270,6 +271,29 @@ private:
     antlrcpp::Any visitIsEmpty(antlr4_stella::StellaParser::IsEmptyContext* ctx) override {
         auto list = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->list));
         return make_expr<ast::NodeExprIsEmpty>(ctx, list);
+    }
+
+    antlrcpp::Any visitTypeTuple(antlr4_stella::StellaParser::TypeTupleContext* ctx) override {
+        std::vector<std::shared_ptr<const ast::Type>> element_types;
+        for (auto type_ctx : ctx->types) {
+            element_types.push_back(
+                try_any_cast<std::shared_ptr<const ast::Type>>(visit(type_ctx)));
+        }
+        return type(std::make_shared<const ast::TypeTuple>(std::move(element_types)));
+    }
+
+    antlrcpp::Any visitTuple(antlr4_stella::StellaParser::TupleContext* ctx) override {
+        std::vector<std::shared_ptr<const ast::NodeExpr>> elements;
+        for (auto expr_ctx : ctx->exprs) {
+            elements.push_back(try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(expr_ctx)));
+        }
+        return make_expr<ast::NodeExprTuple>(ctx, std::move(elements));
+    }
+
+    antlrcpp::Any visitDotTuple(antlr4_stella::StellaParser::DotTupleContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        int index = std::stoi(ctx->index->getText());
+        return make_expr<ast::NodeExprDotTuple>(ctx, expr, index);
     }
 
     antlrcpp::Any visitTypeAsc(antlr4_stella::StellaParser::TypeAscContext* ctx) override {

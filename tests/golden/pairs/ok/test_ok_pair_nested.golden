@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> Nat {
+  return {{n, true}, false}.1.1
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

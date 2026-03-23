@@ -44,6 +44,9 @@ public:
     virtual void VisitExprHead(const NodeExprHead& node) = 0;
     virtual void VisitExprTail(const NodeExprTail& node) = 0;
     virtual void VisitExprIsEmpty(const NodeExprIsEmpty& node) = 0;
+
+    virtual void VisitExprTuple(const NodeExprTuple& node) = 0;
+    virtual void VisitExprDotTuple(const NodeExprDotTuple& node) = 0;
 };
 
 class TypeVisitor {
@@ -57,6 +60,7 @@ public:
     virtual void VisitTypeNat(const TypeNat& type) = 0;
     virtual void VisitTypeUnit(const TypeUnit& type) = 0;
     virtual void VisitTypeList(const TypeList& type) = 0;
+    virtual void VisitTypeTuple(const TypeTuple& type) = 0;
 };
 
 class BaseNodeVisitor : public NodeVisitor {
@@ -89,6 +93,8 @@ public:
     void VisitExprHead(const NodeExprHead& node) override;
     void VisitExprTail(const NodeExprTail& node) override;
     void VisitExprIsEmpty(const NodeExprIsEmpty& node) override;
+    void VisitExprTuple(const NodeExprTuple& node) override;
+    void VisitExprDotTuple(const NodeExprDotTuple& node) override;
 };
 
 class BaseTypeVisitor : public TypeVisitor {
@@ -102,6 +108,7 @@ public:
     void VisitTypeNat(const TypeNat& type) override;
     void VisitTypeUnit(const TypeUnit& type) override;
     void VisitTypeList(const TypeList& type) override;
+    void VisitTypeTuple(const TypeTuple& type) override;
 };
 
 } // namespace ast

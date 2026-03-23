@@ -8,6 +8,7 @@
 #include "stella/ast/list.hpp"    // IWYU pragma: export
 #include "stella/ast/logic.hpp"   // IWYU pragma: export
 #include "stella/ast/nat.hpp"     // IWYU pragma: export
+#include "stella/ast/tuple.hpp"   // IWYU pragma: export
 #include "stella/ast/unit.hpp"    // IWYU pragma: export
 #include "stella/ast/var.hpp"     // IWYU pragma: export
 #include "stella/ast/visitor.hpp" // IWYU pragma: export

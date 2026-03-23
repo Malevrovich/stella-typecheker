@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> Nat {
+  return {n, true}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TUPLE:
+Error occured at stella-examples/pairs/error/test_err_unexpected_tuple.stella:5:9:
+{n, true}
+Expected type Nat, but node has type stella::ast::TypeTuple
+
+EXIT_CODE: 1

@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> {Nat, Bool} {
+  return {true, true}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/pairs/error/test_err_pair_element_type_mismatch.stella:5:10:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

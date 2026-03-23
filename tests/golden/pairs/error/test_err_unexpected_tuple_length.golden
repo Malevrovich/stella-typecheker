@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> {Nat, Bool, Nat} {
+  return {n, true}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TUPLE_LENGTH:
+Error occured at stella-examples/pairs/error/test_err_unexpected_tuple_length.stella:5:9:
+{n, true}
+Expected tuple of length 3, but got tuple of length 2
+
+EXIT_CODE: 1
