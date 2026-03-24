@@ -331,6 +331,10 @@ private:
         return make_expr<ast::NodeExprDotRecord>(ctx, expr, ctx->label->getText());
     }
 
+    antlrcpp::Any visitTypeParens(antlr4_stella::StellaParser::TypeParensContext* ctx) override {
+        return visit(ctx->type_);
+    }
+
     antlrcpp::Any visitTypeSum(antlr4_stella::StellaParser::TypeSumContext* ctx) override {
         auto left = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->left));
         auto right = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->right));
