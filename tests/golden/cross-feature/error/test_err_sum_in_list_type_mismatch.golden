@@ -1,0 +1,21 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+// list of sum types with wrong element type
+language core;
+extend with #sum-types, #lists;
+
+fn main(n : Nat) -> [Nat + Bool] {
+  return [inl(n), inl(true)]
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/cross-feature/error/test_err_sum_in_list_type_mismatch.stella:7:22:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

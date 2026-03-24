@@ -1,0 +1,25 @@
+INPUT:
+// Corner case: ERROR_NONEXHAUSTIVE_MATCH_PATTERNS
+// match on variant missing one label
+language core;
+extend with #variants;
+
+fn main(x : <| ok : Nat, err : Bool |>) -> Nat {
+  return match x {
+    <| ok = n |> => n
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
+Error occured at stella-examples/variants/error/test_err_variant_match_missing_label.stella:7:9:
+match x {
+    <| ok = n |> => n
+  }
+Variant label 'err' not covered in match
+
+EXIT_CODE: 1

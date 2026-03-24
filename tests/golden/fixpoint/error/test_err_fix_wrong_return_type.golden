@@ -1,0 +1,25 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+// fix argument returns wrong type
+language core;
+extend with #fixpoint-combinator;
+
+fn main(n : Nat) -> Bool {
+  return fix(fn(self : fn(Nat) -> Nat) {
+    return fn(x : Nat) { return x }
+  })(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/fixpoint/error/test_err_fix_wrong_return_type.stella:7:9:
+fix(fn(self : fn(Nat) -> Nat) {
+    return fn(x : Nat) { return x }
+  })(n)
+Expected type Bool, but expr has type Nat
+
+EXIT_CODE: 1

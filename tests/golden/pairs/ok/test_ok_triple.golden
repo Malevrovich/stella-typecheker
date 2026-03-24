@@ -1,0 +1,17 @@
+INPUT:
+// Corner case: 3-element tuple (triple)
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> {Nat, Bool, Nat} {
+  return {n, true, succ(n)}
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -1,0 +1,21 @@
+INPUT:
+// Corner case: ERROR_NOT_A_RECORD
+// trying to access a field on a Nat value
+language core;
+extend with #records;
+
+fn main(n : Nat) -> Nat {
+  return n.x
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_RECORD:
+Error occured at stella-examples/records/error/test_err_not_a_record_on_nat.stella:7:9:
+n
+Expected type stella::ast::TypeRecord, but expr has type Nat
+
+EXIT_CODE: 1

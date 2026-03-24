@@ -1,0 +1,17 @@
+INPUT:
+// Corner case: type ascription on a lambda
+language core;
+extend with #type-ascriptions;
+
+fn main(n : Nat) -> Nat {
+  return (fn(x : Nat) { return succ(x) } as fn(Nat) -> Nat)(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

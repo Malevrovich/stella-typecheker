@@ -1,0 +1,21 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+// cons head type doesn't match list element type
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> [Nat] {
+  return cons(true, [n])
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/lists/error/test_err_cons_head_type_mismatch.stella:7:14:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

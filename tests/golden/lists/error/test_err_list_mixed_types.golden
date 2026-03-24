@@ -1,0 +1,21 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+// list with mixed element types
+language core;
+extend with #lists;
+
+fn main(n : Nat) -> [Nat] {
+  return [n, true]
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/lists/error/test_err_list_mixed_types.stella:7:13:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

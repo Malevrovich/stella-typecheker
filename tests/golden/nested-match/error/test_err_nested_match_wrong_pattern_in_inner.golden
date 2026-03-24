@@ -1,0 +1,30 @@
+INPUT:
+// Nested match: ERROR_UNEXPECTED_PATTERN_FOR_TYPE
+// inner match uses inl/inr patterns on a non-sum type (Nat)
+language core;
+extend with #sum-types;
+
+fn main(x : Nat + Bool) -> Nat {
+  return match x {
+      inl(n) => match n {
+          inl(k) => k    // n is Nat, not a sum type
+        | inr(b) => 0
+      }
+    | inr(b) => if b then 1 else 0
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_PATTERN_FOR_TYPE:
+Error occured at stella-examples/nested-match/error/test_err_nested_match_wrong_pattern_in_inner.stella:8:16:
+match n {
+          inl(k) => k    // n is Nat, not a sum type
+        | inr(b) => 0
+      }
+Match scrutinee must be a sum or variant type
+
+EXIT_CODE: 1

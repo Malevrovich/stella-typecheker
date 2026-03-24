@@ -1,0 +1,23 @@
+INPUT:
+// Nested match: variant inside sum type
+language core;
+extend with #sum-types, #variants;
+
+fn main(x : <| a : Nat, b : Bool |> + Nat) -> Nat {
+  return match x {
+      inl(v) => match v {
+          <| a = n |> => n
+        | <| b = f |> => if f then 1 else 0
+      }
+    | inr(n) => succ(n)
+  }
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

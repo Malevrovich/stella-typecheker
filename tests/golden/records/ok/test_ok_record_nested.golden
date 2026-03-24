@@ -1,0 +1,17 @@
+INPUT:
+// Corner case: nested record access
+language core;
+extend with #records;
+
+fn main(n : Nat) -> Nat {
+  return {outer = {inner = n}}.outer.inner
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

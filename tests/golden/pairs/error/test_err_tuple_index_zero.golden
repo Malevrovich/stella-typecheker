@@ -1,0 +1,21 @@
+INPUT:
+// Corner case: ERROR_TUPLE_INDEX_OUT_OF_BOUNDS
+// tuple index 0 is invalid (indices start at 1)
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> Nat {
+  return {n, true}.0
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_TUPLE_INDEX_OUT_OF_BOUNDS:
+Error occured at stella-examples/pairs/error/test_err_tuple_index_zero.stella:7:9:
+{n, true}.0
+Tuple index 0 is out of bounds for tuple of length 2
+
+EXIT_CODE: 1

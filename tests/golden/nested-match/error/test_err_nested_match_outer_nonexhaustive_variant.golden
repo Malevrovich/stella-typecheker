@@ -1,0 +1,35 @@
+INPUT:
+// Nested match: ERROR_NONEXHAUSTIVE_MATCH_PATTERNS
+// outer match on variant is missing a label, inner match is fine
+language core;
+extend with #sum-types, #variants;
+
+fn main(x : <| a : Nat + Bool, b : Nat, c : Bool |>) -> Nat {
+  return match x {
+      <| a = s |> => match s {
+          inl(n) => n
+        | inr(b) => if b then 1 else 0
+      }
+    | <| b = n |> => n
+    // missing: <| c = _ |>
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
+Error occured at stella-examples/nested-match/error/test_err_nested_match_outer_nonexhaustive_variant.stella:7:9:
+match x {
+      <| a = s |> => match s {
+          inl(n) => n
+        | inr(b) => if b then 1 else 0
+      }
+    | <| b = n |> => n
+    // missing: <| c = _ |>
+  }
+Variant label 'c' not covered in match
+
+EXIT_CODE: 1

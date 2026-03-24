@@ -1,0 +1,20 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+// function return type doesn't match declared return type
+language core;
+
+fn main(n : Nat) -> Bool {
+  return succ(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/core/error/test_err_return_type_mismatch.stella:6:9:
+succ(n)
+Expected type Bool, but node has type stella::ast::TypeNat
+
+EXIT_CODE: 1

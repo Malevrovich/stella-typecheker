@@ -1,0 +1,20 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+// if branches have different types
+language core;
+
+fn main(b : Bool) -> Nat {
+  return if b then 0 else false
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/core/error/test_err_if_branch_type_mismatch.stella:6:26:
+false
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

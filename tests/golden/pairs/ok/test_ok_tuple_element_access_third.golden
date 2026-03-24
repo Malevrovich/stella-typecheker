@@ -1,0 +1,17 @@
+INPUT:
+// Corner case: accessing the third element of a triple
+language core;
+extend with #pairs;
+
+fn main(n : Nat) -> Nat {
+  return {n, true, succ(n)}.3
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

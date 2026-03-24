@@ -1,0 +1,21 @@
+INPUT:
+// Corner case: unit passed as function argument
+language core;
+extend with #unit-type;
+
+fn consume_unit(u : Unit) -> Nat {
+  return 0
+}
+
+fn main(n : Nat) -> Nat {
+  return consume_unit(unit)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

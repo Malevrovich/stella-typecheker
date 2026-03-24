@@ -1,0 +1,20 @@
+INPUT:
+// Corner case: ERROR_UNDEFINED_VARIABLE
+// variable used in let body that is not in scope
+language core;
+extend with #let-bindings;
+
+fn main(n : Nat) -> Nat {
+  return let x = n in y
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNDEFINED_VARIABLE:
+Error occured at stella-examples/let-bindings/error/test_err_let_undefined_in_body.stella:7:22:
+y
+
+EXIT_CODE: 1

@@ -1,0 +1,29 @@
+INPUT:
+// Nested match: ERROR_NONEXHAUSTIVE_MATCH_PATTERNS
+// inner match on variant is missing a label
+language core;
+extend with #sum-types, #variants;
+
+fn main(x : <| left : Nat + Bool, right : Nat |>) -> Nat {
+  return match x {
+      <| left = inner |> => match inner {
+          inl(n) => n
+          // missing: inr case
+      }
+    | <| right = n |> => n
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
+Error occured at stella-examples/nested-match/error/test_err_nested_match_inner_nonexhaustive.stella:8:28:
+match inner {
+          inl(n) => n
+          // missing: inr case
+      }
+
+EXIT_CODE: 1

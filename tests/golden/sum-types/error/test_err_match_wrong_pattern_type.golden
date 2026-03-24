@@ -1,0 +1,27 @@
+INPUT:
+// Corner case: ERROR_UNEXPECTED_PATTERN_FOR_TYPE
+// using inl/inr patterns on a non-sum type
+language core;
+extend with #sum-types;
+
+fn main(n : Nat) -> Nat {
+  return match n {
+      inl(x) => x
+    | inr(y) => y
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_PATTERN_FOR_TYPE:
+Error occured at stella-examples/sum-types/error/test_err_match_wrong_pattern_type.stella:7:9:
+match n {
+      inl(x) => x
+    | inr(y) => y
+  }
+Match scrutinee must be a sum or variant type
+
+EXIT_CODE: 1
