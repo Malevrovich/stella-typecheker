@@ -1,6 +1,6 @@
 INPUT:
 language core;
-extend with #lists;
+extend with #lists, #type-ascriptions;
 
 fn main(n : Nat) -> Nat {
   return List::head(cons(n, ([] as [Bool])))

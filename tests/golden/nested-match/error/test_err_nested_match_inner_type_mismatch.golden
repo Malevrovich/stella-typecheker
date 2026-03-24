@@ -19,6 +19,9 @@ STDOUT:
 (empty)
 
 STDERR:
-Parsing error: Unexpected node in AST builder: (Nat+Bool)
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at stella-examples/nested-match/error/test_err_nested_match_inner_type_mismatch.stella:10:20:
+b
+Expected type Nat, but expr has type Bool
 
 EXIT_CODE: 1

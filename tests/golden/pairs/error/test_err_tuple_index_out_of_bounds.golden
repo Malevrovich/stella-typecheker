@@ -1,6 +1,6 @@
 INPUT:
 language core;
-extend with #pairs;
+extend with #pairs, #tuples;
 
 fn main(n : Nat) -> Nat {
   return {n, true}.3

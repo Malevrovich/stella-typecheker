@@ -1,6 +1,6 @@
 INPUT:
 language core;
-extend with #variants;
+extend with #variants, #type-ascriptions;
 
 fn main(n : Nat) -> Nat {
   return (<| a = n |> as Nat)

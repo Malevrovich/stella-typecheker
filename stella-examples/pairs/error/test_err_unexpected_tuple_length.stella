@@ -1,5 +1,5 @@
 language core;
-extend with #pairs;
+extend with #pairs, #tuples;
 
 fn main(n : Nat) -> {Nat, Bool, Nat} {
   return {n, true}

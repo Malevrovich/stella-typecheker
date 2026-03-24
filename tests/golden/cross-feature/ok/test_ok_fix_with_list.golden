@@ -1,7 +1,11 @@
 INPUT:
 // Corner case: fixpoint combinator building a list recursively
 language core;
-extend with #fixpoint-combinator, #lists;
+extend with 
+#fixpoint-combinator, 
+#lists, 
+#type-ascriptions,
+#predecessor;
 
 fn main(n : Nat) -> [Nat] {
   return fix(fn(self : fn(Nat) -> [Nat]) {
