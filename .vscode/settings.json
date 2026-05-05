@@ -1,6 +1,9 @@
 {
     "cmake.configureArgs": [
-        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/toolchains/clang-libc++.cmake"
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
     ],
-    "cmake.buildDirectory": "${workspaceFolder}/build"
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.buildEnvironment": {
+        "CMAKE_POLICY_VERSION_MINIMUM": "3.5"
+    }
 }

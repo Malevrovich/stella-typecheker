@@ -1,0 +1,482 @@
+syntax = "proto3";
+
+package stella;
+
+// ─── Top-level ───────────────────────────────────────────────────────────────
+
+message Program {
+  repeated string extensions = 1;   // ExtensionName tokens
+  repeated Decl   decls      = 2;
+}
+
+// ─── Declarations ────────────────────────────────────────────────────────────
+
+message Decl {
+  oneof decl_kind {
+    DeclFun            fun_decl       = 1;
+    DeclFunGeneric     fun_generic    = 2;
+    DeclTypeAlias      type_alias     = 3;
+    DeclExceptionType  exception_type = 4;
+    DeclExceptionVariant exception_variant = 5;
+  }
+}
+
+message DeclFun {
+  repeated Annotation annotations  = 1;
+  string              name         = 2;
+  repeated ParamDecl  param_decls  = 3;
+  optional StellaType return_type  = 4;
+  repeated StellaType throw_types  = 5;
+  repeated Decl       local_decls  = 6;
+  Expr                return_expr  = 7;
+}
+
+message DeclFunGeneric {
+  repeated Annotation annotations  = 1;
+  string              name         = 2;
+  repeated string     generics     = 3;   // StellaIdent type parameters
+  repeated ParamDecl  param_decls  = 4;
+  optional StellaType return_type  = 5;
+  repeated StellaType throw_types  = 6;
+  repeated Decl       local_decls  = 7;
+  Expr                return_expr  = 8;
+}
+
+message DeclTypeAlias {
+  string     name  = 1;
+  StellaType atype = 2;
+}
+
+message DeclExceptionType {
+  StellaType exception_type = 1;
+}
+
+message DeclExceptionVariant {
+  string     name         = 1;
+  StellaType variant_type = 2;
+}
+
+// ─── Annotations ─────────────────────────────────────────────────────────────
+
+message Annotation {
+  // Currently only 'inline' exists
+  bool inline_ann = 1;
+}
+
+// ─── Parameter declaration ───────────────────────────────────────────────────
+
+message ParamDecl {
+  string     name       = 1;
+  StellaType param_type = 2;
+}
+
+// ─── Expressions ─────────────────────────────────────────────────────────────
+
+message Expr {
+  oneof expr_kind {
+    // Literals / atoms
+    ConstTrue   const_true   = 1;
+    ConstFalse  const_false  = 2;
+    ConstUnit   const_unit   = 3;
+    ConstInt    const_int    = 4;
+    ConstMemory const_memory = 5;
+    Var         var          = 6;
+
+    // Field / index access
+    DotRecord   dot_record   = 7;
+    DotTuple    dot_tuple    = 8;
+
+    // Control flow
+    If          if_expr      = 9;
+    Sequence    sequence     = 10;
+    Assign      assign       = 11;
+
+    // Let / letrec
+    Let         let_expr     = 12;
+    LetRec      letrec_expr  = 13;
+
+    // Abstraction / application
+    Abstraction abstraction  = 14;
+    Application application  = 15;
+
+    // Generic type abstraction / application
+    TypeAbstraction type_abstraction = 16;
+    TypeApplication type_application = 17;
+
+    // Arithmetic / logic binary ops
+    BinaryOp    binary_op    = 18;
+
+    // Unary ops
+    UnaryOp     unary_op     = 19;
+
+    // Type annotations
+    TypeAsc     type_asc     = 20;
+    TypeCast    type_cast    = 21;
+
+    // Sum types
+    Inl         inl          = 22;
+    Inr         inr          = 23;
+
+    // Lists
+    ConsList    cons_list    = 24;
+    Head        head         = 25;
+    IsEmpty     is_empty     = 26;
+    Tail        tail         = 27;
+    ListLiteral list_literal = 28;
+
+    // Nat builtins
+    Succ        succ         = 29;
+    Pred        pred         = 30;
+    IsZero      is_zero      = 31;
+    NatRec      nat_rec      = 32;
+
+    // Recursive types
+    Fold        fold         = 33;
+    Unfold      unfold       = 34;
+
+    // References
+    Ref         ref          = 35;
+    Deref       deref        = 36;
+
+    // Tuples / records / variants
+    Tuple       tuple        = 37;
+    Record      record       = 38;
+    Variant     variant      = 39;
+
+    // Pattern matching
+    Match       match        = 40;
+
+    // Exceptions
+    Panic       panic        = 41;
+    Throw       throw_expr   = 42;
+    TryCatch    try_catch    = 43;
+    TryCastAs   try_cast_as  = 44;
+    TryWith     try_with     = 45;
+
+    // Fix
+    Fix         fix          = 46;
+
+    // Parenthesised / terminating semicolon — transparent wrappers
+    // (kept so the fuzzer can round-trip; logically identical to inner expr)
+    ParenthesisedExpr parenthesised = 47;
+    TerminatingSemicolon terminating_semicolon = 48;
+  }
+}
+
+// ── Atoms ────────────────────────────────────────────────────────────────────
+
+message ConstTrue  {}
+message ConstFalse {}
+message ConstUnit  {}
+message ConstInt    { int32  value   = 1; }
+message ConstMemory { string address = 1; }   // hex string, e.g. "0x1A2B"
+message Var         { string name    = 1; }
+
+// ── Field / index access ─────────────────────────────────────────────────────
+
+message DotRecord { Expr expr  = 1; string label = 2; }
+message DotTuple  { Expr expr  = 1; int32  index = 2; }
+
+// ── Control flow ─────────────────────────────────────────────────────────────
+
+message If {
+  Expr condition  = 1;
+  Expr then_expr  = 2;
+  Expr else_expr  = 3;
+}
+
+message Sequence {
+  Expr expr1 = 1;
+  Expr expr2 = 2;
+}
+
+message Assign {
+  Expr lhs = 1;
+  Expr rhs = 2;
+}
+
+// ── Let / letrec ─────────────────────────────────────────────────────────────
+
+message PatternBinding {
+  Pattern pat = 1;
+  Expr    rhs = 2;
+}
+
+message Let {
+  repeated PatternBinding pattern_bindings = 1;
+  Expr                    body             = 2;
+}
+
+message LetRec {
+  repeated PatternBinding pattern_bindings = 1;
+  Expr                    body             = 2;
+}
+
+// ── Abstraction / application ─────────────────────────────────────────────────
+
+message Abstraction {
+  repeated ParamDecl param_decls  = 1;
+  Expr               return_expr  = 2;
+}
+
+message Application {
+  Expr          fun  = 1;
+  repeated Expr args = 2;
+}
+
+// ── Generic type abstraction / application ────────────────────────────────────
+
+message TypeAbstraction {
+  repeated string generics = 1;
+  Expr            expr     = 2;
+}
+
+message TypeApplication {
+  Expr                fun   = 1;
+  repeated StellaType types = 2;
+}
+
+// ── Binary operators ──────────────────────────────────────────────────────────
+
+enum BinaryOpKind {
+  BINARY_OP_UNSPECIFIED = 0;
+  ADD                   = 1;
+  SUBTRACT              = 2;
+  MULTIPLY              = 3;
+  DIVIDE                = 4;
+  LESS_THAN             = 5;
+  LESS_THAN_OR_EQUAL    = 6;
+  GREATER_THAN          = 7;
+  GREATER_THAN_OR_EQUAL = 8;
+  EQUAL                 = 9;
+  NOT_EQUAL             = 10;
+  LOGIC_AND             = 11;
+  LOGIC_OR              = 12;
+}
+
+message BinaryOp {
+  BinaryOpKind op    = 1;
+  Expr         left  = 2;
+  Expr         right = 3;
+}
+
+// ── Unary operators ───────────────────────────────────────────────────────────
+
+enum UnaryOpKind {
+  UNARY_OP_UNSPECIFIED = 0;
+  LOGIC_NOT            = 1;
+  DEREF_OP             = 2;   // '*' prefix (pointer dereference)
+}
+
+message UnaryOp {
+  UnaryOpKind op   = 1;
+  Expr        expr = 2;
+}
+
+// ── Type annotations ──────────────────────────────────────────────────────────
+
+message TypeAsc  { Expr expr = 1; StellaType type = 2; }
+message TypeCast { Expr expr = 1; StellaType type = 2; }
+
+// ── Sum types ─────────────────────────────────────────────────────────────────
+
+message Inl { Expr expr = 1; }
+message Inr { Expr expr = 1; }
+
+// ── Lists ─────────────────────────────────────────────────────────────────────
+
+message ConsList    { Expr head = 1; Expr tail = 2; }
+message Head        { Expr list = 1; }
+message IsEmpty     { Expr list = 1; }
+message Tail        { Expr list = 1; }
+message ListLiteral { repeated Expr exprs = 1; }
+
+// ── Nat builtins ──────────────────────────────────────────────────────────────
+
+message Succ   { Expr n       = 1; }
+message Pred   { Expr n       = 1; }
+message IsZero { Expr n       = 1; }
+message NatRec { Expr n       = 1; Expr initial = 2; Expr step = 3; }
+
+// ── Recursive types ───────────────────────────────────────────────────────────
+
+message Fold   { StellaType type = 1; Expr expr = 2; }
+message Unfold { StellaType type = 1; Expr expr = 2; }
+
+// ── References ────────────────────────────────────────────────────────────────
+
+message Ref   { Expr expr = 1; }
+message Deref { Expr expr = 1; }
+
+// ── Tuples / records / variants ───────────────────────────────────────────────
+
+message Tuple  { repeated Expr    exprs    = 1; }
+
+message Binding { string name = 1; Expr rhs = 2; }
+message Record  { repeated Binding bindings = 1; }
+
+message Variant {
+  string        label = 1;
+  optional Expr rhs   = 2;
+}
+
+// ── Pattern matching ──────────────────────────────────────────────────────────
+
+message MatchCase {
+  Pattern pattern = 1;
+  Expr    expr    = 2;
+}
+
+message Match {
+  Expr              expr  = 1;
+  repeated MatchCase cases = 2;
+}
+
+// ── Exceptions ────────────────────────────────────────────────────────────────
+
+message Panic {}
+
+message Throw { Expr expr = 1; }
+
+message TryCatch {
+  Expr    try_expr      = 1;
+  Pattern pat           = 2;
+  Expr    fallback_expr = 3;
+}
+
+message TryCastAs {
+  Expr       try_expr      = 1;
+  StellaType type          = 2;
+  Pattern    pattern        = 3;
+  Expr       expr           = 4;
+  Expr       fallback_expr  = 5;
+}
+
+message TryWith {
+  Expr try_expr      = 1;
+  Expr fallback_expr = 2;
+}
+
+// ── Fix ───────────────────────────────────────────────────────────────────────
+
+message Fix { Expr expr = 1; }
+
+// ── Transparent wrappers ──────────────────────────────────────────────────────
+
+message ParenthesisedExpr    { Expr expr = 1; }
+message TerminatingSemicolon { Expr expr = 1; }
+
+// ─── Patterns ────────────────────────────────────────────────────────────────
+
+message Pattern {
+  oneof pattern_kind {
+    PatternVariant      variant       = 1;
+    PatternInl          inl           = 2;
+    PatternInr          inr           = 3;
+    PatternTuple        tuple         = 4;
+    PatternRecord       record        = 5;
+    PatternList         list          = 6;
+    PatternCons         cons          = 7;
+    PatternConsPair     cons_pair     = 8;
+    PatternFalse        pat_false     = 9;
+    PatternTrue         pat_true      = 10;
+    PatternUnit         pat_unit      = 11;
+    PatternInt          pat_int       = 12;
+    PatternSucc         succ          = 13;
+    PatternVar          var           = 14;
+    PatternAsc          asc           = 15;
+    PatternCastAs       cast_as       = 16;
+    ParenthesisedPattern parenthesised = 17;
+  }
+}
+
+message PatternVariant {
+  string          label   = 1;
+  optional Pattern pattern = 2;
+}
+
+message PatternInl { Pattern pattern = 1; }
+message PatternInr { Pattern pattern = 1; }
+
+message PatternTuple  { repeated Pattern patterns = 1; }
+
+message LabelledPattern { string label = 1; Pattern pattern = 2; }
+message PatternRecord   { repeated LabelledPattern patterns = 1; }
+
+message PatternList { repeated Pattern patterns = 1; }
+
+message PatternCons     { Pattern head = 1; Pattern tail = 2; }
+message PatternConsPair { Pattern p1   = 1; Pattern p2   = 2; }
+
+message PatternFalse {}
+message PatternTrue  {}
+message PatternUnit  {}
+message PatternInt   { int32 value = 1; }
+message PatternSucc  { Pattern pattern = 1; }
+message PatternVar   { string name    = 1; }
+
+message PatternAsc    { Pattern pattern = 1; StellaType type = 2; }
+message PatternCastAs { Pattern pattern = 1; StellaType type = 2; }
+
+message ParenthesisedPattern { Pattern pattern = 1; }
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+message StellaType {
+  oneof type_kind {
+    TypeBool    bool_type    = 1;
+    TypeNat     nat_type     = 2;
+    TypeUnit    unit_type    = 3;
+    TypeTop     top_type     = 4;
+    TypeBottom  bottom_type  = 5;
+    TypeAuto    auto_type    = 6;
+    TypeVar     type_var     = 7;
+    TypeRef     ref_type     = 8;
+    TypeSum     sum_type     = 9;
+    TypeFun     fun_type     = 10;
+    TypeForAll  forall_type  = 11;
+    TypeRec     rec_type     = 12;
+    TypeTuple   tuple_type   = 13;
+    TypeRecord  record_type  = 14;
+    TypeVariant variant_type = 15;
+    TypeList    list_type    = 16;
+    TypeParens  parens_type  = 17;
+  }
+}
+
+message TypeBool   {}
+message TypeNat    {}
+message TypeUnit   {}
+message TypeTop    {}
+message TypeBottom {}
+message TypeAuto   {}
+
+message TypeVar    { string name  = 1; }
+message TypeRef    { StellaType type = 1; }
+message TypeSum    { StellaType left = 1; StellaType right = 2; }
+
+message TypeFun {
+  repeated StellaType param_types = 1;
+  StellaType          return_type = 2;
+}
+
+message TypeForAll {
+  repeated string types = 1;   // bound type variable names
+  StellaType      type  = 2;
+}
+
+message TypeRec {
+  string     var  = 1;
+  StellaType type = 2;
+}
+
+message TypeTuple   { repeated StellaType types      = 1; }
+
+message RecordFieldType { string label = 1; StellaType type = 2; }
+message TypeRecord      { repeated RecordFieldType field_types = 1; }
+
+message VariantFieldType { string label = 1; optional StellaType type = 2; }
+message TypeVariant      { repeated VariantFieldType field_types = 1; }
+
+message TypeList   { StellaType type = 1; }
+message TypeParens { StellaType type = 1; }
