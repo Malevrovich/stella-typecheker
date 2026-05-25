@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_FIELD_ACCESS:
-Error occured at stella-examples/records/error/test_err_unexpected_field_access.stella:5:9:
+Error occured at <unknown>:5:9:
 {x = n, y = false}.z
 Record has no field 'z'
 

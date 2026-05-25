@@ -1,6 +1,7 @@
 INPUT:
 // программа на Stella
 language core;
+extend with #natural-literals, #integers;
 
 // наличие main обязательно
 fn main(n : Nat) -> Nat {
@@ -10,7 +11,6 @@ fn main(n : Nat) -> Nat {
 fn increment_twice(n : Nat) -> Nat {
     return succ(succ(n))
 }
-
 
 STDOUT:
 Well-typed

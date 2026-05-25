@@ -1,7 +1,9 @@
 INPUT:
 // Corner case: variant with three labels, exhaustive match
 language core;
-extend with #variants;
+extend with #variants,
+  #natural-literals,
+  #integers;
 
 fn main(x : <| a : Nat, b : Bool, c : Nat |>) -> Nat {
   return match x {
@@ -10,7 +12,6 @@ fn main(x : <| a : Nat, b : Bool, c : Nat |>) -> Nat {
     | <| c = m |> => succ(m)
   }
 }
-
 
 STDOUT:
 Well-typed

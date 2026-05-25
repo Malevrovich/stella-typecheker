@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_LIST:
-Error occured at stella-examples/lists/error/test_err_unexpected_list.stella:5:9:
+Error occured at <unknown>:5:9:
 [n, succ(n)]
-Expected type Nat, but node has type stella::ast::TypeList
+Expected type Nat, but expr has type [?]
 
 EXIT_CODE: 1

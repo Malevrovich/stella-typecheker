@@ -16,7 +16,7 @@ STDOUT:
 
 STDERR:
 ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
-Error occured at stella-examples/variants/error/test_err_variant_match_missing_label.stella:7:9:
+Error occured at <unknown>:7:9:
 match x {
     <| ok = n |> => n
   }

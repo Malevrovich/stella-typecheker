@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #tuples;
+
+fn rotate3(p : {Nat, Nat, Nat}) -> {Nat, Nat, Nat} {
+  return {rotate3.3, p.1, p.2}
+}
+
+fn main(x : Nat) -> {Nat, Nat, Nat} {
+  return rotate3({x, succ(x), succ(succ(x))})
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_TUPLE:
+Error occured at <unknown>:5:10:
+rotate3
+Expected type {_}, but expr has type ({Nat, Nat, Nat} -> {Nat, Nat, Nat})
+
+EXIT_CODE: 1

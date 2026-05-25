@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_DUPLICATE_RECORD_FIELDS:
-Error occured at stella-examples/records/error/test_err_duplicate_record_fields.stella:5:9:
+Error occured at <unknown>:5:9:
 {x = n, x = succ(n)}
 Duplicate record field 'x'
 

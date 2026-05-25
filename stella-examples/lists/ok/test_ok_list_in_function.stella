@@ -1,5 +1,6 @@
 language core;
-extend with #lists;
+extend with #lists,
+  #type-ascriptions;
 
 fn prepend(n : Nat) -> [Nat] {
   return cons(n, ([] as [Nat]))

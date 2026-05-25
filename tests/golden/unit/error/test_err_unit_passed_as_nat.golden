@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/unit/error/test_err_unit_passed_as_nat.stella:7:14:
+Error occured at <unknown>:7:14:
 unit
 Expected type Nat, but expr has type Unit
 

@@ -1,0 +1,23 @@
+INPUT:
+language core;
+
+extend with #lists ;
+
+fn main(n : Nat) -> Nat {
+  return (fn (a : Nat) { return match(0) {
+    x => []
+    | y => y
+		}
+  }) (0)
+}
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_AMBIGUOUS_LIST:
+Error occured at <unknown>:7:9:
+[]
+Cannot determine element type of empty list literal
+
+EXIT_CODE: 1

@@ -14,8 +14,8 @@ STDOUT:
 
 STDERR:
 ERROR_NOT_A_RECORD:
-Error occured at stella-examples/records/error/test_err_not_a_record_on_nat.stella:7:9:
+Error occured at <unknown>:7:9:
 n
-Expected type stella::ast::TypeRecord, but expr has type Nat
+Expected type {_ : _}, but expr has type Nat
 
 EXIT_CODE: 1

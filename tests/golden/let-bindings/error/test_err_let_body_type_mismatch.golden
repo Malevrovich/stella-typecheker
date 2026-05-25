@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/let-bindings/error/test_err_let_body_type_mismatch.stella:5:28:
+Error occured at <unknown>:5:28:
 x
 Expected type Bool, but expr has type Nat
 

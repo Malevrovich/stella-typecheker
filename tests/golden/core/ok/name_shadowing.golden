@@ -13,9 +13,9 @@ fn main(n : Nat) -> Nat {
 }
 
 fn foo(n : Nat) -> Nat {
-  return fn(n : Bool) {
+  return (fn(n : Bool) {
     return if n then 0 else 1
-  } (Nat::iszero(n))
+  }) (Nat::iszero(n))
 }
 
 STDOUT:

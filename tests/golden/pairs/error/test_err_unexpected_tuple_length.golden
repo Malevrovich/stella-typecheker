@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TUPLE_LENGTH:
-Error occured at stella-examples/pairs/error/test_err_unexpected_tuple_length.stella:5:9:
+Error occured at <unknown>:5:9:
 {n, true}
-Expected tuple of length 3, but got tuple of length 2
+Expected type {Nat, Bool, Nat}, but expr has type {?, ?}
 
 EXIT_CODE: 1

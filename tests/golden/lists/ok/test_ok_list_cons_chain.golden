@@ -1,11 +1,11 @@
 INPUT:
 language core;
-extend with #lists;
+extend with #lists,
+  #type-ascriptions;
 
 fn main(n : Nat) -> [Nat] {
   return cons(0, cons(succ(0), ([] as [Nat])))
 }
-
 
 STDOUT:
 Well-typed

@@ -1,0 +1,17 @@
+INPUT:
+language core;
+
+fn main(x : Nat) -> Nat {
+    return (Nat::rec(x, false, fn(i : Nat) { return fn(r : fn(Nat) -> Nat) { return fn(x : Nat) { return 0 } } }))(0)
+}
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_PARAMETER:
+Error occured at <unknown>:4:55:
+r : fn(Nat) -> Nat
+Expected type Bool, but expr has type (Nat -> Nat)
+
+EXIT_CODE: 1

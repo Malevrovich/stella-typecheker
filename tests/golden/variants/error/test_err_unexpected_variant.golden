@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_VARIANT:
-Error occured at stella-examples/variants/error/test_err_unexpected_variant.stella:5:10:
+Error occured at <unknown>:5:10:
 <| a = n |>
-Expected type Nat, but node has type stella::ast::TypeVariant
+Expected type Nat, but expr has type <|_ : _|>
 
 EXIT_CODE: 1

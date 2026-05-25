@@ -1,5 +1,6 @@
 // программа на Stella
 language core;
+extend with #natural-literals, #integers;
 
 // наличие main обязательно
 fn main(n : Nat) -> Nat {

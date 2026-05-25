@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_NOT_A_LIST:
-Error occured at stella-examples/lists/error/test_err_not_a_list_isempty.stella:5:23:
+Error occured at <unknown>:5:23:
 n
-Expected type stella::ast::TypeList, but expr has type Nat
+Expected type [?], but expr has type Nat
 
 EXIT_CODE: 1

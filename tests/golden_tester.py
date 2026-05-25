@@ -42,8 +42,16 @@ def run_typechecker(binary_path: str, stella_file: str, strip_logs: bool = False
         TestOutput с stdout, stderr и exit code
     """
     try:
+        # Читаем содержимое исходного файла
+        try:
+            with open(stella_file, 'r') as f:
+                input_code = f.read()
+        except:
+            input_code = ""
+
         result = subprocess.run(
-            [binary_path, stella_file],
+            [binary_path],
+            input=input_code,
             capture_output=True,
             text=True,
             timeout=10
@@ -51,13 +59,6 @@ def run_typechecker(binary_path: str, stella_file: str, strip_logs: bool = False
         
         stderr = result.stderr.strip() if result.stderr.strip() else "(empty)"
         stdout = result.stdout.strip() if result.stdout.strip() else "(empty)"
-        
-        # Читаем содержимое исходного файла
-        try:
-            with open(stella_file, 'r') as f:
-                input_code = f.read()
-        except:
-            input_code = ""
         
         if strip_logs:
             stderr_clean = strip_debug_logs(result.stderr)

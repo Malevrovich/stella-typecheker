@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/lists/error/test_err_cons_head_type_mismatch.stella:7:14:
+Error occured at <unknown>:7:14:
 true
 Expected type Nat, but expr has type Bool
 

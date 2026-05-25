@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_MISSING_RECORD_FIELDS:
-Error occured at stella-examples/records/error/test_err_missing_record_fields.stella:5:9:
+Error occured at <unknown>:5:9:
 {x = n}
-Missing record field 'y' required by expected type
+Expected type {x : Nat, y : Bool}, but expr has type {x : ?}
 
 EXIT_CODE: 1

@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_NOT_A_TUPLE:
-Error occured at stella-examples/pairs/error/test_err_not_a_tuple.stella:5:9:
+Error occured at <unknown>:5:9:
 n
-Expected type stella::ast::TypeTuple, but expr has type Nat
+Expected type {_}, but expr has type Nat
 
 EXIT_CODE: 1

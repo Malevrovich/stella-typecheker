@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_RECORD_FIELDS:
-Error occured at stella-examples/records/error/test_err_unexpected_record_fields.stella:5:9:
+Error occured at <unknown>:5:9:
 {x = n, y = false}
-Unexpected record field 'y' not present in expected type
+Expected type {x : Nat}, but expr has type {x : ?, y : ?}
 
 EXIT_CODE: 1

@@ -1,0 +1,20 @@
+INPUT:
+language core;
+
+extend with #pairs;
+
+fn main(x : Nat) -> Nat {
+  return {0,0}(0)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_FUNCTION:
+Error occured at <unknown>:6:9:
+{0,0}
+Expected type (? -> ?), but expr has type {_}
+
+EXIT_CODE: 1

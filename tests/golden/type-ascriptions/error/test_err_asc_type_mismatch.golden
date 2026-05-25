@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/type-ascriptions/error/test_err_asc_type_mismatch.stella:5:9:
+Error occured at <unknown>:5:9:
 n
 Expected type Bool, but expr has type Nat
 

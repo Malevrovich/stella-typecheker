@@ -13,8 +13,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/core/error/test_err_return_type_mismatch.stella:6:9:
+Error occured at <unknown>:6:9:
 succ(n)
-Expected type Bool, but node has type stella::ast::TypeNat
+Expected type Bool, but expr has type Nat
 
 EXIT_CODE: 1

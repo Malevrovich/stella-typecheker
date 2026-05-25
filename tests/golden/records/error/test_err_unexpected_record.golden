@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_RECORD:
-Error occured at stella-examples/records/error/test_err_unexpected_record.stella:5:9:
+Error occured at <unknown>:5:9:
 {x = n, y = false}
-Expected type Nat, but node has type stella::ast::TypeRecord
+Expected type Nat, but expr has type {_ : _}
 
 EXIT_CODE: 1

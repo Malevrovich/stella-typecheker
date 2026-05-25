@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/lists/error/test_err_list_ambiguous_cons.stella:5:29:
+Error occured at <unknown>:5:29:
 [] as [Bool]
 Expected type [Nat], but expr has type [Bool]
 

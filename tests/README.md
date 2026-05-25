@@ -67,16 +67,16 @@ EXIT_CODE: 0
 ### Обычное использование (без логов)
 
 ```bash
-./build/typechecker/cli/typechecker filename.stella
+./build/typechecker/cli/typechecker < filename.stella
 ```
 
-Выводит только результат типизации (Well-typed) или ошибку.
+Типчекер читает программу на Stella из стандартного потока ввода (stdin) и выводит результат типизации (`Well-typed`) или ошибку.
 
 ### Verbose режим (с debug логами)
 
 ```bash
-./build/typechecker/cli/typechecker -v filename.stella
-./build/typechecker/cli/typechecker --verbose filename.stella
+./build/typechecker/cli/typechecker -v < filename.stella
+./build/typechecker/cli/typechecker --verbose < filename.stella
 ```
 
 Включает подробный вывод debug информации для диагностики.

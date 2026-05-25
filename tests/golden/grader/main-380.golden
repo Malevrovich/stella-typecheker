@@ -1,0 +1,18 @@
+INPUT:
+language core;
+
+fn main(n : Nat) -> Nat {
+  return main
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:4:9:
+main
+Expected type Nat, but expr has type (Nat -> Nat)
+
+EXIT_CODE: 1

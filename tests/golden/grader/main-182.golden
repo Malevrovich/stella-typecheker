@@ -1,0 +1,18 @@
+INPUT:
+language core;
+
+fn main(x : Nat) -> Nat {
+    return (if false then true else fn(x : Nat) { return x })(0)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_LAMBDA:
+Error occured at <unknown>:4:36:
+fn(x : Nat) { return x }
+Expected type Bool, but expr has type (? -> ?)
+
+EXIT_CODE: 1

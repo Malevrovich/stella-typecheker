@@ -1,6 +1,7 @@
 INPUT:
 language core;
-extend with #lists;
+extend with #lists,
+  #type-ascriptions;
 
 fn prepend(n : Nat) -> [Nat] {
   return cons(n, ([] as [Nat]))
@@ -9,7 +10,6 @@ fn prepend(n : Nat) -> [Nat] {
 fn main(n : Nat) -> [Nat] {
   return prepend(n)
 }
-
 
 STDOUT:
 Well-typed

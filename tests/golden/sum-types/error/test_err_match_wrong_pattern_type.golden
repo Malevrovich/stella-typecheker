@@ -17,7 +17,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_PATTERN_FOR_TYPE:
-Error occured at stella-examples/sum-types/error/test_err_match_wrong_pattern_type.stella:7:9:
+Error occured at <unknown>:7:9:
 match n {
       inl(x) => x
     | inr(y) => y

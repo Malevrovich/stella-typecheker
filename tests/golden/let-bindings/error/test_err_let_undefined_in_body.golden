@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNDEFINED_VARIABLE:
-Error occured at stella-examples/let-bindings/error/test_err_let_undefined_in_body.stella:7:22:
+Error occured at <unknown>:7:22:
 y
 
 EXIT_CODE: 1

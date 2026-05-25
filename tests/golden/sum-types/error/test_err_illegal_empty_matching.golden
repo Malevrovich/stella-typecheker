@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_ILLEGAL_EMPTY_MATCHING:
-Error occured at stella-examples/sum-types/error/test_err_illegal_empty_matching.stella:5:9:
+Error occured at <unknown>:5:9:
 match s {}
 Match expression has no cases
 

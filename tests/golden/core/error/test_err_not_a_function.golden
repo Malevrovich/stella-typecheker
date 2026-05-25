@@ -11,8 +11,8 @@ STDOUT:
 
 STDERR:
 ERROR_NOT_A_FUNCTION:
-Error occured at stella-examples/core/error/test_err_not_a_function.stella:5:9:
+Error occured at <unknown>:5:9:
 x
-Expected type stella::ast::TypeFun, but expr has type Nat
+Expected type (? -> ?), but expr has type Nat
 
 EXIT_CODE: 1

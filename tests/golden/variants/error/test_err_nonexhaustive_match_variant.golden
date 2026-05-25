@@ -15,7 +15,7 @@ STDOUT:
 
 STDERR:
 ERROR_NONEXHAUSTIVE_MATCH_PATTERNS:
-Error occured at stella-examples/variants/error/test_err_nonexhaustive_match_variant.stella:5:9:
+Error occured at <unknown>:5:9:
 match x {
     <| a = n |> => n
   | <| b = f |> => 0

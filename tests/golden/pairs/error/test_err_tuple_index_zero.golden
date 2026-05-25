@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_TUPLE_INDEX_OUT_OF_BOUNDS:
-Error occured at stella-examples/pairs/error/test_err_tuple_index_zero.stella:7:9:
+Error occured at <unknown>:7:9:
 {n, true}.0
 Tuple index 0 is out of bounds for tuple of length 2
 

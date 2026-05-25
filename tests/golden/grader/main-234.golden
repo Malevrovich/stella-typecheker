@@ -1,0 +1,24 @@
+INPUT:
+// ERROR_AMBIGUOUS_LIST_TYPE
+language core;
+
+extend with #lists ;
+
+fn main(n : Nat) -> Nat {
+  return (fn (a : Nat) { return match(0) {
+    x => x
+    | y => []
+		}
+  }) (0)
+}
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_LIST:
+Error occured at <unknown>:9:11:
+[]
+Expected type Nat, but expr has type [?]
+
+EXIT_CODE: 1

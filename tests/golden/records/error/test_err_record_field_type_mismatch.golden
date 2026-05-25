@@ -12,7 +12,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/records/error/test_err_record_field_type_mismatch.stella:5:14:
+Error occured at <unknown>:5:14:
 false
 Expected type Nat, but expr has type Bool
 

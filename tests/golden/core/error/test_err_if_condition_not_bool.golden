@@ -2,18 +2,18 @@ INPUT:
 // Corner case: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
 // if condition is not Bool
 language core;
+extend with #natural-literals, #integers;
 
 fn main(n : Nat) -> Nat {
   return if n then 0 else 1
 }
-
 
 STDOUT:
 (empty)
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/core/error/test_err_if_condition_not_bool.stella:6:12:
+Error occured at <unknown>:7:12:
 n
 Expected type Bool, but expr has type Nat
 

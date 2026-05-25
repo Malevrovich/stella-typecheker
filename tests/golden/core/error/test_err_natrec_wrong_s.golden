@@ -1,6 +1,7 @@
 INPUT:
 // Ожидание: ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
 language core;
+extend with #natural-literals, #integers;
 
 fn main(n : Nat) -> Nat {
   // s должен иметь тип fn (Nat) -> fn (Nat) -> Nat, но здесь не функция
@@ -12,7 +13,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/core/error/test_err_natrec_wrong_s.stella:6:24:
+Error occured at <unknown>:7:24:
 42
 Expected type (Nat -> (Nat -> Nat)), but expr has type Nat
 
