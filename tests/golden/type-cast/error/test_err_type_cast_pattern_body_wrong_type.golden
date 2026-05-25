@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #type-cast, #top-type, #structural-subtyping, #type-cast-patterns;
+
+// pattern variable x : Nat, but body returns Bool — type mismatch
+fn main(n : Nat) -> Bool {
+  return match n {
+      x cast as Nat => x
+  }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:7:23:
+x
+Expected type Bool, but expr has type Nat
+
+EXIT_CODE: 1

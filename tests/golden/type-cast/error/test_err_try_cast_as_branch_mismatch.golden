@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #type-cast, #top-type, #structural-subtyping, #try-cast-as;
+
+// success branch returns Nat, fallback returns Bool — type mismatch
+fn main(n : Nat) -> Nat {
+  return try { n } cast as Nat { x => x } with { false }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:49:
+false
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

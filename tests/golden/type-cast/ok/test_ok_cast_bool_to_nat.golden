@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #type-cast;
+
+// cast as ignores the actual type of the expression,
+// result type is the cast-to type
+fn main(b : Bool) -> Nat {
+  return (b cast as Nat)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

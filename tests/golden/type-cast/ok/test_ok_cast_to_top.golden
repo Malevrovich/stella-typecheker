@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #type-cast, #top-type;
+
+fn main(n : Nat) -> Top {
+  return (n cast as Top)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

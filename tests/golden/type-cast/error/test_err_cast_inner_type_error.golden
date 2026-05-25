@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #type-cast;
+
+// inner expression is ill-typed (succ applied to Bool) — should fail
+fn main(n : Nat) -> Nat {
+  return (succ(true) cast as Nat)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:6:15:
+true
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

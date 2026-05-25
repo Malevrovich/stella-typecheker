@@ -1,0 +1,9 @@
+language core;
+extend with #type-cast, #top-type, #structural-subtyping, #type-cast-patterns;
+
+// pattern variable x : Nat, but body returns Bool — type mismatch
+fn main(n : Nat) -> Bool {
+  return match n {
+      x cast as Nat => x
+  }
+}

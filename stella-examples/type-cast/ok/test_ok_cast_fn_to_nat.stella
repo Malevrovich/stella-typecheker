@@ -1,0 +1,7 @@
+language core;
+extend with #type-cast;
+
+// cast a function value to Nat — inner expr is well-typed, result is Nat
+fn main(n : Nat) -> Nat {
+  return (fn(x : Nat) { return x } cast as Nat)
+}

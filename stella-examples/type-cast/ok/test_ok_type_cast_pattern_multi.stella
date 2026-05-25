@@ -1,0 +1,13 @@
+language core;
+extend with #type-cast, #top-type, #structural-subtyping, #type-cast-patterns;
+
+fn to_nat(x : Top) -> Nat {
+  return match x {
+      n cast as Nat => n
+    | b cast as Bool => 0
+  }
+}
+
+fn main(n : Nat) -> Nat {
+  return to_nat(n)
+}

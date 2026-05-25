@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #type-cast, #top-type, #structural-subtyping, #type-cast-patterns;
+
+fn classify(x : Top) -> Bool {
+  return match x {
+      n cast as Nat => Nat::iszero(n)
+    | b cast as Bool => b
+  }
+}
+
+fn main(n : Nat) -> Bool {
+  return classify(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

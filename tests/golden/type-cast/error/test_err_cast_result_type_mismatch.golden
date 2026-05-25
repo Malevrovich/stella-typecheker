@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #type-cast;
+
+// cast gives Bool, but function returns Nat — type mismatch on the result
+fn main(n : Nat) -> Nat {
+  return (n cast as Bool)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:6:10:
+n cast as Bool
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #type-cast;
+
+// inner expression has an undefined variable — should fail with ERROR_UNDEFINED_VARIABLE
+fn main(n : Nat) -> Nat {
+  return (undefined_var cast as Nat)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNDEFINED_VARIABLE:
+Error occured at <unknown>:6:10:
+undefined_var
+
+EXIT_CODE: 1

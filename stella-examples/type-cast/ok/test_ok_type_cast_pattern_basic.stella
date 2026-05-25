@@ -1,0 +1,8 @@
+language core;
+extend with #type-cast, #top-type, #structural-subtyping, #type-cast-patterns;
+
+fn main(n : Nat) -> Nat {
+  return match n {
+      x cast as Nat => x
+  }
+}
