@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #references, #unit-type, #structural-subtyping, #ambiguous-type-as-bottom;
+
+fn main(n : Nat) -> &Nat {
+  return <0x1>
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

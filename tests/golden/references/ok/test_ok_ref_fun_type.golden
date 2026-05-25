@@ -1,0 +1,24 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn apply(f : &(fn(Nat) -> Nat)) -> Nat {
+  return (*f)(0)
+}
+
+fn succ_fn(n : Nat) -> Nat {
+  return succ(n)
+}
+
+fn main(n : Nat) -> Nat {
+  return apply(new(succ_fn))
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

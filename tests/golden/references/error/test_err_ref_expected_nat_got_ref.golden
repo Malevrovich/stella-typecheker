@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn inc(n : Nat) -> Nat {
+  return succ(n)
+}
+
+fn main(n : Nat) -> Nat {
+  return inc(new(n))
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_REFERENCE:
+Error occured at <unknown>:9:13:
+new(n)
+Expected type Nat, but expr has type &?
+
+EXIT_CODE: 1

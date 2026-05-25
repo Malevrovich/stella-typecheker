@@ -1,0 +1,11 @@
+language core;
+extend with #references, #unit-type, #structural-subtyping, #top-type;
+
+// References are invariant: &Bool is not a subtype of &Nat
+fn takes_nat_ref(r : &Nat) -> Nat {
+  return *r
+}
+
+fn main(n : Nat) -> Nat {
+  return takes_nat_ref(new(false))
+}

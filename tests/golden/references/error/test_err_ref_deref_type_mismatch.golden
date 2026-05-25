@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn main(n : Nat) -> Bool {
+  return *(new(n))
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:5:15:
+n
+Expected type Bool, but expr has type Nat
+
+EXIT_CODE: 1

@@ -1,0 +1,6 @@
+language core;
+extend with #references, #unit-type, #structural-subtyping, #records;
+
+fn main(n : Nat) -> Unit {
+  return new({ a = n }) := { a = succ(n) }
+}

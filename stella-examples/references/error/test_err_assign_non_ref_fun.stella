@@ -1,0 +1,10 @@
+language core;
+extend with #references, #unit-type;
+
+fn try_assign(n : Nat) -> Unit {
+  return n := succ(n)
+}
+
+fn main(n : Nat) -> Unit {
+  return try_assign(n)
+}

@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #references, #unit-type, #structural-subtyping, #records;
+
+fn takes_ref_ab(r : &{ a : Nat, b : Nat }) -> Nat {
+  return (*r).a
+}
+
+fn main(n : Nat) -> Nat {
+  return takes_ref_ab(new({ a = n, b = n, c = n }))
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn main(n : Nat) -> Nat {
+  return *n
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_REFERENCE:
+Error occured at <unknown>:5:10:
+n
+Expected type &Nat, but expr has type Nat
+
+EXIT_CODE: 1

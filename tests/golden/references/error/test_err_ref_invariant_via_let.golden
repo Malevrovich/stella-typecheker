@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #references, #unit-type, #records, #structural-subtyping, #let-bindings;
+
+fn use(r : &{a : Nat}) -> Unit {
+    return unit
+}
+
+fn main(n : Nat) -> Unit {
+    return let x = new({a = n, b = n}) in use(x)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_MISSING_RECORD_FIELDS:
+Error occured at <unknown>:9:46:
+x
+Expected type &{a : Nat}, but expr has type &{a : Nat, b : Nat}
+
+EXIT_CODE: 1

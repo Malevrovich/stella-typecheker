@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn main(n : Nat) -> &&Nat {
+  return new(new(n))
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

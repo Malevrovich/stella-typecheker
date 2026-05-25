@@ -1,0 +1,6 @@
+language core;
+extend with #references, #unit-type;
+
+fn main(n : Bool) -> Bool {
+  return *(new(n))
+}

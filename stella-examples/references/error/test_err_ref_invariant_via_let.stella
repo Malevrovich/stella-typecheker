@@ -1,0 +1,10 @@
+language core;
+extend with #references, #unit-type, #records, #structural-subtyping, #let-bindings;
+
+fn use(r : &{a : Nat}) -> Unit {
+    return unit
+}
+
+fn main(n : Nat) -> Unit {
+    return let x = new({a = n, b = n}) in use(x)
+}

@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn inc_ref(ref : &Nat) -> Unit {
+  return ref := succ(*ref)
+}
+
+fn main(n : Nat) -> Unit {
+  return inc_ref(<0x1>)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

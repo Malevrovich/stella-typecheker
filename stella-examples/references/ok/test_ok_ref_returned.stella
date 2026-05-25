@@ -1,0 +1,10 @@
+language core;
+extend with #references, #unit-type;
+
+fn make_ref(n : Nat) -> &Nat {
+  return new(n)
+}
+
+fn main(n : Nat) -> Nat {
+  return *(make_ref(n))
+}

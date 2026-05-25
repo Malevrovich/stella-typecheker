@@ -1,0 +1,19 @@
+INPUT:
+language core;
+extend with #references, #unit-type;
+
+fn main(n : Nat) -> Nat {
+  return <0x1>
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_MEMORY_ADDRESS:
+Error occured at <unknown>:5:9:
+<0x1>
+Memory address used where non-reference type Nat is expected
+
+EXIT_CODE: 1

@@ -1,0 +1,26 @@
+INPUT:
+language core;
+
+extend with #structural-subtyping;
+extend with #references;
+extend with #top-type;
+extend with #bottom-type;
+extend with #let-bindings;
+extend with #let-patterns;
+extend with #records;
+extend with #unit-type;
+extend with #lists;
+extend with #sequencing;
+
+fn main(n : &{ a : Nat, b : Bool }) -> { a : Nat } {
+  return *n
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

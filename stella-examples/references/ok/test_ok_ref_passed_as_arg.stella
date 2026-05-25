@@ -1,0 +1,10 @@
+language core;
+extend with #references, #unit-type;
+
+fn read_ref(r : &Nat) -> Nat {
+  return *r
+}
+
+fn main(n : Nat) -> Nat {
+  return read_ref(new(n))
+}

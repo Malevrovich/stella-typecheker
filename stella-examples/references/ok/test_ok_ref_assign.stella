@@ -1,0 +1,6 @@
+language core;
+extend with #references, #unit-type;
+
+fn main(n : Nat) -> Unit {
+  return new(n) := succ(n)
+}
