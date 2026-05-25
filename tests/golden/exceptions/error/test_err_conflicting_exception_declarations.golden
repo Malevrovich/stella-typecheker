@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration, #open-variant-exceptions;
+
+exception type = Nat
+exception variant Failure : Bool
+
+fn main(n : Nat) -> Nat {
+  return n
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_CONFLICTING_EXCEPTION_DECLARATIONS:
+Error occured at <unknown>:5:0:
+exception variant Failure : Bool
+cannot mix 'exception variant' and 'exception type' declarations in the same scope
+
+EXIT_CODE: 1

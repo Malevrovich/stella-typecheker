@@ -1,0 +1,21 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration;
+
+exception type = Nat
+
+fn main(n : Nat) -> Nat {
+  return try { n } with { false }
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:7:26:
+false
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

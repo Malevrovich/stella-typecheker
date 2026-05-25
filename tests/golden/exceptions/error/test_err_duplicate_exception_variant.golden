@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #exceptions, #open-variant-exceptions;
+
+exception variant Failure : Nat
+exception variant Failure : Bool
+
+fn main(n : Nat) -> Nat {
+  return n
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_EXCEPTION_VARIANT:
+Error occured at <unknown>:5:0:
+exception variant Failure : Bool
+duplicate exception variant label 'Failure'
+
+EXIT_CODE: 1

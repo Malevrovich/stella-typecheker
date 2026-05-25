@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration, #let-bindings;
+
+exception type = Nat
+
+// throw used as a let-binding RHS with no expected type — ambiguous
+fn main(n : Nat) -> Nat {
+  return let x = throw(n) in x
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_AMBIGUOUS_THROW_TYPE:
+Error occured at <unknown>:8:17:
+throw(n)
+Cannot determine type of throw expression: no expected type provided
+
+EXIT_CODE: 1

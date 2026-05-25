@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #exceptions, #open-variant-exceptions;
+
+fn main(n : Nat) -> Nat {
+  exception variant Failure : Nat
+  return n
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_ILLEGAL_LOCAL_OPEN_VARIANT_EXCEPTION:
+Error occured at <unknown>:5:2:
+exception variant Failure : Nat
+exception variant declaration is not allowed inside a function body
+
+EXIT_CODE: 1

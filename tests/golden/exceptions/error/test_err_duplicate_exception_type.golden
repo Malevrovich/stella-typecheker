@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration;
+
+exception type = Nat
+exception type = Bool
+
+fn main(n : Nat) -> Bool {
+  return throw(succ(0))
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_DUPLICATE_EXCEPTION_TYPE:
+Error occured at <unknown>:5:0:
+exception type = Bool
+duplicate exception type declaration; only one exception type may be declared
+
+EXIT_CODE: 1

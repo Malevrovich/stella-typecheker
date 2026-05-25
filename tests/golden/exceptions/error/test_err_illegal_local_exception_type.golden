@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration;
+
+fn main(n : Nat) -> Bool {
+  exception type = Nat
+  return throw(succ(0))
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_ILLEGAL_LOCAL_EXCEPTION_TYPE:
+Error occured at <unknown>:5:2:
+exception type = Nat
+exception type declaration is not allowed inside a function body
+
+EXIT_CODE: 1

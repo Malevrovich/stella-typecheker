@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration;
+
+exception type = Nat
+
+fn main(n : Nat) -> Bool {
+  return try { Nat::iszero(n) } with { false }
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0
