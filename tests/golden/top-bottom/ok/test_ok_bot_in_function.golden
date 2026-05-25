@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #bottom-type, #type-ascriptions;
+
+fn main(n : Bot) -> Bot {
+  return n
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

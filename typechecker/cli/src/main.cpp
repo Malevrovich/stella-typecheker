@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include <loguru.hpp>
 #include <string>
 
@@ -9,29 +10,19 @@
 int main(int argc, const char* argv[]) {
     loguru::g_stderr_verbosity = loguru::Verbosity_OFF;
 
-    bool verbose = false;
-    std::string filename;
-
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "-v" || arg == "--verbose") {
-            verbose = true;
             // Включаем все логи, включая INFO и DEBUG
             loguru::g_stderr_verbosity = loguru::Verbosity_MAX;
-        } else if (arg[0] != '-') {
-            filename = arg;
         }
     }
 
-    if (filename.empty()) {
-        std::cerr << "Usage: " << argv[0] << " [OPTIONS] <input-file>" << std::endl;
-        std::cerr << "\nOptions:" << std::endl;
-        std::cerr << "  -v, --verbose    Enable verbose debug output" << std::endl;
-        return 1;
-    }
-
     try {
-        auto program = stella::ParseProgramFile(filename);
+        std::string input{std::istreambuf_iterator<char>(std::cin),
+                          std::istreambuf_iterator<char>()};
+
+        auto program = stella::ParseProgramText(std::string_view{input});
 
         stella::typecheck::CheckProgram(*program);
 

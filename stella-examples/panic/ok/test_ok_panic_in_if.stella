@@ -1,0 +1,21 @@
+language core;
+extend with #panic, #fixpoint-combinator,
+  #predecessor;
+
+fn div(n : Nat) -> fn(Nat) -> Nat {
+  return fn(m : Nat) {
+    return if Nat::iszero(m)
+           then panic!
+           else fix(fn(self : fn(Nat) -> fn(Nat) -> Nat) {
+             return fn(a : Nat) {
+               return fn(b : Nat) {
+                 return if Nat::iszero(a) then 0 else succ(self(Nat::pred(a))(b))
+               }
+             }
+           })(n)(m)
+  }
+}
+
+fn main(n : Nat) -> Nat {
+  return div(n)(succ(0))
+}

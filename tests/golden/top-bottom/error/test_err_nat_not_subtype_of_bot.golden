@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #bottom-type, #structural-subtyping;
+
+fn takes_bot(n : Bot) -> Bot {
+  return n
+}
+
+fn main(n : Nat) -> Bot {
+  return takes_bot(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:9:19:
+n
+Expected type Bot, but expr has type Nat
+
+EXIT_CODE: 1

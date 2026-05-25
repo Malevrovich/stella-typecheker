@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn takes_nat(n : Nat) -> Nat {
+  return n
+}
+
+fn main(x : Top) -> Nat {
+  return takes_nat(x)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:9:19:
+x
+Expected type Nat, but expr has type Top
+
+EXIT_CODE: 1

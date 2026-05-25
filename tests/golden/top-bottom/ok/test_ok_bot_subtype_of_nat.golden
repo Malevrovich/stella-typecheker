@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #bottom-type, #structural-subtyping, #type-ascriptions;
+
+fn takes_nat(n : Nat) -> Nat {
+  return n
+}
+
+fn main(n : Bot) -> Nat {
+  return takes_nat(n)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

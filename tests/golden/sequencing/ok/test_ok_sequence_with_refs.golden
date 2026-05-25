@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #unit-type, #sequencing, #references, #let-bindings;
+
+fn main(n : Nat) -> Nat {
+  return let r = new(n) in
+    (r := succ(*r));
+    *r
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0
