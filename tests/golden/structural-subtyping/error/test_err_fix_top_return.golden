@@ -1,0 +1,20 @@
+INPUT:
+// Error: fix(f) where f : Nat -> Top is invalid since Top is NOT <: Nat
+language core;
+extend with #fixpoint-combinator, #top-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Top) -> Top {
+  return fix(f)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:9:
+fix(f)
+Mismatched parameter type and return type in fix combinator argument
+
+EXIT_CODE: 1

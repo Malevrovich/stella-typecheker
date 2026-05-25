@@ -1,0 +1,20 @@
+INPUT:
+// Error: &Top is NOT <: &Nat  (refs are invariant, not contravariant)
+language core;
+extend with #references, #top-type, #structural-subtyping;
+
+fn main(r : &Top) -> &Nat {
+  return r
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:9:
+r
+Expected type &Nat, but expr has type &Top
+
+EXIT_CODE: 1

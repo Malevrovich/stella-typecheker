@@ -1,0 +1,20 @@
+INPUT:
+// Error: {Top, Nat} is NOT <: {Nat, Nat}  (Top is not subtype of Nat)
+language core;
+extend with #pairs, #top-type, #structural-subtyping;
+
+fn main(t : {Top, Nat}) -> {Nat, Nat} {
+  return t
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:9:
+t
+Expected type {Nat, Nat}, but expr has type {Top, Nat}
+
+EXIT_CODE: 1

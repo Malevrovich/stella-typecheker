@@ -1,0 +1,7 @@
+// Error: literal tuple {n} has too few elements when expected {Nat, Bool}
+language core;
+extend with #pairs, #structural-subtyping;
+
+fn main(n : Nat) -> {Nat, Bool} {
+  return {n}
+}

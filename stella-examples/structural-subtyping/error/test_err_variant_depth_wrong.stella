@@ -1,0 +1,7 @@
+// Error: <|a:Top|> is NOT <: <|a:Nat|>  (depth: Top not subtype of Nat)
+language core;
+extend with #variants, #top-type, #structural-subtyping;
+
+fn main(v : <| a : Top |>) -> <| a : Nat |> {
+  return v
+}

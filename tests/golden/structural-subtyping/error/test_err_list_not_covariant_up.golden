@@ -1,0 +1,20 @@
+INPUT:
+// Error: [Top] is NOT <: [Nat]
+language core;
+extend with #lists, #top-type, #structural-subtyping;
+
+fn main(l : [Top]) -> [Nat] {
+  return l
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:9:
+l
+Expected type [Nat], but expr has type [Top]
+
+EXIT_CODE: 1

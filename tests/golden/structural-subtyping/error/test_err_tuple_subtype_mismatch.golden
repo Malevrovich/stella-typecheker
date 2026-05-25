@@ -1,0 +1,20 @@
+INPUT:
+// Error: {Nat} is NOT <: {Nat, Bool}  (subtype mismatch via variable)
+language core;
+extend with #pairs, #structural-subtyping,
+  #tuples;
+
+fn main(t : {Nat}) -> {Nat, Bool} {
+  return t
+}
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TUPLE_LENGTH:
+Error occured at <unknown>:7:9:
+t
+Expected type {Nat, Bool}, but expr has type {Nat}
+
+EXIT_CODE: 1

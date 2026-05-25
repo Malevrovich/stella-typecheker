@@ -1,0 +1,8 @@
+// Error: {Nat} is NOT <: {Nat, Bool}  (subtype mismatch via variable)
+language core;
+extend with #pairs, #structural-subtyping,
+  #tuples;
+
+fn main(t : {Nat}) -> {Nat, Bool} {
+  return t
+}

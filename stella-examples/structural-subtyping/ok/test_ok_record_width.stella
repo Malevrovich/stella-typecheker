@@ -1,0 +1,7 @@
+// Width subtyping: {x:Nat, y:Bool} <: {x:Nat}  (more fields is a subtype)
+language core;
+extend with #records, #structural-subtyping;
+
+fn main(r : {x : Nat, y : Bool}) -> {x : Nat} {
+  return r
+}

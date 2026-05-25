@@ -1,0 +1,7 @@
+// Error: [Top] is NOT <: [Nat]
+language core;
+extend with #lists, #top-type, #structural-subtyping;
+
+fn main(l : [Top]) -> [Nat] {
+  return l
+}

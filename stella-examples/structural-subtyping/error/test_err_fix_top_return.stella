@@ -1,0 +1,7 @@
+// Error: fix(f) where f : Nat -> Top is invalid since Top is NOT <: Nat
+language core;
+extend with #fixpoint-combinator, #top-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Top) -> Top {
+  return fix(f)
+}

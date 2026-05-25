@@ -1,0 +1,7 @@
+// Error: (Top + Nat) is NOT <: (Nat + Nat)
+language core;
+extend with #sum-types, #top-type, #structural-subtyping;
+
+fn main(s : Top + Nat) -> Nat + Nat {
+  return s
+}

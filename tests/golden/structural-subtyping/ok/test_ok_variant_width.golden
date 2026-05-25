@@ -1,0 +1,22 @@
+INPUT:
+// Width subtyping: <|a:Nat|> <: <|a:Nat, b:Bool|>
+// (fewer labels in sub is fine — sub's tags are a subset of super's)
+language core;
+extend with #variants, #structural-subtyping;
+
+fn f(v : <| a : Nat |>) -> <| a : Nat, b : Bool |> {
+  return v
+}
+
+fn main(n : Nat) -> <| a : Nat, b : Bool |> {
+  return f(<| a = n |>)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

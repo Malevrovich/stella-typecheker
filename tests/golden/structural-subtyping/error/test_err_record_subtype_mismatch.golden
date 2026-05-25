@@ -1,0 +1,20 @@
+INPUT:
+// Error: {x:Nat} is NOT <: {x:Nat, y:Bool}  (subtype mismatch via variable)
+language core;
+extend with #records, #structural-subtyping;
+
+fn main(r : {x : Nat}) -> {x : Nat, y : Bool} {
+  return r
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_MISSING_RECORD_FIELDS:
+Error occured at <unknown>:6:9:
+r
+Expected type {x : Nat, y : Bool}, but expr has type {x : Nat}
+
+EXIT_CODE: 1

@@ -1,0 +1,8 @@
+// Error: (Nat -> Nat) is NOT <: (Top -> Nat)
+// (arg is covariant here which violates contravariance)
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Nat) -> fn(Top) -> Nat {
+  return f
+}

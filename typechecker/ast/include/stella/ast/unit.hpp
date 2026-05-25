@@ -19,8 +19,11 @@ public:
     void OutputTo(std::ostream& out) const override { out << "Unit"; }
     void Accept(TypeVisitor& visitor) const override;
 
-    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
-    bool operator==(const TypeUnit&) const { return true; }
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
+        return DefaultCheckCompatible(*this, expected_type);
+    }
+
+    std::optional<ErrorCode> CheckCompatibleImpl(const TypeUnit&) const { return std::nullopt; }
 };
 
 } // namespace ast

@@ -1,0 +1,7 @@
+// Ref is invariant: &Nat <: &Nat  (reflexivity)
+language core;
+extend with #references, #structural-subtyping;
+
+fn main(r : &Nat) -> &Nat {
+  return r
+}

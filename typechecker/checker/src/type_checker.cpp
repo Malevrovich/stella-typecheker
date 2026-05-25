@@ -2,11 +2,11 @@
 
 #include <exception>
 #include <format>
+#include <loguru.hpp>
 #include <memory>
 
-#include <loguru.hpp>
-
 #include "stella/ast/base.hpp"
+#include "stella/ast/exception.hpp"
 #include "stella/ast/fun.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
@@ -42,67 +42,145 @@ void TypeChecker::Visit(const ast::NodeBase& node) {
                                 node.ToString());
 }
 
-void TypeChecker::CheckCompatibility(const ast::NodeBase& node,
-                                     const ExpectedTypeList& expected_types,
-                                     const DeducedType& deduced_type) const {
-    for (const auto& exp : expected_types.All()) {
-        auto conflict_error_code = exp.Check(*deduced_type.type);
-        if (conflict_error_code) {
-            OnError(TypeCheckNodeError{*conflict_error_code, node,
-                                       std::format("Expected type {}, but expr has type {}",
-                                                   exp.ToString(), deduced_type.type->ToString())});
+std::optional<ErrorCode> TypeChecker::CheckCompatible(const ast::Type& given,
+                                                      const ast::Type& expected) const {
+    auto error = given.CheckCompatible(expected);
+    if (error) {
+        if (HasExtension("#structural-subtyping")) {
+            return subtype_checker_.IsSubtypeOrError(given, expected);
         }
+        return error;
     }
+    return std::nullopt;
 }
 
-void TypeChecker::SetDeducedType(const ast::NodeBase& node, DeducedType&& deduced_type) {
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    if (expected_types) {
-        CheckCompatibility(node, *expected_types, deduced_type);
-    }
-
-    auto [result_type, was_set] =
-        types_storage_.trySet<DeducedType>(&node, std::move(deduced_type));
-    if (!was_set) {
-        OnInternalError(std::format(
-            "At: {}\n Unable to set deduced type to {}. Type is already set to {}", node.ToString(),
-            deduced_type.type->ToString(), result_type->type->ToString()));
+// Returns true if the error code is a "structural" same-family mismatch that should
+// be overridden by the ExpectedType's mismatch_error (default:
+// ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION) when raised implicitly through SetDeducedType
+// or SetProvisionalType on a non-constructor expression.
+//
+// The precise codes are still emitted explicitly by the visitor methods for constructors
+// (e.g. VisitExprRecord emits MISSING/UNEXPECTED_RECORD_FIELDS before SetDeducedType).
+//
+// ERROR_UNEXPECTED_RECORD_FIELDS: raised by CheckCompatibleImpl when given has MORE
+//   fields than expected.  On a function call result this means the callee returns a
+//   wider record — not a record-constructor problem, so use the generic fallback.
+// ERROR_UNEXPECTED_TYPE_FOR_PARAMETER: raised by TypeFun::CheckCompatibleImpl when arg
+//   types differ — only meaningful for lambda parameter mismatches (raised explicitly in
+//   VisitExprAbstraction), not for function-valued expressions at call sites.
+static bool IsStructuralMismatch(ErrorCode code) {
+    switch (code) {
+    case ErrorCode::ERROR_UNEXPECTED_RECORD_FIELDS:
+    case ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_PARAMETER:
+        return true;
+    default:
+        return false;
     }
 }
 
 void TypeChecker::ExpectType(const ast::NodeBase& node, ExpectedType&& expected_type) {
-    const auto deduced_type = types_storage_.tryGet<DeducedType>(&node);
-
-    auto& expected_list = types_storage_.get<ExpectedTypeList>(&node, ExpectedTypeList{});
+    const auto* deduced_type = types_storage_.tryGet<DeducedType>(&node);
 
     if (deduced_type) {
-        auto conflict_error_code = expected_type.Check(*deduced_type->type);
-        if (conflict_error_code) {
-            OnError(TypeCheckNodeError{*conflict_error_code, node,
+        auto error = CheckCompatible(*deduced_type->type, *expected_type.GetType());
+
+        if (error) {
+            const ErrorCode final_error =
+                (expected_type.HasExplicitMismatchError() || IsStructuralMismatch(*error))
+                    ? expected_type.GetMismatchError()
+                    : *error;
+            OnError(TypeCheckNodeError{final_error, node,
                                        std::format("Expected type {}, but expr has type {}",
                                                    expected_type.ToString(),
                                                    deduced_type->type->ToString())});
         }
     }
 
-    expected_list.Push(std::move(expected_type));
+    types_storage_.set<ExpectedType>(&node, std::move(expected_type));
+}
+
+void TypeChecker::SetProvisionalType(const ast::NodeBase& node, ProvisionalType&& provisional_type,
+                                     bool skip_structural_mismatch) {
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+
+    if (exp) {
+        auto error = CheckCompatible(*provisional_type.type, *exp->GetType());
+
+        if (error) {
+            const ErrorCode final_error =
+                (exp->HasExplicitMismatchError() ||
+                 (!skip_structural_mismatch && IsStructuralMismatch(*error)))
+                    ? exp->GetMismatchError()
+                    : *error;
+            OnError(TypeCheckNodeError{final_error, node,
+                                       std::format("Expected type {}, but expr has type {}",
+                                                   exp->ToString(),
+                                                   provisional_type.type->ToString())});
+        }
+    }
+
+    types_storage_.set<ProvisionalType>(&node, std::move(provisional_type));
+}
+
+void TypeChecker::SetDeducedType(const ast::NodeBase& node, DeducedType&& deduced_type) {
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+
+    if (exp) {
+        auto error = CheckCompatible(*deduced_type.type, *exp->GetType());
+
+        if (error) {
+            const ErrorCode final_error =
+                (exp->HasExplicitMismatchError() || IsStructuralMismatch(*error))
+                    ? exp->GetMismatchError()
+                    : *error;
+            OnError(
+                TypeCheckNodeError{final_error, node,
+                                   std::format("Expected type {}, but expr has type {}",
+                                               exp->ToString(), deduced_type.type->ToString())});
+        }
+    }
+
+    types_storage_.set<DeducedType>(&node, std::move(deduced_type));
 }
 
 void TypeChecker::PropagateExpectedType(const ast::NodeBase& src, const ast::NodeBase& dst) {
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&src);
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            ExpectType(dst, ExpectedType{exp});
-        }
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&src);
+    // Do not propagate sentinel (family-hint) expected types: they express a family
+    // constraint on the parent node itself, not a concrete expectation for sub-expressions.
+    if (exp && !exp->GetType()->IsSentinel()) {
+        ExpectType(dst, ExpectedType{*exp});
+    }
+}
+
+bool TypeChecker::HasExtension(std::string_view name) const {
+    return extensions_.count(std::string{name}) > 0;
+}
+
+void TypeChecker::SetAmbiguousOrError(const ast::NodeBase& node,
+                                      std::shared_ptr<const ast::Type> bot_type,
+                                      ErrorCode ambiguous_error, std::string_view message) {
+    if (HasExtension("#ambiguous-type-as-bottom")) {
+        SetDeducedType(node, {std::move(bot_type)});
+    } else {
+        OnError(TypeCheckNodeError{ambiguous_error, node, message});
     }
 }
 
 void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
+    extensions_ = node.GetExtensions();
+
     std::vector<NameContext::NameContextGuard> name_guards;
     auto declarations = node.GetDeclarations();
     name_guards.reserve(declarations.size());
 
     for (auto& decl : declarations) {
+        if (std::dynamic_pointer_cast<const ast::NodeDeclExceptionType>(decl)) {
+            continue;
+        }
+        if (std::dynamic_pointer_cast<const ast::NodeDeclExceptionVariant>(decl)) {
+            continue;
+        }
+
         auto func_decl = std::dynamic_pointer_cast<const ast::NodeDeclFun>(decl);
 
         if (!func_decl) {

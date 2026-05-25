@@ -1,0 +1,7 @@
+// Covariant return: (Nat -> Nat) <: (Nat -> Top)
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Nat) -> fn(Nat) -> Top {
+  return f
+}

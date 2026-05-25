@@ -1,0 +1,7 @@
+// Width subtyping: {Nat, Bool, Nat} <: {Nat, Bool}
+language core;
+extend with #tuples, #structural-subtyping;
+
+fn main(t : {Nat, Bool, Nat}) -> {Nat, Bool} {
+  return t
+}

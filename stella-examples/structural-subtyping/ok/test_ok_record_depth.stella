@@ -1,0 +1,7 @@
+// Depth subtyping: {x:Nat} <: {x:Top}
+language core;
+extend with #records, #top-type, #structural-subtyping;
+
+fn main(r : {x : Nat}) -> {x : Top} {
+  return r
+}

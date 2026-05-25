@@ -1,0 +1,7 @@
+// Error: {x:Nat} is NOT <: {x:Nat, y:Bool}  (subtype mismatch via variable)
+language core;
+extend with #records, #structural-subtyping;
+
+fn main(r : {x : Nat}) -> {x : Nat, y : Bool} {
+  return r
+}

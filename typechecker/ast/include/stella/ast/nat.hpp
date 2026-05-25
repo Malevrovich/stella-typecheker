@@ -59,10 +59,8 @@ private:
 
 class NodeExprNatRec final : public NodeExpr {
 public:
-    NodeExprNatRec(std::shared_ptr<SourceInfo> source_info,
-                   std::shared_ptr<const NodeExpr> n,
-                   std::shared_ptr<const NodeExpr> initial,
-                   std::shared_ptr<const NodeExpr> step);
+    NodeExprNatRec(std::shared_ptr<SourceInfo> source_info, std::shared_ptr<const NodeExpr> n,
+                   std::shared_ptr<const NodeExpr> initial, std::shared_ptr<const NodeExpr> step);
 
     void Accept(NodeVisitor& visitor) const override;
 
@@ -81,8 +79,11 @@ public:
     void OutputTo(std::ostream& out) const override { out << "Nat"; }
     void Accept(TypeVisitor& visitor) const override;
 
-    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
-    bool operator==(const TypeNat&) const { return true; }
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
+        return DefaultCheckCompatible(*this, expected_type);
+    }
+
+    std::optional<ErrorCode> CheckCompatibleImpl(const TypeNat&) const { return std::nullopt; }
 };
 
 } // namespace ast

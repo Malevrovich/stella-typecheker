@@ -1,0 +1,17 @@
+INPUT:
+// Covariant sum: (Nat + Bool) <: (Top + Top)
+language core;
+extend with #sum-types, #top-type, #structural-subtyping;
+
+fn main(s : Nat + Bool) -> Top + Top {
+  return s
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

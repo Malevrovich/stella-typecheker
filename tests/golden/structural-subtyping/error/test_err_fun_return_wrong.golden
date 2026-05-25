@@ -1,0 +1,21 @@
+INPUT:
+// Error: (Nat -> Top) is NOT <: (Nat -> Nat)
+// (return: Top is not subtype of Nat)
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Top) -> fn(Nat) -> Nat {
+  return f
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:7:9:
+f
+Expected type (Nat -> Nat), but expr has type (Nat -> Top)
+
+EXIT_CODE: 1

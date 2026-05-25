@@ -1,0 +1,26 @@
+INPUT:
+// Error: function returns {a:Nat, b:Bool} but expected {a:Nat}
+// Without structural-subtyping this is ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+language core;
+
+extend with #records;
+
+fn test(n : Nat) -> {a : Nat, b : Bool} {
+  return { a = n, b = false }
+}
+
+fn main(n : Nat) -> {a : Nat} {
+  return test(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:12:9:
+test(n)
+Expected type {a : Nat}, but expr has type {a : Nat, b : Bool}
+
+EXIT_CODE: 1

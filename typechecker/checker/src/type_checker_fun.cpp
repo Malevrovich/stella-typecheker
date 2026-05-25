@@ -6,6 +6,7 @@
 #include <loguru.hpp>
 
 #include "stella/ast/ast.hpp"
+#include "stella/ast/base.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
@@ -14,7 +15,7 @@ namespace stella {
 namespace typecheck {
 
 void TypeChecker::VisitDeclFun(const ast::NodeDeclFun& node) {
-    SetDeducedTypeFamily<ast::TypeFun>(node);
+    SetProvisionalType(node, {ast::TypeFun::MakeSentinel()});
 
     Visit(*node.GetReturnType());
 
@@ -22,11 +23,32 @@ void TypeChecker::VisitDeclFun(const ast::NodeDeclFun& node) {
     const auto& param = abstraction.GetParam();
     Visit(*param->GetType());
     Visit(*param);
+
+    // Pre-set a DeducedType on this DeclFun from the declared param/return types so that
+    // recursive references to the function (e.g. `return main`) find a valid type and do
+    // not cause infinite recursion. The final SetDeducedType below will overwrite this.
+    {
+        auto param_type = types_storage_.get<DeducedType>(param.get()).type;
+        auto return_type = node.GetReturnType();
+        types_storage_.set<DeducedType>(
+            &node, {std::make_shared<const ast::TypeFun>(param_type, return_type)});
+    }
+
     auto name_guard = name_context_.Push(std::string{param->GetName()}, *param);
+
+    const bool was_in_function_body = in_function_body_;
+    in_function_body_ = true;
+
+    // Visit local declarations (e.g. exception type declarations) before the body.
+    for (const auto& local_decl : node.GetLocalDecls()) {
+        Visit(*local_decl);
+    }
 
     const auto& body = abstraction.GetBody();
     ExpectType(*body, ExpectedType::EqualsTo(node.GetReturnType()));
     Visit(*body);
+
+    in_function_body_ = was_in_function_body;
 
     auto param_type = types_storage_.get<DeducedType>(param.get()).type;
     auto body_type = types_storage_.get<DeducedType>(body.get()).type;
@@ -39,7 +61,22 @@ void TypeChecker::VisitParamDecl(const ast::NodeParamDecl& node) {
 }
 
 void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
-    SetDeducedTypeFamily<ast::TypeFun>(node, ErrorCode::ERROR_UNEXPECTED_LAMBDA);
+    // If the expected type is a non-function concrete type, override the mismatch error to
+    // ERROR_UNEXPECTED_LAMBDA (this is a lambda where a non-function type is expected).
+    // Must happen BEFORE SetProvisionalType which also checks against expected type.
+    {
+        const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+        if (exp && !exp->GetType()->IsSentinel() &&
+            !std::dynamic_pointer_cast<const ast::TypeFun>(exp->GetType()) &&
+            !exp->HasExplicitMismatchError()) {
+            // Directly overwrite the ExpectedType slot (not via ExpectType which would
+            // immediately check and throw using the old error code).
+            types_storage_.set<ExpectedType>(
+                &node, ExpectedType::EqualsTo(exp->GetType(), ErrorCode::ERROR_UNEXPECTED_LAMBDA));
+        }
+    }
+
+    SetProvisionalType(node, {ast::TypeFun::MakeSentinel()});
 
     std::shared_ptr<const ast::Type> expected_arg_type = nullptr;
     std::shared_ptr<const ast::Type> expected_body_type = nullptr;
@@ -73,17 +110,16 @@ void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
 
 void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
     const auto& expr = node.GetExpr();
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
 
-    if (expected_types && !expected_types->Empty()) {
-        auto expected_type_type = expected_types->Front().TryGetType();
-        if (expected_type_type) {
+    ExpectType(*expr, ExpectedType::EqualsTo(ast::TypeFun::MakeSentinel()));
+
+    if (exp) {
+        const auto expected_type_type = exp->GetType();
+        const auto expected_fun = std::dynamic_pointer_cast<const ast::TypeFun>(expected_type_type);
+        if (expected_fun && !expected_fun->IsSentinel()) {
             ExpectType(*expr, ExpectedType::EqualsTo(std::make_shared<ast::TypeFun>(
-                                                         expected_type_type, expected_type_type),
-                                                     ErrorCode::ERROR_NOT_A_FUNCTION));
-        } else {
-            ExpectType(*expr,
-                       ExpectedType::CompatibleWith<ast::TypeFun>(ErrorCode::ERROR_NOT_A_FUNCTION));
+                                  expected_type_type, expected_type_type)));
         }
     }
     Visit(*expr);
@@ -94,10 +130,11 @@ void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
         OnInternalError("Unexpected fix expression deduction type");
     }
 
-    if (!fun_type->GetReturnType()->Equals(*fun_type->GetArgType())) {
+    auto err = CheckCompatible(*fun_type->GetReturnType(), *fun_type->GetArgType());
+
+    if (err) {
         OnError(TypeCheckNodeError(
-            ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION, node,
-            "Mismatched parameter type and return type in fix combinator argument"));
+            *err, node, "Mismatched parameter type and return type in fix combinator argument"));
     }
 
     SetDeducedType(node, {fun_type->GetReturnType()});
@@ -105,8 +142,7 @@ void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
 
 void TypeChecker::VisitExprApplication(const ast::NodeExprApplication& node) {
     const auto& function = node.GetFunction();
-    ExpectType(*function,
-               ExpectedType::CompatibleWith<ast::TypeFun>(ErrorCode::ERROR_NOT_A_FUNCTION));
+    ExpectType(*function, ExpectedType::EqualsTo(ast::TypeFun::MakeSentinel()));
     Visit(*function);
 
     const auto fun_type = std::dynamic_pointer_cast<const ast::TypeFun>(

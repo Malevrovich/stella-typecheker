@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "stella/ast/ast.hpp"
+#include "stella/ast/base.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
@@ -12,29 +13,28 @@ namespace stella {
 namespace typecheck {
 
 void TypeChecker::VisitExprTuple(const ast::NodeExprTuple& node) {
-    SetDeducedTypeFamily<ast::TypeTuple>(node, ErrorCode::ERROR_UNEXPECTED_TUPLE);
+    SetProvisionalType(node, {ast::TypeTuple::MakeSentinel()});
+
+    {
+        const auto unknown = std::make_shared<ast::TypeUnknown>();
+        std::vector<std::shared_ptr<const ast::Type>> unknown_elements(node.GetElements().size(),
+                                                                       unknown);
+        SetProvisionalType(node, {std::make_shared<ast::TypeTuple>(std::move(unknown_elements))});
+    }
 
     const auto expected_tuple_type = TryGetExpectedType<ast::TypeTuple>(node);
-
-    if (expected_tuple_type) {
-        if (expected_tuple_type->GetElementTypes().size() != node.GetElements().size()) {
-            OnError(TypeCheckNodeError{
-                ErrorCode::ERROR_UNEXPECTED_TUPLE_LENGTH,
-                node,
-                std::format("Expected tuple of length {}, but got tuple of length {}",
-                            expected_tuple_type->GetElementTypes().size(),
-                            node.GetElements().size()),
-            });
-        }
-    }
+    const bool has_concrete_expected = expected_tuple_type && !expected_tuple_type->IsSentinel();
 
     std::vector<std::shared_ptr<const ast::Type>> element_types;
     element_types.reserve(node.GetElements().size());
 
     for (std::size_t i = 0; i < node.GetElements().size(); ++i) {
         const auto& elem = node.GetElements()[i];
-        if (expected_tuple_type) {
-            ExpectType(*elem, ExpectedType::EqualsTo(expected_tuple_type->GetElementTypes()[i]));
+        if (has_concrete_expected) {
+            const auto& exp_elems = *expected_tuple_type->GetElementTypes();
+            if (i < exp_elems.size()) {
+                ExpectType(*elem, ExpectedType::EqualsTo(exp_elems[i]));
+            }
         }
         Visit(*elem);
         element_types.push_back(types_storage_.get<DeducedType>(elem.get()).type);
@@ -47,17 +47,22 @@ void TypeChecker::VisitExprDotTuple(const ast::NodeExprDotTuple& node) {
     const auto& expr = node.GetExpr();
     const int index = node.GetIndex();
 
-    ExpectType(*expr, ExpectedType::CompatibleWith<ast::TypeTuple>(ErrorCode::ERROR_NOT_A_TUPLE));
+    ExpectType(*expr, ExpectedType::EqualsTo(ast::TypeTuple::MakeSentinel()));
 
     Visit(*expr);
 
     const auto tuple_type = std::dynamic_pointer_cast<const ast::TypeTuple>(
         types_storage_.get<DeducedType>(expr.get()).type);
     if (!tuple_type) {
-        OnInternalError("Unexpected dot-tuple expr deduction type");
+        OnError(TypeCheckNodeError{
+            ErrorCode::ERROR_NOT_A_TUPLE,
+            node,
+            std::format("Expected a tuple type but got {}",
+                        types_storage_.get<DeducedType>(expr.get()).type->ToString()),
+        });
     }
 
-    const auto& element_types = tuple_type->GetElementTypes();
+    const auto& element_types = *tuple_type->GetElementTypes();
     if (index < 1 || static_cast<std::size_t>(index) > element_types.size()) {
         OnError(TypeCheckNodeError{
             ErrorCode::ERROR_TUPLE_INDEX_OUT_OF_BOUNDS,

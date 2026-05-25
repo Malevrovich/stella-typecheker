@@ -1,0 +1,20 @@
+INPUT:
+// Error: literal tuple {n} has too few elements when expected {Nat, Bool}
+language core;
+extend with #pairs, #structural-subtyping;
+
+fn main(n : Nat) -> {Nat, Bool} {
+  return {n}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TUPLE_LENGTH:
+Error occured at <unknown>:6:9:
+{n}
+Expected type {Nat, Bool}, but expr has type {?}
+
+EXIT_CODE: 1

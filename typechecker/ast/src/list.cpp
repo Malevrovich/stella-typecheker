@@ -35,10 +35,18 @@ NodeExprIsEmpty::NodeExprIsEmpty(std::shared_ptr<SourceInfo> source_info,
 TypeList::TypeList(std::shared_ptr<const Type> element_type)
     : element_type_(std::move(element_type)) {}
 
+std::shared_ptr<TypeList> TypeList::MakeSentinel() {
+    return std::make_shared<TypeList>(TypeList::SentinelTag{});
+}
+
 void TypeList::OutputTo(std::ostream& out) const {
-    out << "[";
-    element_type_->OutputTo(out);
-    out << "]";
+    if (IsSentinel()) {
+        out << "[?]";
+    } else {
+        out << "[";
+        element_type_->OutputTo(out);
+        out << "]";
+    }
 }
 
 } // namespace ast

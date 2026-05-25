@@ -1,0 +1,20 @@
+INPUT:
+// Error: <|a:Top|> is NOT <: <|a:Nat|>  (depth: Top not subtype of Nat)
+language core;
+extend with #variants, #top-type, #structural-subtyping;
+
+fn main(v : <| a : Top |>) -> <| a : Nat |> {
+  return v
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:9:
+v
+Expected type <|a : Nat|>, but expr has type <|a : Top|>
+
+EXIT_CODE: 1

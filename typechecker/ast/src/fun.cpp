@@ -24,11 +24,13 @@ NodeExprAbstraction::NodeExprAbstraction(std::shared_ptr<SourceInfo> source_info
 
 NodeDeclFun::NodeDeclFun(std::shared_ptr<SourceInfo> source_info, std::string name,
                          std::shared_ptr<const Type> return_type,
-                         std::shared_ptr<const NodeExprAbstraction> abstraction)
+                         std::shared_ptr<const NodeExprAbstraction> abstraction,
+                         std::vector<std::shared_ptr<const NodeDecl>> local_decls)
     : NodeDecl(std::move(source_info)),
       name_(std::move(name)),
       return_type_(std::move(return_type)),
-      abstraction_(std::move(abstraction)) {}
+      abstraction_(std::move(abstraction)),
+      local_decls_(std::move(local_decls)) {}
 
 NodeExprApplication::NodeExprApplication(std::shared_ptr<SourceInfo> source_info,
                                          std::shared_ptr<const NodeExpr> function,
@@ -53,8 +55,16 @@ TypeFun::TypeFun(std::shared_ptr<const Type> arg_type, std::shared_ptr<const Typ
     CHECK_F(return_type_ != nullptr);
 }
 
+std::shared_ptr<TypeFun> TypeFun::MakeSentinel() {
+    return std::make_shared<TypeFun>(TypeFun::SentinelTag{});
+}
+
 void TypeFun::OutputTo(std::ostream& out) const {
-    out << "(" << *arg_type_ << " -> " << *return_type_ << ")";
+    if (IsSentinel()) {
+        out << "(? -> ?)";
+    } else {
+        out << "(" << *arg_type_ << " -> " << *return_type_ << ")";
+    }
 }
 
 } // namespace ast

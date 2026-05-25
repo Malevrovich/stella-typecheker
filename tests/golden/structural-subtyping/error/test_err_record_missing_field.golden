@@ -1,0 +1,20 @@
+INPUT:
+// Error: literal record {x=n} is missing field y when expected {x:Nat, y:Bool}
+language core;
+extend with #records, #structural-subtyping;
+
+fn main(n : Nat) -> {x : Nat, y : Bool} {
+  return {x = n}
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_MISSING_RECORD_FIELDS:
+Error occured at <unknown>:6:9:
+{x = n}
+Expected type {x : Nat, y : Bool}, but expr has type {x : ?}
+
+EXIT_CODE: 1

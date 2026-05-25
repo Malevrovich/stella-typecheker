@@ -19,13 +19,21 @@ NodeExprDotTuple::NodeExprDotTuple(std::shared_ptr<SourceInfo> source_info,
 TypeTuple::TypeTuple(std::vector<std::shared_ptr<const Type>> element_types)
     : element_types_(std::move(element_types)) {}
 
+std::shared_ptr<TypeTuple> TypeTuple::MakeSentinel() {
+    return std::make_shared<TypeTuple>(TypeTuple::SentinelTag{});
+}
+
 void TypeTuple::OutputTo(std::ostream& out) const {
+    if (IsSentinel()) {
+        out << "{_}";
+        return;
+    }
     out << "{";
-    for (std::size_t i = 0; i < element_types_.size(); ++i) {
+    for (std::size_t i = 0; i < element_types_->size(); ++i) {
         if (i > 0) {
             out << ", ";
         }
-        element_types_[i]->OutputTo(out);
+        (*element_types_)[i]->OutputTo(out);
     }
     out << "}";
 }

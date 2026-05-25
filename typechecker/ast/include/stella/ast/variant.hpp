@@ -47,38 +47,59 @@ public:
         std::string label;
         std::optional<std::shared_ptr<const Type>> type;
     };
+    struct SentinelTag {};
 
+    // Concrete variant type.
     explicit TypeVariant(std::vector<Field> fields,
                          std::optional<std::string> duplicate_label = std::nullopt);
+    // Family sentinel: "some variant, labels unknown".
+    explicit TypeVariant(SentinelTag) {}
+    static std::shared_ptr<TypeVariant> MakeSentinel();
 
     void OutputTo(std::ostream& out) const override;
     void Accept(TypeVisitor& visitor) const override;
 
-    const std::vector<Field>& GetFields() const { return fields_; }
+    bool IsSentinel() const override { return !fields_.has_value(); }
+    // Returns nullopt for sentinels.
+    const std::optional<std::vector<Field>>& GetFields() const { return fields_; }
     const std::optional<std::string>& GetDuplicateLabel() const { return duplicate_label_; }
 
-    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
+    std::optional<ErrorCode> GetUnexpectedErrorCode() const override {
+        return ErrorCode::ERROR_UNEXPECTED_VARIANT;
+    }
 
-    bool operator==(const TypeVariant& other) const {
-        if (fields_.size() != other.fields_.size()) {
-            return false;
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
+        return DefaultCheckCompatible(*this, expected_type);
+    }
+
+    std::optional<ErrorCode> CheckCompatibleImpl(const TypeVariant& other) const {
+        if (!fields_ || !other.fields_)
+            return std::nullopt; // sentinel matches any
+
+        if (fields_->size() != other.fields_->size()) {
+            return ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION;
         }
-        for (std::size_t i = 0; i < fields_.size(); ++i) {
-            if (fields_[i].label != other.fields_[i].label) {
-                return false;
+
+        for (std::size_t i = 0; i < fields_->size(); ++i) {
+            if ((*fields_)[i].label != (*other.fields_)[i].label) {
+                return ErrorCode::ERROR_UNEXPECTED_VARIANT_LABEL;
             }
-            if (fields_[i].type.has_value() != other.fields_[i].type.has_value()) {
-                return false;
+            if ((*fields_)[i].type.has_value() != (*other.fields_)[i].type.has_value()) {
+                return ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION;
             }
-            if (fields_[i].type && !(*fields_[i].type)->Equals(**other.fields_[i].type)) {
-                return false;
+            if ((*fields_)[i].type) {
+                if (auto error =
+                        (*(*fields_)[i].type)->CheckCompatible(*(*(*other.fields_)[i].type))) {
+                    return error;
+                }
             }
         }
-        return true;
+        return std::nullopt;
     }
 
 private:
-    std::vector<Field> fields_;
+    // nullopt = sentinel; std::vector{} = valid empty variant <||>.
+    std::optional<std::vector<Field>> fields_;
     std::optional<std::string> duplicate_label_;
 };
 

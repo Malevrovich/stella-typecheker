@@ -1,0 +1,7 @@
+// Error: {x:Top} is NOT <: {x:Nat}  (depth: Top is not subtype of Nat)
+language core;
+extend with #records, #top-type, #structural-subtyping;
+
+fn main(r : {x : Top}) -> {x : Nat} {
+  return r
+}

@@ -1,8 +1,11 @@
 #pragma once
 
 #include <concepts>
-#include <format>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <type_traits>
+#include <unordered_set>
 
 #include "stella/ast/ast.hpp"
 #include "stella/ast/attribute_storage.hpp"
@@ -12,7 +15,7 @@
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
-#include "stella/utils.hpp"
+#include "stella/typecheck/subtype.hpp"
 
 namespace stella {
 namespace typecheck {
@@ -49,6 +52,7 @@ public:
     void VisitExprTypeAsc(const ast::NodeExprTypeAsc& node) override;
 
     void VisitPatternVar(const ast::NodePatternVar& node) override;
+    void VisitPatternCastAs(const ast::NodePatternCastAs& node) override;
     void VisitExprLet(const ast::NodeExprLet& node) override;
 
     void VisitExprList(const ast::NodeExprList& node) override;
@@ -74,6 +78,28 @@ public:
     void VisitExprVariant(const ast::NodeExprVariant& node) override;
     void VisitTypeVariant(const ast::TypeVariant& type) override;
 
+    void VisitExprSequence(const ast::NodeExprSequence& node) override;
+
+    void VisitTypeTop(const ast::TypeTop& type) override;
+    void VisitTypeBottom(const ast::TypeBottom& type) override;
+
+    void VisitExprPanic(const ast::NodeExprPanic& node) override;
+
+    void VisitDeclExceptionType(const ast::NodeDeclExceptionType& node) override;
+    void VisitDeclExceptionVariant(const ast::NodeDeclExceptionVariant& node) override;
+    void VisitExprThrow(const ast::NodeExprThrow& node) override;
+    void VisitExprTryWith(const ast::NodeExprTryWith& node) override;
+    void VisitExprTryCatch(const ast::NodeExprTryCatch& node) override;
+
+    void VisitExprTypeCast(const ast::NodeExprTypeCast& node) override;
+    void VisitExprTryCastAs(const ast::NodeExprTryCastAs& node) override;
+
+    void VisitTypeRef(const ast::TypeRef& type) override;
+    void VisitExprRef(const ast::NodeExprRef& node) override;
+    void VisitExprDeref(const ast::NodeExprDeref& node) override;
+    void VisitExprAssign(const ast::NodeExprAssign& node) override;
+    void VisitExprConstMemory(const ast::NodeExprConstMemory& node) override;
+
     void VisitDefaultNode(const ast::NodeBase& node) override { throw NotSupportedError(node); }
 
 private:
@@ -81,16 +107,24 @@ private:
         std::shared_ptr<const ast::Type> type;
     };
 
+    struct ProvisionalType {
+        std::shared_ptr<const ast::Type> type;
+    };
+
+    bool HasExtension(std::string_view name) const;
+
+    void SetAmbiguousOrError(const ast::NodeBase& node, std::shared_ptr<const ast::Type> bot_type,
+                             ErrorCode ambiguous_error, std::string_view message);
+
+    std::optional<ErrorCode> CheckCompatible(const ast::Type& given,
+                                             const ast::Type& expected) const;
+
     void ExpectType(const ast::NodeBase& node, ExpectedType&& expected_type);
     void PropagateExpectedType(const ast::NodeBase& src, const ast::NodeBase& dst);
     void SetDeducedType(const ast::NodeBase& node, DeducedType&& deduced_type);
-    template <typename T>
-        requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
-    void SetDeducedTypeFamily(
-        const ast::NodeBase& node,
-        std::optional<ErrorCode> conflict_error_code = std::nullopt); // TODO: better name
-    void CheckCompatibility(const ast::NodeBase& node, const ExpectedTypeList& expected_types,
-                            const DeducedType& deduced_type) const;
+
+    void SetProvisionalType(const ast::NodeBase& node, ProvisionalType&& provisional_type,
+                            bool skip_structural_mismatch = false);
 
     template <typename T>
         requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
@@ -101,48 +135,31 @@ private:
                        const ast::NodeExprMatch& match_node, const ast::NodeBase& case_expr,
                        std::shared_ptr<const ast::Type>& result_type);
 
-    // Per-kind match handlers called from VisitExprMatch
     void VisitMatchSum(const ast::NodeExprMatch& node, const ast::TypeSum& scrutinee_type);
     void VisitMatchVariant(const ast::NodeExprMatch& node, const ast::TypeVariant& scrutinee_type);
+
     NameContext name_context_;
-    ast::AttributeStorage<ExpectedTypeList, DeducedType> types_storage_;
+    ast::AttributeStorage<ExpectedType, DeducedType, ProvisionalType> types_storage_;
+
+    std::shared_ptr<const ast::Type> exception_type_{nullptr};
+    // true when currently type-checking inside a function body (not at top level)
+    bool in_function_body_{false};
+    // true if exception_type_ was set via "exception type = ..." (as opposed to variants)
+    bool exception_type_is_monotype_{false};
+    // labels accumulated from "exception variant" declarations
+    std::unordered_set<std::string> exception_variant_labels_;
+    std::unordered_set<std::string> extensions_;
+
+    SubtypeChecker subtype_checker_;
 };
 
 template <typename T>
     requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
 std::shared_ptr<const T> TypeChecker::TryGetExpectedType(const ast::NodeBase& node) const {
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    if (!expected_types) {
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+    if (!exp)
         return nullptr;
-    }
-    for (const auto& exp : expected_types->All()) {
-        auto t = std::dynamic_pointer_cast<const T>(exp.TryGetType());
-        if (t) {
-            return t;
-        }
-    }
-    return nullptr;
-}
-
-template <typename T>
-    requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
-void TypeChecker::SetDeducedTypeFamily(const ast::NodeBase& node,
-                                       std::optional<ErrorCode> conflict_error_code) {
-    auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    if (expected_types) {
-        auto error_code =
-            expected_types->CheckAllCompatibleWith<std::remove_cvref_t<T>>(conflict_error_code);
-        if (error_code) {
-            const std::string expected_str =
-                expected_types->Empty() ? "" : expected_types->Front().ToString();
-            OnError(TypeCheckNodeError{
-                *error_code,
-                node,
-                std::format("Expected type {}, but node has type {}", expected_str,
-                            tryDemangle(typeid(T).name())),
-            });
-        }
-    }
+    return std::dynamic_pointer_cast<const T>(exp->GetType());
 }
 
 } // namespace typecheck

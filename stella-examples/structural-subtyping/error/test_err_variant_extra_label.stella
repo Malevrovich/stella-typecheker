@@ -1,0 +1,8 @@
+// Error: <|a:Nat, b:Bool|> is NOT <: <|a:Nat|>
+// (sub has label b which super doesn't have)
+language core;
+extend with #variants, #structural-subtyping;
+
+fn main(v : <| a : Nat, b : Bool |>) -> <| a : Nat |> {
+  return v
+}

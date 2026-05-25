@@ -1,0 +1,7 @@
+// Error: literal record {x=n} is missing field y when expected {x:Nat, y:Bool}
+language core;
+extend with #records, #structural-subtyping;
+
+fn main(n : Nat) -> {x : Nat, y : Bool} {
+  return {x = n}
+}

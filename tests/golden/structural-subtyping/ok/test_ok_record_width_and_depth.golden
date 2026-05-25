@@ -1,0 +1,17 @@
+INPUT:
+// Width + depth subtyping: {x:Nat, y:Bool} <: {x:Top}
+language core;
+extend with #records, #top-type, #structural-subtyping;
+
+fn main(r : {x : Nat, y : Bool}) -> {x : Top} {
+  return r
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

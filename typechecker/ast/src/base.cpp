@@ -27,12 +27,18 @@ void NodeBase::OutputTo(std::ostream& out) const {
 }
 
 NodeProgram::NodeProgram(std::shared_ptr<SourceInfo> source_info,
-                         std::vector<std::shared_ptr<const NodeDecl>> decls)
+                         std::vector<std::shared_ptr<const NodeDecl>> decls,
+                         std::unordered_set<std::string> extensions)
     : NodeBase(std::move(source_info)),
-      decls_(std::move(decls)) {
+      decls_(std::move(decls)),
+      extensions_(std::move(extensions)) {
     for (const auto& decl : decls_) {
         CHECK_F(decl != nullptr);
     }
+}
+
+bool NodeProgram::HasExtension(std::string_view name) const {
+    return extensions_.count(std::string{name}) > 0;
 }
 
 } // namespace ast

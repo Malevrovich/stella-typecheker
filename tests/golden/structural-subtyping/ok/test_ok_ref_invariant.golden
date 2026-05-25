@@ -1,0 +1,17 @@
+INPUT:
+// Ref is invariant: &Nat <: &Nat  (reflexivity)
+language core;
+extend with #references, #structural-subtyping;
+
+fn main(r : &Nat) -> &Nat {
+  return r
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -1,0 +1,6 @@
+language core;
+extend with #bottom-type, #structural-subtyping;
+
+fn main(n : Bot) -> Nat {
+  return n
+}

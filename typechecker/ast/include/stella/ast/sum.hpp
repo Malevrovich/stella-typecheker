@@ -61,21 +61,40 @@ private:
 
 class TypeSum final : public BaseTypeImpl<TypeSum, Type> {
 public:
+    struct SentinelTag {};
+
+    // Concrete sum type.
     TypeSum(std::shared_ptr<const Type> left, std::shared_ptr<const Type> right);
+    // Family sentinel: "some sum type, left/right unknown".
+    explicit TypeSum(SentinelTag) {}
+    static std::shared_ptr<TypeSum> MakeSentinel();
 
     void OutputTo(std::ostream& out) const override;
     void Accept(TypeVisitor& visitor) const override;
 
+    bool IsSentinel() const override { return left_ == nullptr; }
+    // Return nullptr for sentinels.
     std::shared_ptr<const Type> GetLeft() const { return left_; }
     std::shared_ptr<const Type> GetRight() const { return right_; }
 
-    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
+    std::optional<ErrorCode> GetUnexpectedErrorCode() const override {
+        return ErrorCode::ERROR_UNEXPECTED_INJECTION;
+    }
 
-    bool operator==(const TypeSum& other) const {
-        return left_->Equals(*other.left_) && right_->Equals(*other.right_);
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
+        return DefaultCheckCompatible(*this, expected_type);
+    }
+
+    std::optional<ErrorCode> CheckCompatibleImpl(const TypeSum& other) const {
+        if (!left_ || !other.left_)
+            return std::nullopt; // sentinel matches any
+        if (auto error = left_->CheckCompatible(*other.left_))
+            return error;
+        return right_->CheckCompatible(*other.right_);
     }
 
 private:
+    // nullptr = sentinel (both fields nullptr together).
     std::shared_ptr<const Type> left_;
     std::shared_ptr<const Type> right_;
 };

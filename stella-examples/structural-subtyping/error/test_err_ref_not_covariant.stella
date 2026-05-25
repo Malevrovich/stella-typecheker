@@ -1,0 +1,7 @@
+// Error: &Nat is NOT <: &Top  (refs are invariant, not covariant)
+language core;
+extend with #references, #top-type, #structural-subtyping;
+
+fn main(r : &Nat) -> &Top {
+  return r
+}

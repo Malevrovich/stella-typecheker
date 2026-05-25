@@ -1,0 +1,7 @@
+// Covariant list: [Nat] <: [Top]
+language core;
+extend with #lists, #top-type, #structural-subtyping;
+
+fn main(l : [Nat]) -> [Top] {
+  return l
+}

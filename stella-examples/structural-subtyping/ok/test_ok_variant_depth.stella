@@ -1,0 +1,7 @@
+// Depth subtyping: <|a:Nat|> <: <|a:Top|>
+language core;
+extend with #variants, #top-type, #structural-subtyping;
+
+fn main(v : <| a : Nat |>) -> <| a : Top |> {
+  return v
+}

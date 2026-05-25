@@ -74,20 +74,40 @@ private:
 
 class TypeList final : public BaseTypeImpl<TypeList, Type> {
 public:
+    struct SentinelTag {};
+
+    // Concrete list type with a known element type.
     explicit TypeList(std::shared_ptr<const Type> element_type);
+    // Family sentinel: "some list, element type unknown".
+    explicit TypeList(SentinelTag) {}
+    static std::shared_ptr<TypeList> MakeSentinel();
 
     void OutputTo(std::ostream& out) const override;
     void Accept(TypeVisitor& visitor) const override;
 
+    bool IsSentinel() const override { return element_type_ == nullptr; }
+    // Returns nullptr for sentinels.
     std::shared_ptr<const Type> GetElementType() const { return element_type_; }
 
-    bool Equals(const Type& type) const override { return DefaultEquals(*this, type); }
+    std::optional<ErrorCode> GetFamilyErrorCode() const override {
+        return ErrorCode::ERROR_NOT_A_LIST;
+    }
+    std::optional<ErrorCode> GetUnexpectedErrorCode() const override {
+        return ErrorCode::ERROR_UNEXPECTED_LIST;
+    }
 
-    bool operator==(const TypeList& other) const {
-        return element_type_->Equals(*other.element_type_);
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
+        return DefaultCheckCompatible(*this, expected_type);
+    }
+
+    std::optional<ErrorCode> CheckCompatibleImpl(const TypeList& other) const {
+        if (!element_type_ || !other.element_type_)
+            return std::nullopt; // sentinel matches any
+        return element_type_->CheckCompatible(*other.element_type_);
     }
 
 private:
+    // nullptr = sentinel
     std::shared_ptr<const Type> element_type_;
 };
 

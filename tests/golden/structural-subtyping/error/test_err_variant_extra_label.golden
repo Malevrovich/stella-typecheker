@@ -1,0 +1,21 @@
+INPUT:
+// Error: <|a:Nat, b:Bool|> is NOT <: <|a:Nat|>
+// (sub has label b which super doesn't have)
+language core;
+extend with #variants, #structural-subtyping;
+
+fn main(v : <| a : Nat, b : Bool |>) -> <| a : Nat |> {
+  return v
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_VARIANT_LABEL:
+Error occured at <unknown>:7:9:
+v
+Expected type <|a : Nat|>, but expr has type <|a : Nat, b : Bool|>
+
+EXIT_CODE: 1

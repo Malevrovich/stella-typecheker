@@ -1,0 +1,20 @@
+INPUT:
+// Error: {x:Top} is NOT <: {x:Nat}  (depth: Top is not subtype of Nat)
+language core;
+extend with #records, #top-type, #structural-subtyping;
+
+fn main(r : {x : Top}) -> {x : Nat} {
+  return r
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_SUBTYPE:
+Error occured at <unknown>:6:9:
+r
+Expected type {x : Nat}, but expr has type {x : Top}
+
+EXIT_CODE: 1

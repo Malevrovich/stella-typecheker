@@ -1,13 +1,19 @@
 #include "stella/ast/visitor.hpp"
 
 #include "stella/ast/asc.hpp"
+#include "stella/ast/cast.hpp"
+#include "stella/ast/exception.hpp"
+#include "stella/ast/panic.hpp"
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
 #include "stella/ast/match.hpp"
 #include "stella/ast/record.hpp"
+#include "stella/ast/reference.hpp"
+#include "stella/ast/sequence.hpp"
 #include "stella/ast/sum.hpp"
+#include "stella/ast/top_bottom.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/ast/unit.hpp"
 #include "stella/ast/variant.hpp"
@@ -184,6 +190,86 @@ void BaseNodeVisitor::VisitPatternVariant(const NodePatternVariant& node) {
 }
 
 void BaseTypeVisitor::VisitTypeVariant(const TypeVariant& type) { VisitDefaultType(type); }
+
+void NodeExprSequence::Accept(NodeVisitor& visitor) const { visitor.VisitExprSequence(*this); }
+
+void BaseNodeVisitor::VisitExprSequence(const NodeExprSequence& node) { VisitDefaultNode(node); }
+
+void TypeTop::Accept(TypeVisitor& visitor) const { visitor.VisitTypeTop(*this); }
+
+void TypeBottom::Accept(TypeVisitor& visitor) const { visitor.VisitTypeBottom(*this); }
+
+void BaseTypeVisitor::VisitTypeTop(const TypeTop& type) { VisitDefaultType(type); }
+
+void BaseTypeVisitor::VisitTypeBottom(const TypeBottom& type) { VisitDefaultType(type); }
+
+void NodeExprPanic::Accept(NodeVisitor& visitor) const { visitor.VisitExprPanic(*this); }
+
+void BaseNodeVisitor::VisitExprPanic(const NodeExprPanic& node) { VisitDefaultNode(node); }
+
+void NodeDeclExceptionType::Accept(NodeVisitor& visitor) const {
+    visitor.VisitDeclExceptionType(*this);
+}
+
+void BaseNodeVisitor::VisitDeclExceptionType(const NodeDeclExceptionType& node) {
+    VisitDefaultNode(node);
+}
+
+void NodeDeclExceptionVariant::Accept(NodeVisitor& visitor) const {
+    visitor.VisitDeclExceptionVariant(*this);
+}
+
+void BaseNodeVisitor::VisitDeclExceptionVariant(const NodeDeclExceptionVariant& node) {
+    VisitDefaultNode(node);
+}
+
+void NodeExprThrow::Accept(NodeVisitor& visitor) const { visitor.VisitExprThrow(*this); }
+
+void BaseNodeVisitor::VisitExprThrow(const NodeExprThrow& node) { VisitDefaultNode(node); }
+
+void NodeExprTryWith::Accept(NodeVisitor& visitor) const { visitor.VisitExprTryWith(*this); }
+
+void BaseNodeVisitor::VisitExprTryWith(const NodeExprTryWith& node) { VisitDefaultNode(node); }
+
+void NodeExprTryCatch::Accept(NodeVisitor& visitor) const { visitor.VisitExprTryCatch(*this); }
+
+void BaseNodeVisitor::VisitExprTryCatch(const NodeExprTryCatch& node) { VisitDefaultNode(node); }
+
+void NodePatternCastAs::Accept(NodeVisitor& visitor) const { visitor.VisitPatternCastAs(*this); }
+
+void BaseNodeVisitor::VisitPatternCastAs(const NodePatternCastAs& node) { VisitDefaultNode(node); }
+
+void NodeExprTypeCast::Accept(NodeVisitor& visitor) const { visitor.VisitExprTypeCast(*this); }
+
+void BaseNodeVisitor::VisitExprTypeCast(const NodeExprTypeCast& node) { VisitDefaultNode(node); }
+
+void NodeExprTryCastAs::Accept(NodeVisitor& visitor) const { visitor.VisitExprTryCastAs(*this); }
+
+void BaseNodeVisitor::VisitExprTryCastAs(const NodeExprTryCastAs& node) {
+    VisitDefaultNode(node);
+}
+
+void NodeExprRef::Accept(NodeVisitor& visitor) const { visitor.VisitExprRef(*this); }
+
+void BaseNodeVisitor::VisitExprRef(const NodeExprRef& node) { VisitDefaultNode(node); }
+
+void NodeExprDeref::Accept(NodeVisitor& visitor) const { visitor.VisitExprDeref(*this); }
+
+void BaseNodeVisitor::VisitExprDeref(const NodeExprDeref& node) { VisitDefaultNode(node); }
+
+void NodeExprAssign::Accept(NodeVisitor& visitor) const { visitor.VisitExprAssign(*this); }
+
+void BaseNodeVisitor::VisitExprAssign(const NodeExprAssign& node) { VisitDefaultNode(node); }
+
+void NodeExprConstMemory::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstMemory(*this); }
+
+void BaseNodeVisitor::VisitExprConstMemory(const NodeExprConstMemory& node) {
+    VisitDefaultNode(node);
+}
+
+void TypeRef::Accept(TypeVisitor& visitor) const { visitor.VisitTypeRef(*this); }
+
+void BaseTypeVisitor::VisitTypeRef(const TypeRef& type) { VisitDefaultType(type); }
 
 } // namespace ast
 } // namespace stella

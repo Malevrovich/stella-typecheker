@@ -17,7 +17,7 @@ void TypeChecker::VisitExprConstInt(const ast::NodeExprConstInt& node) {
 }
 
 void TypeChecker::VisitExprIsZero(const ast::NodeExprIsZero& node) {
-    SetDeducedTypeFamily<ast::TypeBool>(node);
+    SetProvisionalType(node, {std::make_shared<ast::TypeBool>()});
 
     const auto& operand = node.GetOperand();
     ExpectType(*operand, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
@@ -27,7 +27,7 @@ void TypeChecker::VisitExprIsZero(const ast::NodeExprIsZero& node) {
 }
 
 void TypeChecker::VisitExprSucc(const ast::NodeExprSucc& node) {
-    SetDeducedTypeFamily<ast::TypeNat>(node);
+    SetProvisionalType(node, {std::make_shared<ast::TypeNat>()});
 
     const auto& operand = node.GetOperand();
     ExpectType(*operand, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
@@ -37,7 +37,7 @@ void TypeChecker::VisitExprSucc(const ast::NodeExprSucc& node) {
 }
 
 void TypeChecker::VisitExprPred(const ast::NodeExprPred& node) {
-    SetDeducedTypeFamily<ast::TypeNat>(node);
+    SetProvisionalType(node, {std::make_shared<ast::TypeNat>()});
 
     const auto& operand = node.GetOperand();
     ExpectType(*operand, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
@@ -52,7 +52,15 @@ void TypeChecker::VisitExprNatRec(const ast::NodeExprNatRec& node) {
     Visit(*n);
 
     const auto& initial = node.GetInitial();
-    PropagateExpectedType(node, *initial);
+    // Only propagate expected type to 'initial' if it is a concrete non-function type.
+    // If Nat::rec itself is used as the function in an application, the outer expected type
+    // is TypeFun::MakeSentinel(), which must not be forwarded to 'initial'.
+    {
+        const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+        if (exp && !std::dynamic_pointer_cast<const ast::TypeFun>(exp->GetType())) {
+            PropagateExpectedType(node, *initial);
+        }
+    }
     Visit(*initial);
 
     const auto& deduced_type = types_storage_.get<DeducedType>(initial.get()).type;
@@ -61,7 +69,10 @@ void TypeChecker::VisitExprNatRec(const ast::NodeExprNatRec& node) {
     const auto& step_type =
         std::make_shared<ast::TypeFun>(std::make_shared<ast::TypeNat>(),
                                        std::make_shared<ast::TypeFun>(deduced_type, deduced_type));
-    ExpectType(*step, ExpectedType::EqualsTo(step_type));
+    // Use ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION (not ERROR_NOT_A_FUNCTION) because
+    // this is a type-mismatch at a specific argument position, not a function-call context.
+    ExpectType(*step,
+               ExpectedType::EqualsTo(step_type, ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION));
     Visit(*step);
 
     SetDeducedType(node, {deduced_type});

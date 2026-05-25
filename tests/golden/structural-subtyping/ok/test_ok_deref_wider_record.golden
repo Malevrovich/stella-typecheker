@@ -1,0 +1,21 @@
+INPUT:
+// Well-typed: *n where n : &{a:Nat, b:Bool} and expected {a:Nat}
+// Deref is covariant: the result {a:Nat, b:Bool} is a subtype of {a:Nat}
+language core;
+
+extend with #structural-subtyping;
+extend with #references;
+extend with #records;
+
+fn main(n : &{ a : Nat, b : Bool }) -> { a : Nat } {
+  return *n
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

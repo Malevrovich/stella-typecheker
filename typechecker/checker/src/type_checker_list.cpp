@@ -3,7 +3,9 @@
 #include <memory>
 
 #include "stella/ast/ast.hpp"
+#include "stella/ast/base.hpp"
 #include "stella/ast/list.hpp"
+#include "stella/ast/top_bottom.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
 
@@ -11,7 +13,7 @@ namespace stella {
 namespace typecheck {
 
 void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
-    SetDeducedTypeFamily<ast::TypeList>(node, ErrorCode::ERROR_UNEXPECTED_LIST);
+    SetProvisionalType(node, {ast::TypeList::MakeSentinel()});
 
     std::shared_ptr<const ast::Type> element_type = nullptr;
     if (const auto expected_list_type = TryGetExpectedType<ast::TypeList>(node)) {
@@ -19,8 +21,10 @@ void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
     }
 
     if (!element_type && node.GetElements().empty()) {
-        OnError(TypeCheckNodeError{ErrorCode::ERROR_AMBIGUOUS_LIST, node,
-                                   "Cannot determine element type of empty list literal"});
+        SetAmbiguousOrError(node, std::make_shared<ast::TypeList>(ast::TypeBottom::Get()),
+                            ErrorCode::ERROR_AMBIGUOUS_LIST,
+                            "Cannot determine element type of empty list literal");
+        return;
     }
 
     for (const auto& elem : node.GetElements()) {
@@ -38,20 +42,24 @@ void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
 }
 
 void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
-    SetDeducedTypeFamily<ast::TypeList>(node, ErrorCode::ERROR_UNEXPECTED_LIST);
+    SetProvisionalType(node, {ast::TypeList::MakeSentinel()});
 
     std::shared_ptr<const ast::Type> element_type = nullptr;
     if (const auto expected_list_type = TryGetExpectedType<ast::TypeList>(node)) {
-        element_type = expected_list_type->GetElementType();
+        if (!expected_list_type->IsSentinel()) {
+            element_type = expected_list_type->GetElementType();
+        }
     }
 
     const auto& head = node.GetHead();
     const auto& tail = node.GetTail();
 
-    ExpectType(*tail, ExpectedType::CompatibleWith<ast::TypeList>(ErrorCode::ERROR_NOT_A_LIST));
+    // Phase 1: just ensure tail is a list family.
+    ExpectType(*tail, ExpectedType::EqualsTo(ast::TypeList::MakeSentinel()));
 
     if (element_type) {
         ExpectType(*head, ExpectedType::EqualsTo(element_type));
+        // Phase 2: refine to concrete list type (overwrites the sentinel expectation).
         ExpectType(*tail, ExpectedType::EqualsTo(std::make_shared<ast::TypeList>(element_type)));
     }
 
@@ -59,6 +67,7 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
 
     if (!element_type) {
         element_type = types_storage_.get<DeducedType>(head.get()).type;
+        // Phase 2: refine after deducing head type.
         ExpectType(*tail, ExpectedType::EqualsTo(std::make_shared<ast::TypeList>(element_type)));
     }
 
@@ -76,22 +85,15 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
 void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
     const auto& list = node.GetList();
 
-    std::shared_ptr<const ast::Type> exact_element_type = nullptr;
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            const auto t = exp.TryGetType();
-            if (t) {
-                exact_element_type = t;
-                break;
-            }
-        }
-    }
+    // If we know the expected element type, propagate as concrete list; otherwise sentinel.
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+    const auto exact_element_type = exp ? exp->GetType() : nullptr;
 
-    ExpectType(*list, ExpectedType::CompatibleWith<ast::TypeList>(ErrorCode::ERROR_NOT_A_LIST));
-    if (exact_element_type) {
+    if (exact_element_type && !exact_element_type->IsSentinel()) {
         ExpectType(*list,
                    ExpectedType::EqualsTo(std::make_shared<ast::TypeList>(exact_element_type)));
+    } else {
+        ExpectType(*list, ExpectedType::EqualsTo(ast::TypeList::MakeSentinel()));
     }
 
     Visit(*list);
@@ -108,21 +110,14 @@ void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
 void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
     const auto& list = node.GetList();
 
-    std::shared_ptr<const ast::Type> exact_list_type = nullptr;
-    const auto expected_types = types_storage_.tryGet<ExpectedTypeList>(&node);
-    if (expected_types) {
-        for (const auto& exp : expected_types->All()) {
-            const auto t = exp.TryGetType();
-            if (t) {
-                exact_list_type = t;
-                break;
-            }
-        }
-    }
+    // If we know the expected list type, propagate as concrete; otherwise sentinel.
+    const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
+    const auto exact_list_type = exp ? exp->GetType() : nullptr;
 
-    ExpectType(*list, ExpectedType::CompatibleWith<ast::TypeList>(ErrorCode::ERROR_NOT_A_LIST));
-    if (exact_list_type) {
+    if (exact_list_type && !exact_list_type->IsSentinel()) {
         ExpectType(*list, ExpectedType::EqualsTo(exact_list_type));
+    } else {
+        ExpectType(*list, ExpectedType::EqualsTo(ast::TypeList::MakeSentinel()));
     }
 
     Visit(*list);
@@ -137,10 +132,10 @@ void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
 }
 
 void TypeChecker::VisitExprIsEmpty(const ast::NodeExprIsEmpty& node) {
-    SetDeducedTypeFamily<ast::TypeBool>(node);
+    SetProvisionalType(node, {std::make_shared<ast::TypeBool>()});
 
     const auto& list = node.GetList();
-    ExpectType(*list, ExpectedType::CompatibleWith<ast::TypeList>(ErrorCode::ERROR_NOT_A_LIST));
+    ExpectType(*list, ExpectedType::EqualsTo(ast::TypeList::MakeSentinel()));
     Visit(*list);
 
     SetDeducedType(node, {std::make_shared<ast::TypeBool>()});

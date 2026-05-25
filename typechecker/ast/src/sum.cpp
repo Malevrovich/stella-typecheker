@@ -29,7 +29,15 @@ TypeSum::TypeSum(std::shared_ptr<const Type> left, std::shared_ptr<const Type> r
     : left_(std::move(left)),
       right_(std::move(right)) {}
 
+std::shared_ptr<TypeSum> TypeSum::MakeSentinel() {
+    return std::make_shared<TypeSum>(TypeSum::SentinelTag{});
+}
+
 void TypeSum::OutputTo(std::ostream& out) const {
+    if (IsSentinel()) {
+        out << "? + ?";
+        return;
+    }
     left_->OutputTo(out);
     out << " + ";
     right_->OutputTo(out);

@@ -1,0 +1,8 @@
+// Error: (Nat -> Top) is NOT <: (Nat -> Nat)
+// (return: Top is not subtype of Nat)
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Top) -> fn(Nat) -> Nat {
+  return f
+}

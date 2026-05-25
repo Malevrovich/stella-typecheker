@@ -1,0 +1,7 @@
+// Contravariant argument: (Top -> Nat) <: (Nat -> Nat)
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn main(f : fn(Top) -> Nat) -> fn(Nat) -> Nat {
+  return f
+}

@@ -6,6 +6,8 @@
 #include <unordered_set>
 
 #include "stella/ast/ast.hpp"
+#include "stella/ast/base.hpp"
+#include "stella/ast/top_bottom.hpp"
 #include "stella/ast/variant.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
@@ -24,19 +26,25 @@ void TypeChecker::VisitTypeVariant(const ast::TypeVariant& type) {
 }
 
 void TypeChecker::VisitExprVariant(const ast::NodeExprVariant& node) {
-    SetDeducedTypeFamily<ast::TypeVariant>(node, ErrorCode::ERROR_UNEXPECTED_VARIANT);
+    SetProvisionalType(node, {ast::TypeVariant::MakeSentinel()});
 
     const auto expected_variant_type = TryGetExpectedType<ast::TypeVariant>(node);
-    if (!expected_variant_type) {
-        OnError(TypeCheckNodeError{
-            ErrorCode::ERROR_AMBIGUOUS_VARIANT_TYPE,
-            node,
-            std::format("Cannot determine variant type for label '{}': no expected type provided",
-                        node.GetLabel()),
-        });
+    // Only use concrete (non-sentinel) expected type.
+    const bool has_concrete_expected =
+        expected_variant_type && !expected_variant_type->IsSentinel();
+
+    if (!has_concrete_expected) {
+        if (node.GetExpr()) {
+            Visit(**node.GetExpr());
+        }
+        SetAmbiguousOrError(node, ast::TypeBottom::Get(), ErrorCode::ERROR_AMBIGUOUS_VARIANT_TYPE,
+                            std::format("Cannot determine variant type for label '{}': "
+                                        "no expected type provided",
+                                        node.GetLabel()));
+        return;
     }
 
-    const auto& fields = expected_variant_type->GetFields();
+    const auto& fields = *expected_variant_type->GetFields();
     const auto it = std::find_if(fields.begin(), fields.end(),
                                  [&](const auto& f) { return f.label == node.GetLabel(); });
 
@@ -61,7 +69,7 @@ void TypeChecker::VisitExprVariant(const ast::NodeExprVariant& node) {
 
 void TypeChecker::VisitMatchVariant(const ast::NodeExprMatch& node,
                                     const ast::TypeVariant& scrutinee_type) {
-    const auto& fields = scrutinee_type.GetFields();
+    const auto& fields = *scrutinee_type.GetFields();
     std::unordered_set<std::string> covered;
     covered.reserve(fields.size());
 

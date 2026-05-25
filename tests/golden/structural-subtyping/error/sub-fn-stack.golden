@@ -1,0 +1,30 @@
+INPUT:
+language core;
+
+extend with
+  #sequencing;
+extend with #records;
+extend with #bottom-type;
+extend with #panic;
+
+fn test(n : Nat) -> fn({a : Nat}) -> Bot {
+  return fn(rec : {a : Nat}) {
+    return panic!
+  }
+}
+
+fn main(n : Nat) -> fn({a : Nat, b : Bool}) -> Bool {
+  return test(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:16:9:
+test(n)
+Expected type ({a : Nat, b : Bool} -> Bool), but expr has type ({a : Nat} -> Bot)
+
+EXIT_CODE: 1

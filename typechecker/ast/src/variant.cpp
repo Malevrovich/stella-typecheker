@@ -25,16 +25,24 @@ TypeVariant::TypeVariant(std::vector<Field> fields, std::optional<std::string> d
     : fields_(std::move(fields)),
       duplicate_label_(std::move(duplicate_label)) {}
 
+std::shared_ptr<TypeVariant> TypeVariant::MakeSentinel() {
+    return std::make_shared<TypeVariant>(TypeVariant::SentinelTag{});
+}
+
 void TypeVariant::OutputTo(std::ostream& out) const {
+    if (IsSentinel()) {
+        out << "<|_ : _|>";
+        return;
+    }
     out << "<|";
-    for (std::size_t i = 0; i < fields_.size(); ++i) {
+    for (std::size_t i = 0; i < fields_->size(); ++i) {
         if (i > 0) {
             out << ", ";
         }
-        out << fields_[i].label;
-        if (fields_[i].type) {
+        out << (*fields_)[i].label;
+        if ((*fields_)[i].type) {
             out << " : ";
-            (*fields_[i].type)->OutputTo(out);
+            (*(*fields_)[i].type)->OutputTo(out);
         }
     }
     out << "|>";

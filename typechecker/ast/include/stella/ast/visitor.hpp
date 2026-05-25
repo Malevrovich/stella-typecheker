@@ -60,6 +60,25 @@ public:
 
     virtual void VisitExprVariant(const NodeExprVariant& node) = 0;
     virtual void VisitPatternVariant(const NodePatternVariant& node) = 0;
+
+    virtual void VisitExprSequence(const NodeExprSequence& node) = 0;
+
+    virtual void VisitExprPanic(const NodeExprPanic& node) = 0;
+
+    virtual void VisitDeclExceptionType(const NodeDeclExceptionType& node) = 0;
+    virtual void VisitDeclExceptionVariant(const NodeDeclExceptionVariant& node) = 0;
+    virtual void VisitExprThrow(const NodeExprThrow& node) = 0;
+    virtual void VisitExprTryWith(const NodeExprTryWith& node) = 0;
+    virtual void VisitExprTryCatch(const NodeExprTryCatch& node) = 0;
+
+    virtual void VisitPatternCastAs(const NodePatternCastAs& node) = 0;
+    virtual void VisitExprTypeCast(const NodeExprTypeCast& node) = 0;
+    virtual void VisitExprTryCastAs(const NodeExprTryCastAs& node) = 0;
+
+    virtual void VisitExprRef(const NodeExprRef& node) = 0;
+    virtual void VisitExprDeref(const NodeExprDeref& node) = 0;
+    virtual void VisitExprAssign(const NodeExprAssign& node) = 0;
+    virtual void VisitExprConstMemory(const NodeExprConstMemory& node) = 0;
 };
 
 class TypeVisitor {
@@ -77,6 +96,9 @@ public:
     virtual void VisitTypeRecord(const TypeRecord& type) = 0;
     virtual void VisitTypeSum(const TypeSum& type) = 0;
     virtual void VisitTypeVariant(const TypeVariant& type) = 0;
+    virtual void VisitTypeTop(const TypeTop& type) = 0;
+    virtual void VisitTypeBottom(const TypeBottom& type) = 0;
+    virtual void VisitTypeRef(const TypeRef& type) = 0;
 };
 
 class BaseNodeVisitor : public NodeVisitor {
@@ -123,6 +145,25 @@ public:
 
     void VisitExprVariant(const NodeExprVariant& node) override;
     void VisitPatternVariant(const NodePatternVariant& node) override;
+
+    void VisitExprSequence(const NodeExprSequence& node) override;
+
+    void VisitExprPanic(const NodeExprPanic& node) override;
+
+    void VisitDeclExceptionType(const NodeDeclExceptionType& node) override;
+    void VisitDeclExceptionVariant(const NodeDeclExceptionVariant& node) override;
+    void VisitExprThrow(const NodeExprThrow& node) override;
+    void VisitExprTryWith(const NodeExprTryWith& node) override;
+    void VisitExprTryCatch(const NodeExprTryCatch& node) override;
+
+    void VisitPatternCastAs(const NodePatternCastAs& node) override;
+    void VisitExprTypeCast(const NodeExprTypeCast& node) override;
+    void VisitExprTryCastAs(const NodeExprTryCastAs& node) override;
+
+    void VisitExprRef(const NodeExprRef& node) override;
+    void VisitExprDeref(const NodeExprDeref& node) override;
+    void VisitExprAssign(const NodeExprAssign& node) override;
+    void VisitExprConstMemory(const NodeExprConstMemory& node) override;
 };
 
 class BaseTypeVisitor : public TypeVisitor {
@@ -140,6 +181,9 @@ public:
     void VisitTypeRecord(const TypeRecord& type) override;
     void VisitTypeSum(const TypeSum& type) override;
     void VisitTypeVariant(const TypeVariant& type) override;
+    void VisitTypeTop(const TypeTop& type) override;
+    void VisitTypeBottom(const TypeBottom& type) override;
+    void VisitTypeRef(const TypeRef& type) override;
 };
 
 } // namespace ast

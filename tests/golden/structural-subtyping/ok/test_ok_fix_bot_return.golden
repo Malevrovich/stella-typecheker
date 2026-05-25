@@ -1,0 +1,17 @@
+INPUT:
+// fix(f) where f : Nat -> Bot is valid since Bot <: Nat (subtyping in fix combinator)
+language core;
+extend with #fixpoint-combinator, #bottom-type, #structural-subtyping;
+
+fn main(f : fn(Nat) -> Bot) -> Nat {
+  return fix(f)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

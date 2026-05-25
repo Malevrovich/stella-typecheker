@@ -1,0 +1,17 @@
+INPUT:
+// Depth subtyping: {Nat, Bool} <: {Top, Top}
+language core;
+extend with #pairs, #top-type, #structural-subtyping;
+
+fn main(t : {Nat, Bool}) -> {Top, Top} {
+  return t
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

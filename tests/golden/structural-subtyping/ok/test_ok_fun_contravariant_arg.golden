@@ -1,0 +1,17 @@
+INPUT:
+// Contravariant argument: (Top -> Nat) <: (Nat -> Nat)
+language core;
+extend with #top-type, #structural-subtyping;
+
+fn main(f : fn(Top) -> Nat) -> fn(Nat) -> Nat {
+  return f
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

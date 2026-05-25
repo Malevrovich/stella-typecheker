@@ -1,139 +1,93 @@
 #pragma once
 
 #include <concepts>
-#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
-#include <typeinfo>
-#include <vector>
 
 #include "stella/ast/base.hpp"
 #include "stella/typecheck/error.hpp"
-#include "stella/utils.hpp"
 
 namespace stella {
 namespace typecheck {
 
+// Holds a single type expectation for a node.
+//
+// Calling ExpectType() on a node that already has an ExpectedType overwrites it
+// (i.e. the second call "refines" the expectation, as happens in VisitExprConsList).
+//
+// Construction:
+//   ExpectedType::EqualsTo(type)
+//       -- expect exactly this type (or a subtype when #structural-subtyping is on).
+//       -- family_error is taken automatically from type->GetFamilyErrorCode().
+//       -- mismatch_error defaults to ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION.
+//
 class ExpectedType {
 public:
+    // Expect exactly this type.
+    // family_error  : error to report when the deduced type is of a completely
+    //                 different family (e.g. Nat where [T] was expected).
+    //                 If not provided, taken from type->GetFamilyErrorCode().
+    // mismatch_error: error to report when the family matches but the types differ.
+    //                 Defaults to ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION.
     template <typename T>
         requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
-    static ExpectedType EqualsTo(std::shared_ptr<T> type,
-                                 std::optional<ErrorCode> conflict_error_code = std::nullopt);
-
-    template <typename T>
-        requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
-    static ExpectedType CompatibleWith(std::optional<ErrorCode> conflict_error_code = std::nullopt);
-
-    std::optional<ErrorCode>
-    Check(const ast::Type& type, std::optional<ErrorCode> conflict_error_code = std::nullopt) const;
-
-    template <typename T>
-    std::optional<ErrorCode>
-    CheckCompatibleWith(std::optional<ErrorCode> conflict_error_code = std::nullopt) const;
+    static ExpectedType EqualsTo(
+        std::shared_ptr<T> type,
+        std::optional<ErrorCode> mismatch_error = std::nullopt,
+        std::optional<ErrorCode> family_error_override = std::nullopt);
 
     std::string ToString() const { return name_; }
 
-    std::shared_ptr<const ast::Type> TryGetType() const { return stored_type_; }
+    std::shared_ptr<const ast::Type> GetType() const { return type_; }
+
+    // Error when the deduced type is of a completely wrong family.
+    std::optional<ErrorCode> GetFamilyError() const { return family_error_; }
+
+    // Error when the family matches but the types differ (or for subtype failures).
+    ErrorCode GetMismatchError() const { return mismatch_error_; }
+
+    // Returns true if the mismatch_error was explicitly provided by the caller
+    // (vs. being the default ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION).
+    // When true, mismatch_error takes priority over family_error on family mismatch.
+    bool HasExplicitMismatchError() const { return explicit_mismatch_; }
+
+    // Default-constructible so it can be used in AttributeStorage (unordered_map).
+    ExpectedType() : mismatch_error_(ErrorCode::ERROR_UNKNOWN), explicit_mismatch_(false) {}
 
 private:
-    using TypeCompatibilityChecker = bool(const ast::Type&);
-    using TypeInfoCompatibilityChecker = bool(const std::type_info&);
+    explicit ExpectedType(std::shared_ptr<const ast::Type> type,
+                          std::optional<ErrorCode> family_error,
+                          ErrorCode mismatch_error,
+                          bool explicit_mismatch)
+        : name_(type->ToString()),
+          type_(std::move(type)),
+          family_error_(family_error),
+          mismatch_error_(mismatch_error),
+          explicit_mismatch_(explicit_mismatch) {}
 
-    ExpectedType() = default;
-
-    template <typename TypeCompatibilityCheck, typename TypeInfoCompatibilityCheck>
-    ExpectedType(TypeCompatibilityCheck&& type_compat_check,
-                 TypeInfoCompatibilityCheck&& type_info_compat_check,
-                 std::optional<ErrorCode> conflict_error_code, std::string name,
-                 std::shared_ptr<const ast::Type> stored_type)
-        : type_compatibility_checker_(std::forward<TypeCompatibilityCheck>(type_compat_check)),
-          type_info_compatibility_checker_(
-              std::forward<TypeInfoCompatibilityCheck>(type_info_compat_check)),
-          conflict_error_code_(conflict_error_code),
-          name_(std::move(name)),
-          stored_type_(std::move(stored_type)) {}
-
-    ErrorCode DetermineErrorCode(std::optional<ErrorCode> conflict_error_code) const;
-
-    std::function<TypeCompatibilityChecker> type_compatibility_checker_;
-    std::function<TypeInfoCompatibilityChecker> type_info_compatibility_checker_;
     std::string name_;
-    std::optional<ErrorCode> conflict_error_code_{std::nullopt};
-    std::shared_ptr<const ast::Type> stored_type_{nullptr};
+    std::shared_ptr<const ast::Type> type_;
+    std::optional<ErrorCode> family_error_;
+    ErrorCode mismatch_error_;
+    bool explicit_mismatch_{false};
 };
 
-class ExpectedTypeList {
-public:
-    ExpectedTypeList() = default;
-
-    void Push(ExpectedType&& expected_type) { expectations_.push_back(std::move(expected_type)); }
-
-    bool Empty() const { return expectations_.empty(); }
-
-    std::size_t Size() const { return expectations_.size(); }
-
-    const ExpectedType& Front() const { return expectations_.front(); }
-
-    const std::vector<ExpectedType>& All() const { return expectations_; }
-
-    std::optional<ErrorCode> CheckAll(const ast::Type& type) const {
-        for (const auto& exp : expectations_) {
-            if (auto err = exp.Check(type)) {
-                return err;
-            }
-        }
-        return std::nullopt;
-    }
-
-    template <typename T>
-    std::optional<ErrorCode>
-    CheckAllCompatibleWith(std::optional<ErrorCode> conflict_error_code = std::nullopt) const {
-        for (const auto& exp : expectations_) {
-            if (auto err = exp.CheckCompatibleWith<T>(conflict_error_code)) {
-                return err;
-            }
-        }
-        return std::nullopt;
-    }
-
-private:
-    std::vector<ExpectedType> expectations_;
-};
+// ---------------------------------------------------------------------------
+// Template implementation
+// ---------------------------------------------------------------------------
 
 template <typename T>
     requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
 ExpectedType ExpectedType::EqualsTo(std::shared_ptr<T> type,
-                                    std::optional<ErrorCode> conflict_error_code) {
-    return ExpectedType{
-        [type = type](const ast::Type& other) { return type->Equals(other); },
-        [type = type](const std::type_info& info) { return type->DynamicIsCompatibleWith(info); },
-        conflict_error_code,
-        type->ToString(),
-        type,
-    };
-}
-
-template <typename T>
-    requires std::derived_from<std::remove_cvref_t<T>, ast::Type>
-ExpectedType ExpectedType::CompatibleWith(std::optional<ErrorCode> conflict_error_code) {
-    return ExpectedType{
-        [](const ast::Type& other) { return T::StaticIsCompatibleWith(typeid(other)); },
-        [](const std::type_info& info) { return T::StaticIsCompatibleWith(info); },
-        conflict_error_code,
-        tryDemangle(typeid(T).name()),
-        nullptr,
-    };
-}
-
-template <typename T>
-std::optional<ErrorCode>
-ExpectedType::CheckCompatibleWith(std::optional<ErrorCode> conflict_error_code) const {
-    if (!type_info_compatibility_checker_(typeid(T))) {
-        return DetermineErrorCode(conflict_error_code);
-    }
-    return std::nullopt;
+                                    std::optional<ErrorCode> mismatch_error,
+                                    std::optional<ErrorCode> family_error_override) {
+    std::optional<ErrorCode> family_err =
+        family_error_override ? family_error_override : type->GetFamilyErrorCode();
+    const bool explicit_mismatch = mismatch_error.has_value();
+    ErrorCode mismatch_err =
+        mismatch_error.value_or(ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION);
+    return ExpectedType{std::move(type), family_err, mismatch_err, explicit_mismatch};
 }
 
 } // namespace typecheck
