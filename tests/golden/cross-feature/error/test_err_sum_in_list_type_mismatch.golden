@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/cross-feature/error/test_err_sum_in_list_type_mismatch.stella:7:22:
+Error occured at <unknown>:7:22:
 true
 Expected type Nat, but expr has type Bool
 

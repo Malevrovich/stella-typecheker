@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #references, #unit-type, #exceptions, #exception-type-declaration, #sequencing, #let-bindings;
+
+exception type = Nat
+
+fn safe_read(r : &Nat) -> Nat {
+  return try { *r } catch { e => e }
+}
+
+fn main(n : Nat) -> Nat {
+  return let r = new(n) in safe_read(r)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

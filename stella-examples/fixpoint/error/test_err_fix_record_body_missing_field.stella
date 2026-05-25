@@ -1,0 +1,8 @@
+language core;
+extend with #fixpoint-combinator, #records, #structural-subtyping;
+
+fn main(n : Nat) -> { a : Nat } {
+  return fix(fn(self : { a : Nat, b : Nat }) { 
+    return {a = n} 
+  })
+}

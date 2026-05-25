@@ -2,7 +2,9 @@ INPUT:
 // Nested match: ERROR_UNEXPECTED_PATTERN_FOR_TYPE
 // inner match uses inl/inr patterns on a non-sum type (Nat)
 language core;
-extend with #sum-types;
+extend with #sum-types,
+  #natural-literals,
+  #integers;
 
 fn main(x : Nat + Bool) -> Nat {
   return match x {
@@ -14,13 +16,12 @@ fn main(x : Nat + Bool) -> Nat {
   }
 }
 
-
 STDOUT:
 (empty)
 
 STDERR:
 ERROR_UNEXPECTED_PATTERN_FOR_TYPE:
-Error occured at stella-examples/nested-match/error/test_err_nested_match_wrong_pattern_in_inner.stella:8:16:
+Error occured at <unknown>:10:16:
 match n {
           inl(k) => k    // n is Nat, not a sum type
         | inr(b) => 0

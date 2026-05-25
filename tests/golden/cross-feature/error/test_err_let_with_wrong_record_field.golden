@@ -14,7 +14,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_FIELD_ACCESS:
-Error occured at stella-examples/cross-feature/error/test_err_let_with_wrong_record_field.stella:7:38:
+Error occured at <unknown>:7:38:
 r.z
 Record has no field 'z'
 

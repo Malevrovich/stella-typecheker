@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #exceptions, #exception-type-declaration, #structural-subtyping, #top-type;
+
+exception type = Nat
+
+fn main(n : Nat) -> Top {
+  return try { n } with { n }
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

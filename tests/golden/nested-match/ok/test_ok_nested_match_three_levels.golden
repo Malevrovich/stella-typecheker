@@ -2,7 +2,9 @@ INPUT:
 // Nested match: three levels deep using variants and sum types
 // outer: variant, middle: sum type, inner: variant
 language core;
-extend with #sum-types, #variants;
+extend with #sum-types, #variants,
+  #natural-literals,
+  #integers;
 
 fn main(x : <| outer : Nat + <| a : Nat, b : Bool |>, other : Bool |>) -> Nat {
   return match x {
@@ -16,7 +18,6 @@ fn main(x : <| outer : Nat + <| a : Nat, b : Bool |>, other : Bool |>) -> Nat {
     | <| other = f |> => if f then 0 else 1
   }
 }
-
 
 STDOUT:
 Well-typed

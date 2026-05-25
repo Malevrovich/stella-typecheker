@@ -1,7 +1,9 @@
 INPUT:
 // Nested match: variant inside variant
 language core;
-extend with #variants;
+extend with #variants,
+  #natural-literals,
+  #integers;
 
 fn main(x : <| outer : <| a : Nat, b : Bool |>, other : Nat |>) -> Nat {
   return match x {
@@ -12,7 +14,6 @@ fn main(x : <| outer : <| a : Nat, b : Bool |>, other : Nat |>) -> Nat {
     | <| other = n |> => succ(n)
   }
 }
-
 
 STDOUT:
 Well-typed

@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #fixpoint-combinator, #records, #structural-subtyping;
+
+fn main(n : Nat) -> { a : Nat } {
+  return fix(fn(self : { a : Nat, b : Nat }) { 
+    return {a = n} 
+  })
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_MISSING_RECORD_FIELDS:
+Error occured at <unknown>:5:9:
+fix(fn(self : { a : Nat, b : Nat }) { 
+    return {a = n} 
+  })
+Mismatched parameter type and return type in fix combinator argument
+
+EXIT_CODE: 1

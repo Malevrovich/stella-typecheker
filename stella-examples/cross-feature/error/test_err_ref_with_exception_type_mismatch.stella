@@ -1,0 +1,8 @@
+language core;
+extend with #references, #unit-type, #exceptions, #exception-type-declaration, #let-bindings;
+
+exception type = Nat
+
+fn main(n : Nat) -> Bool {
+  return try { false } catch { e => new(e) }
+}

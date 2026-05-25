@@ -12,8 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_NOT_A_FUNCTION:
-Error occured at stella-examples/fixpoint/error/test_err_fix_not_a_function.stella:5:13:
+Error occured at <unknown>:5:13:
 n
-Expected type (Nat -> Nat), but expr has type Nat
+Expected type (? -> ?), but expr has type Nat
 
 EXIT_CODE: 1

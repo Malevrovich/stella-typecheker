@@ -20,7 +20,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/nested-match/error/test_err_nested_match_inner_type_mismatch.stella:10:20:
+Error occured at <unknown>:10:20:
 b
 Expected type Nat, but expr has type Bool
 

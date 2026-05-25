@@ -1,7 +1,9 @@
 INPUT:
 // Nested match: sum type inside variant field
 language core;
-extend with #sum-types, #variants;
+extend with #sum-types, #variants,
+  #natural-literals,
+  #integers;
 
 fn main(x : <| result : Nat + Bool, empty : Bool |>) -> Nat {
   return match x {
@@ -12,7 +14,6 @@ fn main(x : <| result : Nat + Bool, empty : Bool |>) -> Nat {
     | <| empty = _ |> => 0
   }
 }
-
 
 STDOUT:
 Well-typed

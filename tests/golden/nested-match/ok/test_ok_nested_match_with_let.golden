@@ -20,7 +20,7 @@ STDOUT:
 
 STDERR:
 ERROR_AMBIGUOUS_SUM_TYPE:
-Error occured at stella-examples/nested-match/ok/test_ok_nested_match_with_let.stella:7:39:
+Error occured at <unknown>:7:39:
 inr(true)
 Cannot determine sum type for inr injection: no expected type provided
 

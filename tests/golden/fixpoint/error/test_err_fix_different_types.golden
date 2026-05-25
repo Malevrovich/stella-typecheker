@@ -16,7 +16,7 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at stella-examples/fixpoint/error/test_err_fix_different_types.stella:5:9:
+Error occured at <unknown>:5:9:
 fix(fn(self : fn(Bool) -> Nat) {
     return fn(x : Bool) {
       return if (x) then true else false

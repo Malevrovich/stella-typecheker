@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #fixpoint-combinator, #references, #unit-type, #records, #structural-subtyping, #let-bindings;
+
+fn main(n : Nat) -> { a : Nat } {
+  return fix(fn(self : { a : Nat }) { 
+    return {a = n, b = false} 
+  })
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0
