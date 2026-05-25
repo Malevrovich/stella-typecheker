@@ -12,10 +12,16 @@
 
 #include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
+#include "stella/ast/cast.hpp"
+#include "stella/ast/exception.hpp"
 #include "stella/ast/let.hpp"
+#include "stella/ast/panic.hpp"
 #include "stella/ast/list.hpp"
 #include "stella/ast/record.hpp"
+#include "stella/ast/reference.hpp"
+#include "stella/ast/sequence.hpp"
 #include "stella/ast/sum.hpp"
+#include "stella/ast/top_bottom.hpp"
 #include "stella/ast/tuple.hpp"
 #include "stella/ast/variant.hpp"
 #include "stella/utils.hpp"
@@ -104,12 +110,22 @@ private:
     }
 
     antlrcpp::Any visitProgram(antlr4_stella::StellaParser::ProgramContext* ctx) override {
+        std::unordered_set<std::string> extensions;
+        for (auto ext_ctx : ctx->extensions) {
+            auto* an_ext = dynamic_cast<antlr4_stella::StellaParser::AnExtensionContext*>(ext_ctx);
+            if (an_ext) {
+                for (auto* name_node : an_ext->ExtensionName()) {
+                    extensions.insert(name_node->getText());
+                }
+            }
+        }
+
         std::vector<std::shared_ptr<const ast::NodeDecl>> decls;
         for (auto decl_ctx : ctx->decl()) {
             decls.push_back(try_any_cast<std::shared_ptr<const ast::NodeDecl>>(visit(decl_ctx)));
         }
 
-        return make_node<ast::NodeProgram>(ctx, std::move(decls));
+        return make_node<ast::NodeProgram>(ctx, std::move(decls), std::move(extensions));
     }
 
     antlrcpp::Any visitTypeNat(antlr4_stella::StellaParser::TypeNatContext* ctx) override {
@@ -134,6 +150,14 @@ private:
 
     antlrcpp::Any visitTypeUnit(antlr4_stella::StellaParser::TypeUnitContext* ctx) override {
         return type(std::make_shared<const ast::TypeUnit>());
+    }
+
+    antlrcpp::Any visitTypeTop(antlr4_stella::StellaParser::TypeTopContext* ctx) override {
+        return type(std::make_shared<const ast::TypeTop>());
+    }
+
+    antlrcpp::Any visitTypeBottom(antlr4_stella::StellaParser::TypeBottomContext* ctx) override {
+        return type(std::make_shared<const ast::TypeBottom>());
     }
 
     antlrcpp::Any visitConstTrue(antlr4_stella::StellaParser::ConstTrueContext* ctx) override {
@@ -238,9 +262,16 @@ private:
         auto return_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->returnType));
         auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->returnExpr));
 
+        std::vector<std::shared_ptr<const ast::NodeDecl>> local_decls;
+        for (auto* local_ctx : ctx->localDecls) {
+            local_decls.push_back(
+                try_any_cast<std::shared_ptr<const ast::NodeDecl>>(visit(local_ctx)));
+        }
+
         auto abstr = make_node<ast::NodeExprAbstraction>(ctx, param, body);
 
-        return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr);
+        return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr,
+                                          std::move(local_decls));
     }
 
     antlrcpp::Any visitTypeList(antlr4_stella::StellaParser::TypeListContext* ctx) override {
@@ -423,9 +454,25 @@ private:
         return make_expr<ast::NodeExprTypeAsc>(ctx, expr, asc_type);
     }
 
+    antlrcpp::Any visitTypeCast(antlr4_stella::StellaParser::TypeCastContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        auto cast_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+
+        return make_expr<ast::NodeExprTypeCast>(ctx, expr, cast_type);
+    }
+
     antlrcpp::Any visitPatternVar(antlr4_stella::StellaParser::PatternVarContext* ctx) override {
         return std::static_pointer_cast<const ast::NodePattern>(
             make_node<ast::NodePatternVar>(ctx, ctx->name->getText()));
+    }
+
+    antlrcpp::Any
+    visitPatternCastAs(antlr4_stella::StellaParser::PatternCastAsContext* ctx) override {
+        auto inner_pattern =
+            try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pattern_));
+        auto cast_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+        return std::static_pointer_cast<const ast::NodePattern>(
+            make_node<ast::NodePatternCastAs>(ctx, inner_pattern, cast_type));
     }
 
     antlrcpp::Any visitLet(antlr4_stella::StellaParser::LetContext* ctx) override {
@@ -444,6 +491,89 @@ private:
         auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->body));
 
         return make_expr<ast::NodeExprLet>(ctx, pattern, init, body);
+    }
+
+    antlrcpp::Any visitPanic(antlr4_stella::StellaParser::PanicContext* ctx) override {
+        return make_expr<ast::NodeExprPanic>(ctx);
+    }
+
+    antlrcpp::Any visitSequence(antlr4_stella::StellaParser::SequenceContext* ctx) override {
+        auto expr1 = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr1));
+        auto expr2 = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr2));
+        return make_expr<ast::NodeExprSequence>(ctx, expr1, expr2);
+    }
+
+    antlrcpp::Any
+    visitDeclExceptionType(antlr4_stella::StellaParser::DeclExceptionTypeContext* ctx) override {
+        auto exception_type =
+            try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->exceptionType));
+        return make_decl<ast::NodeDeclExceptionType>(ctx, exception_type);
+    }
+
+    antlrcpp::Any
+    visitDeclExceptionVariant(antlr4_stella::StellaParser::DeclExceptionVariantContext* ctx)
+        override {
+        auto variant_type =
+            try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->variantType));
+        return make_decl<ast::NodeDeclExceptionVariant>(ctx, ctx->name->getText(), variant_type);
+    }
+
+    antlrcpp::Any visitThrow(antlr4_stella::StellaParser::ThrowContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprThrow>(ctx, expr);
+    }
+
+    antlrcpp::Any visitTryWith(antlr4_stella::StellaParser::TryWithContext* ctx) override {
+        auto try_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->tryExpr));
+        auto fallback_expr =
+            try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fallbackExpr));
+        return make_expr<ast::NodeExprTryWith>(ctx, try_expr, fallback_expr);
+    }
+
+    antlrcpp::Any visitTryCatch(antlr4_stella::StellaParser::TryCatchContext* ctx) override {
+        auto try_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->tryExpr));
+        auto pattern =
+            try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pat));
+        auto fallback_expr =
+            try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fallbackExpr));
+        return make_expr<ast::NodeExprTryCatch>(ctx, try_expr, pattern, fallback_expr);
+    }
+
+    antlrcpp::Any visitTryCastAs(antlr4_stella::StellaParser::TryCastAsContext* ctx) override {
+        auto try_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->tryExpr));
+        auto cast_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+        auto pattern =
+            try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pattern_));
+        auto success_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        auto fallback_expr =
+            try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fallbackExpr));
+        return make_expr<ast::NodeExprTryCastAs>(ctx, try_expr, cast_type, pattern, success_expr,
+                                                 fallback_expr);
+    }
+
+    antlrcpp::Any visitTypeRef(antlr4_stella::StellaParser::TypeRefContext* ctx) override {
+        auto inner_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+        return type(std::make_shared<const ast::TypeRef>(inner_type));
+    }
+
+    antlrcpp::Any visitRef(antlr4_stella::StellaParser::RefContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprRef>(ctx, expr);
+    }
+
+    antlrcpp::Any visitDeref(antlr4_stella::StellaParser::DerefContext* ctx) override {
+        auto expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+        return make_expr<ast::NodeExprDeref>(ctx, expr);
+    }
+
+    antlrcpp::Any visitAssign(antlr4_stella::StellaParser::AssignContext* ctx) override {
+        auto lhs = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->lhs));
+        auto rhs = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->rhs));
+        return make_expr<ast::NodeExprAssign>(ctx, lhs, rhs);
+    }
+
+    antlrcpp::Any visitConstMemory(antlr4_stella::StellaParser::ConstMemoryContext* ctx) override {
+        return make_expr<ast::NodeExprConstMemory>(ctx, ctx->mem->getText());
     }
 
     std::any visitTerminatingSemicolon(

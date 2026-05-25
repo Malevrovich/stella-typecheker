@@ -62,6 +62,31 @@ class NodeExprVariant;
 class NodePatternVariant;
 class TypeVariant;
 
+class NodeExprSequence;
+
+class NodeExprPanic;
+
+class NodeDeclExceptionType;
+class NodeDeclExceptionVariant;
+class NodeExprThrow;
+class NodeExprTryWith;
+class NodeExprTryCatch;
+
+class NodePatternCastAs;
+class NodeExprTypeCast;
+class NodeExprTryCastAs;
+
+class TypeTop;
+class TypeBottom;
+
+class TypeRef;
+class NodeExprRef;
+class NodeExprDeref;
+class NodeExprAssign;
+class NodeExprConstMemory;
+
+class TypeUnknown;
+
 class NodeVisitor;
 class TypeVisitor;
 

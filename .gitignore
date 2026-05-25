@@ -4,3 +4,5 @@ build
 **/stella-grammar/*
 !**/stella-grammar/*.g4
 antlr4-output
+.DS_Store
+docs/*.zipdocs/external_test_suite_mismatches.md

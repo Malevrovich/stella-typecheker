@@ -1,13 +1,18 @@
 set(AST_SOURCES
     src/asc.cpp
     src/base.cpp
+    src/cast.cpp
+    src/exception.cpp
     src/fun.cpp
     src/let.cpp
     src/list.cpp
     src/logic.cpp
     src/match.cpp
     src/nat.cpp
+    src/panic.cpp
     src/record.cpp
+    src/reference.cpp
+    src/sequence.cpp
     src/sum.cpp
     src/tuple.cpp
     src/variant.cpp

@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #ambiguous-type-as-bottom, #sum-types, #bottom-type, #let-bindings;
+
+fn main(n : Nat) -> Bot + Nat {
+  return let x = inr(n) in x
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0
