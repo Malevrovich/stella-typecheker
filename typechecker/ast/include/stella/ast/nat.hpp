@@ -74,16 +74,17 @@ private:
     std::shared_ptr<const NodeExpr> step_;
 };
 
-class TypeNat final : public BaseTypeImpl<TypeNat, Type> {
+class TypeNat final : public Type {
 public:
     void OutputTo(std::ostream& out) const override { out << "Nat"; }
     void Accept(TypeVisitor& visitor) const override;
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other, const Type::Comparator&) const override {
+        if (!dynamic_cast<const TypeNat*>(&other))
+            return FamilyMismatchError(other);
+        return std::nullopt;
     }
-
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeNat&) const { return std::nullopt; }
 };
 
 } // namespace ast

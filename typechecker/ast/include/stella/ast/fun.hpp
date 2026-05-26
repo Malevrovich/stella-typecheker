@@ -90,7 +90,7 @@ private:
     std::shared_ptr<const NodeExpr> expr_;
 };
 
-class TypeFun final : public BaseTypeImpl<TypeFun, Type> {
+class TypeFun final : public Type {
 public:
     struct SentinelTag {};
 
@@ -111,32 +111,29 @@ public:
     std::optional<ErrorCode> GetFamilyErrorCode() const override {
         return ErrorCode::ERROR_NOT_A_FUNCTION;
     }
-    std::optional<ErrorCode> GetUnexpectedErrorCode() const override {
-        // Do not use ERROR_UNEXPECTED_LAMBDA here: that error is only appropriate when
-        // an *expression* is literally a lambda (NodeExprAbstraction).  When a function
-        // value (e.g. a variable) is used where a non-function type is expected the
-        // reference typechecker emits ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION.
-        // VisitExprAbstraction explicitly overrides the mismatch error to
-        // ERROR_UNEXPECTED_LAMBDA where needed.
-        return std::nullopt; // falls back to ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION
+    // Note: GetUnexpectedErrorCode() is intentionally nullopt — when a function
+    // value is used where a non-function type is expected, the error is context-
+    // dependent (VisitExprAbstraction sets ERROR_UNEXPECTED_LAMBDA explicitly).
+
+    bool Contains(const std::function<bool(const Type&)>& pred) const override {
+        if (pred(*this))
+            return true;
+        if (IsSentinel())
+            return false;
+        return arg_type_->Contains(pred) || return_type_->Contains(pred);
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
-    }
-
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeFun& other) const {
-        if (!arg_type_ || !other.arg_type_)
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                 const Type::Comparator& cmp) const override {
+        const auto* o = dynamic_cast<const TypeFun*>(&other);
+        if (!o)
+            return FamilyMismatchError(other);
+        if (!arg_type_ || !o->arg_type_)
             return std::nullopt; // sentinel matches any
-
-        auto error = arg_type_->CheckCompatible(*other.arg_type_);
-        if (error) {
+        if (auto error = cmp(*arg_type_, *o->arg_type_))
             return ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_PARAMETER;
-        }
-        if (!error)
-            error = return_type_->CheckCompatible(*other.return_type_);
-
-        return error;
+        return cmp(*return_type_, *o->return_type_);
     }
 
 private:

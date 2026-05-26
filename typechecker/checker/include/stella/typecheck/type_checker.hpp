@@ -9,6 +9,7 @@
 
 #include "stella/ast/ast.hpp"
 #include "stella/ast/attribute_storage.hpp"
+#include "stella/ast/auto.hpp"
 #include "stella/ast/base.hpp"
 #include "stella/ast/fun.hpp"
 #include "stella/ast/visitor.hpp"
@@ -16,6 +17,7 @@
 #include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
 #include "stella/typecheck/subtype.hpp"
+#include "stella/typecheck/unifier.hpp"
 
 namespace stella {
 namespace typecheck {
@@ -95,6 +97,7 @@ public:
     void VisitExprTryCastAs(const ast::NodeExprTryCastAs& node) override;
 
     void VisitTypeRef(const ast::TypeRef& type) override;
+    void VisitTypeAuto(const ast::TypeAuto& type) override;
     void VisitExprRef(const ast::NodeExprRef& node) override;
     void VisitExprDeref(const ast::NodeExprDeref& node) override;
     void VisitExprAssign(const ast::NodeExprAssign& node) override;
@@ -116,8 +119,8 @@ private:
     void SetAmbiguousOrError(const ast::NodeBase& node, std::shared_ptr<const ast::Type> bot_type,
                              ErrorCode ambiguous_error, std::string_view message);
 
-    std::optional<ErrorCode> CheckCompatible(const ast::Type& given,
-                                             const ast::Type& expected) const;
+    std::optional<ErrorCode> CheckCompatible(std::shared_ptr<const ast::Type> given,
+                                             std::shared_ptr<const ast::Type> expected);
 
     void ExpectType(const ast::NodeBase& node, ExpectedType&& expected_type);
     void PropagateExpectedType(const ast::NodeBase& src, const ast::NodeBase& dst);
@@ -151,6 +154,7 @@ private:
     std::unordered_set<std::string> extensions_;
 
     SubtypeChecker subtype_checker_;
+    Unifier unifier_;
 };
 
 template <typename T>

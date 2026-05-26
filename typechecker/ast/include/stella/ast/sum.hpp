@@ -59,7 +59,7 @@ private:
     std::shared_ptr<const NodePattern> pattern_;
 };
 
-class TypeSum final : public BaseTypeImpl<TypeSum, Type> {
+class TypeSum final : public Type {
 public:
     struct SentinelTag {};
 
@@ -81,16 +81,25 @@ public:
         return ErrorCode::ERROR_UNEXPECTED_INJECTION;
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+    bool Contains(const std::function<bool(const Type&)>& pred) const override {
+        if (pred(*this))
+            return true;
+        if (IsSentinel())
+            return false;
+        return left_->Contains(pred) || right_->Contains(pred);
     }
 
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeSum& other) const {
-        if (!left_ || !other.left_)
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                 const Type::Comparator& cmp) const override {
+        const auto* o = dynamic_cast<const TypeSum*>(&other);
+        if (!o)
+            return FamilyMismatchError(other);
+        if (!left_ || !o->left_)
             return std::nullopt; // sentinel matches any
-        if (auto error = left_->CheckCompatible(*other.left_))
+        if (auto error = cmp(*left_, *o->left_))
             return error;
-        return right_->CheckCompatible(*other.right_);
+        return cmp(*right_, *o->right_);
     }
 
 private:

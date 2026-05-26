@@ -1,0 +1,17 @@
+INPUT:
+language core;
+extend with #type-reconstruction;
+
+fn main(f : auto) -> auto {
+  return f(f)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_OCCURS_CHECK_INFINITE_TYPE:
+Type unification failed during type reconstruction
+
+EXIT_CODE: 1

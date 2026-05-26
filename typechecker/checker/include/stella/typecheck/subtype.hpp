@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <optional>
 
 #include "stella/ast/base.hpp"
@@ -33,6 +34,22 @@ private:
     std::optional<ErrorCode> RuleVariant(const ast::Type& sub, const ast::Type& super) const;
     std::optional<ErrorCode> RuleSum(const ast::Type& sub, const ast::Type& super) const;
     std::optional<ErrorCode> RuleRef(const ast::Type& sub, const ast::Type& super) const;
+};
+
+// Comparator strategy that checks subtype relation (a <: b).
+// Pass via std::cref(*this) to avoid heap allocation in std::function
+// (reference_wrapper fits in SBO). The comparator is forwarded to
+// CheckCompatibleImpl so subtyping applies recursively on subtrees.
+class SubtypeAwareComparator {
+public:
+    explicit SubtypeAwareComparator(const SubtypeChecker& checker) : checker_(checker) {}
+
+    std::optional<ErrorCode> operator()(const ast::Type& a, const ast::Type& b) const {
+        return checker_.IsSubtypeOrError(a, b);
+    }
+
+private:
+    const SubtypeChecker& checker_;
 };
 
 } // namespace typecheck

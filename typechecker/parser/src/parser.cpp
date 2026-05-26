@@ -12,11 +12,12 @@
 
 #include "stella/ast/asc.hpp"
 #include "stella/ast/ast.hpp"
+#include "stella/ast/auto.hpp"
 #include "stella/ast/cast.hpp"
 #include "stella/ast/exception.hpp"
 #include "stella/ast/let.hpp"
-#include "stella/ast/panic.hpp"
 #include "stella/ast/list.hpp"
+#include "stella/ast/panic.hpp"
 #include "stella/ast/record.hpp"
 #include "stella/ast/reference.hpp"
 #include "stella/ast/sequence.hpp"
@@ -160,6 +161,10 @@ private:
         return type(std::make_shared<const ast::TypeBottom>());
     }
 
+    antlrcpp::Any visitTypeAuto(antlr4_stella::StellaParser::TypeAutoContext* ctx) override {
+        return type(std::make_shared<const ast::TypeAuto>());
+    }
+
     antlrcpp::Any visitConstTrue(antlr4_stella::StellaParser::ConstTrueContext* ctx) override {
         return make_expr<ast::NodeExprConstTrue>(ctx);
     }
@@ -271,7 +276,7 @@ private:
         auto abstr = make_node<ast::NodeExprAbstraction>(ctx, param, body);
 
         return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr,
-                                          std::move(local_decls));
+                                           std::move(local_decls));
     }
 
     antlrcpp::Any visitTypeList(antlr4_stella::StellaParser::TypeListContext* ctx) override {
@@ -510,11 +515,9 @@ private:
         return make_decl<ast::NodeDeclExceptionType>(ctx, exception_type);
     }
 
-    antlrcpp::Any
-    visitDeclExceptionVariant(antlr4_stella::StellaParser::DeclExceptionVariantContext* ctx)
-        override {
-        auto variant_type =
-            try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->variantType));
+    antlrcpp::Any visitDeclExceptionVariant(
+        antlr4_stella::StellaParser::DeclExceptionVariantContext* ctx) override {
+        auto variant_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->variantType));
         return make_decl<ast::NodeDeclExceptionVariant>(ctx, ctx->name->getText(), variant_type);
     }
 
@@ -532,8 +535,7 @@ private:
 
     antlrcpp::Any visitTryCatch(antlr4_stella::StellaParser::TryCatchContext* ctx) override {
         auto try_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->tryExpr));
-        auto pattern =
-            try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pat));
+        auto pattern = try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pat));
         auto fallback_expr =
             try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fallbackExpr));
         return make_expr<ast::NodeExprTryCatch>(ctx, try_expr, pattern, fallback_expr);
@@ -542,8 +544,7 @@ private:
     antlrcpp::Any visitTryCastAs(antlr4_stella::StellaParser::TryCastAsContext* ctx) override {
         auto try_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->tryExpr));
         auto cast_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
-        auto pattern =
-            try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pattern_));
+        auto pattern = try_any_cast<std::shared_ptr<const ast::NodePattern>>(visit(ctx->pattern_));
         auto success_expr = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
         auto fallback_expr =
             try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fallbackExpr));

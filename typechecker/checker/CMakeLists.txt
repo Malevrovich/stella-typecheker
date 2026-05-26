@@ -4,6 +4,7 @@ set(TYPE_CHECK_SOURCES
     src/name_context.cpp
     src/subtype.cpp
     src/type_checker_asc.cpp
+    src/type_checker_auto.cpp
     src/type_checker_cast.cpp
     src/type_checker_bool.cpp
     src/type_checker_exception.cpp
@@ -23,6 +24,7 @@ set(TYPE_CHECK_SOURCES
     src/type_checker_var.cpp
     src/type_checker_variant.cpp
     src/type_checker.cpp
+    src/unifier.cpp
     src/expected_type.cpp)
 
 add_library(stella-type-check ${TYPE_CHECK_SOURCES})

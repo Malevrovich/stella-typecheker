@@ -87,6 +87,8 @@ class NodeExprConstMemory;
 
 class TypeUnknown;
 
+class TypeAuto;
+
 class NodeVisitor;
 class TypeVisitor;
 

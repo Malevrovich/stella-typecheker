@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #type-reconstruction, #sum-types;
+
+fn main(b : auto) -> auto {
+  return inr(b) as (Nat + auto)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

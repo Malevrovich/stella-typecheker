@@ -99,6 +99,7 @@ public:
     virtual void VisitTypeTop(const TypeTop& type) = 0;
     virtual void VisitTypeBottom(const TypeBottom& type) = 0;
     virtual void VisitTypeRef(const TypeRef& type) = 0;
+    virtual void VisitTypeAuto(const TypeAuto& type) = 0;
 };
 
 class BaseNodeVisitor : public NodeVisitor {
@@ -184,6 +185,7 @@ public:
     void VisitTypeTop(const TypeTop& type) override;
     void VisitTypeBottom(const TypeBottom& type) override;
     void VisitTypeRef(const TypeRef& type) override;
+    void VisitTypeAuto(const TypeAuto& type) override;
 };
 
 } // namespace ast

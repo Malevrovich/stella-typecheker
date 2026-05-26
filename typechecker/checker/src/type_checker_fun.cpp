@@ -130,7 +130,7 @@ void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
         OnInternalError("Unexpected fix expression deduction type");
     }
 
-    auto err = CheckCompatible(*fun_type->GetReturnType(), *fun_type->GetArgType());
+    auto err = CheckCompatible(fun_type->GetReturnType(), fun_type->GetArgType());
 
     if (err) {
         OnError(TypeCheckNodeError(
@@ -145,9 +145,26 @@ void TypeChecker::VisitExprApplication(const ast::NodeExprApplication& node) {
     ExpectType(*function, ExpectedType::EqualsTo(ast::TypeFun::MakeSentinel()));
     Visit(*function);
 
-    const auto fun_type = std::dynamic_pointer_cast<const ast::TypeFun>(
-        types_storage_.get<DeducedType>(function.get()).type);
+    const auto deduced_fun = types_storage_.get<DeducedType>(function.get()).type;
+    auto fun_type = std::dynamic_pointer_cast<const ast::TypeFun>(deduced_fun);
+
     if (!fun_type) {
+        // In type-reconstruction mode the function expression may have type TypeAuto.
+        // Introduce fresh type variables for arg and return, add a constraint, and proceed.
+        if (HasExtension("#type-reconstruction") &&
+            std::dynamic_pointer_cast<const ast::TypeAuto>(deduced_fun)) {
+            auto arg_var = unifier_.FreshTypeVar();
+            auto ret_var = unifier_.FreshTypeVar();
+            auto inferred_fun = std::make_shared<ast::TypeFun>(arg_var, ret_var);
+            unifier_.AddConstraint(deduced_fun, inferred_fun);
+
+            const auto& arg = node.GetArgument();
+            ExpectType(*arg, ExpectedType::EqualsTo(arg_var));
+            Visit(*arg);
+
+            SetDeducedType(node, {ret_var});
+            return;
+        }
         OnInternalError("Unexpected function deduction type");
     }
 

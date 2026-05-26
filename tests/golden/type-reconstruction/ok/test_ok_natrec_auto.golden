@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #type-reconstruction;
+
+fn main(n : auto) -> auto {
+  return Nat::rec(n, 0, fn(i : auto) {
+    return fn(r : auto) {
+      return succ(r)
+    }
+  })
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

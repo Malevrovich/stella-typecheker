@@ -72,7 +72,7 @@ private:
     std::shared_ptr<const NodeExpr> list_;
 };
 
-class TypeList final : public BaseTypeImpl<TypeList, Type> {
+class TypeList final : public Type {
 public:
     struct SentinelTag {};
 
@@ -96,14 +96,23 @@ public:
         return ErrorCode::ERROR_UNEXPECTED_LIST;
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+    bool Contains(const std::function<bool(const Type&)>& pred) const override {
+        if (pred(*this))
+            return true;
+        if (IsSentinel())
+            return false;
+        return element_type_->Contains(pred);
     }
 
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeList& other) const {
-        if (!element_type_ || !other.element_type_)
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                 const Type::Comparator& cmp) const override {
+        const auto* o = dynamic_cast<const TypeList*>(&other);
+        if (!o)
+            return FamilyMismatchError(other);
+        if (!element_type_ || !o->element_type_)
             return std::nullopt; // sentinel matches any
-        return element_type_->CheckCompatible(*other.element_type_);
+        return cmp(*element_type_, *o->element_type_);
     }
 
 private:

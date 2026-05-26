@@ -14,16 +14,17 @@ public:
     void Accept(NodeVisitor& visitor) const override;
 };
 
-class TypeUnit final : public BaseTypeImpl<TypeUnit, Type> {
+class TypeUnit final : public Type {
 public:
     void OutputTo(std::ostream& out) const override { out << "Unit"; }
     void Accept(TypeVisitor& visitor) const override;
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other, const Type::Comparator&) const override {
+        if (!dynamic_cast<const TypeUnit*>(&other))
+            return FamilyMismatchError(other);
+        return std::nullopt;
     }
-
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeUnit&) const { return std::nullopt; }
 };
 
 } // namespace ast

@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #type-reconstruction;
+
+fn apply_to_zero(f : auto) -> auto {
+  return f(0)
+}
+
+fn main(n : auto) -> auto {
+  return apply_to_zero(fn(x : auto) { return succ(x) })
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

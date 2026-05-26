@@ -1,5 +1,6 @@
 set(AST_SOURCES
     src/asc.cpp
+    src/auto.cpp
     src/base.cpp
     src/cast.cpp
     src/exception.cpp

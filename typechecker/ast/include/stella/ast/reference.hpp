@@ -9,7 +9,7 @@ namespace stella {
 namespace ast {
 
 // &<type>
-class TypeRef final : public BaseTypeImpl<TypeRef, Type> {
+class TypeRef final : public Type {
 public:
     struct SentinelTag {};
 
@@ -33,14 +33,23 @@ public:
         return ErrorCode::ERROR_UNEXPECTED_REFERENCE;
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+    bool Contains(const std::function<bool(const Type&)>& pred) const override {
+        if (pred(*this))
+            return true;
+        if (IsSentinel())
+            return false;
+        return inner_type_->Contains(pred);
     }
 
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeRef& other) const {
-        if (!inner_type_ || !other.inner_type_)
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                 const Type::Comparator& cmp) const override {
+        const auto* o = dynamic_cast<const TypeRef*>(&other);
+        if (!o)
+            return FamilyMismatchError(other);
+        if (!inner_type_ || !o->inner_type_)
             return std::nullopt; // sentinel matches any
-        return inner_type_->CheckCompatible(*other.inner_type_);
+        return cmp(*inner_type_, *o->inner_type_);
     }
 
 private:

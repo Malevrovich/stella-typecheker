@@ -43,7 +43,7 @@ private:
     std::string label_;
 };
 
-class TypeRecord final : public BaseTypeImpl<TypeRecord, Type> {
+class TypeRecord final : public Type {
 public:
     struct Field {
         std::string label;
@@ -70,32 +70,41 @@ public:
         return ErrorCode::ERROR_UNEXPECTED_RECORD;
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+    bool Contains(const std::function<bool(const Type&)>& pred) const override {
+        if (pred(*this))
+            return true;
+        if (IsSentinel())
+            return false;
+        for (const auto& f : *fields_) {
+            if (f.type->Contains(pred))
+                return true;
+        }
+        return false;
     }
 
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeRecord& other) const {
-        if (!fields_ || !other.fields_)
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                 const Type::Comparator& cmp) const override {
+        const auto* o = dynamic_cast<const TypeRecord*>(&other);
+        if (!o)
+            return FamilyMismatchError(other);
+        if (!fields_ || !o->fields_)
             return std::nullopt;
 
-        if (fields_->size() < other.fields_->size()) {
+        if (fields_->size() < o->fields_->size())
             return ErrorCode::ERROR_MISSING_RECORD_FIELDS;
-        }
-        if (fields_->size() > other.fields_->size()) {
+        if (fields_->size() > o->fields_->size())
             return ErrorCode::ERROR_UNEXPECTED_RECORD_FIELDS;
-        }
 
         // Compare fields by label (order-independent): every expected field must exist in self
         // with a compatible type. Extra fields in self are checked via size comparison above.
-        for (const auto& expected_field : *other.fields_) {
+        for (const auto& expected_field : *o->fields_) {
             auto it = std::find_if(fields_->begin(), fields_->end(),
                                    [&](const Field& f) { return f.label == expected_field.label; });
-            if (it == fields_->end()) {
+            if (it == fields_->end())
                 return ErrorCode::ERROR_UNEXPECTED_RECORD_FIELDS;
-            }
-            if (auto error = it->type->CheckCompatible(*expected_field.type)) {
+            if (auto error = cmp(*it->type, *expected_field.type))
                 return error;
-            }
         }
 
         return std::nullopt;

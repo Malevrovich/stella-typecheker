@@ -6,19 +6,20 @@
 namespace stella {
 namespace ast {
 
-class TypeTop final : public BaseTypeImpl<TypeTop, Type> {
+class TypeTop final : public Type {
 public:
     void OutputTo(std::ostream& out) const override { out << "Top"; }
     void Accept(TypeVisitor& visitor) const override;
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other, const Type::Comparator&) const override {
+        if (!dynamic_cast<const TypeTop*>(&other))
+            return FamilyMismatchError(other);
+        return std::nullopt;
     }
-
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeTop&) const { return std::nullopt; }
 };
 
-class TypeBottom final : public BaseTypeImpl<TypeBottom, Type> {
+class TypeBottom final : public Type {
 public:
     static std::shared_ptr<TypeBottom> Get() {
         static auto instance = std::make_shared<TypeBottom>();
@@ -28,11 +29,12 @@ public:
     void OutputTo(std::ostream& out) const override { out << "Bot"; }
     void Accept(TypeVisitor& visitor) const override;
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other, const Type::Comparator&) const override {
+        if (!dynamic_cast<const TypeBottom*>(&other))
+            return FamilyMismatchError(other);
+        return std::nullopt;
     }
-
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeBottom&) const { return std::nullopt; }
 };
 
 } // namespace ast

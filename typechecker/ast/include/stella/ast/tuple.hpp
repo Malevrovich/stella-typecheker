@@ -37,7 +37,7 @@ private:
     int index_;
 };
 
-class TypeTuple final : public BaseTypeImpl<TypeTuple, Type> {
+class TypeTuple final : public Type {
 public:
     struct SentinelTag {};
 
@@ -63,20 +63,31 @@ public:
         return ErrorCode::ERROR_UNEXPECTED_TUPLE;
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const override {
-        return DefaultCheckCompatible(*this, expected_type);
+    bool Contains(const std::function<bool(const Type&)>& pred) const override {
+        if (pred(*this))
+            return true;
+        if (IsSentinel())
+            return false;
+        for (const auto& t : *element_types_) {
+            if (t->Contains(pred))
+                return true;
+        }
+        return false;
     }
 
-    std::optional<ErrorCode> CheckCompatibleImpl(const TypeTuple& other) const {
-        if (!element_types_ || !other.element_types_)
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                 const Type::Comparator& cmp) const override {
+        const auto* o = dynamic_cast<const TypeTuple*>(&other);
+        if (!o)
+            return FamilyMismatchError(other);
+        if (!element_types_ || !o->element_types_)
             return std::nullopt; // sentinel matches any
-        if (element_types_->size() != other.element_types_->size()) {
+        if (element_types_->size() != o->element_types_->size())
             return ErrorCode::ERROR_UNEXPECTED_TUPLE_LENGTH;
-        }
         for (std::size_t i = 0; i < element_types_->size(); ++i) {
-            if (auto error = (*element_types_)[i]->CheckCompatible(*(*other.element_types_)[i])) {
+            if (auto error = cmp(*(*element_types_)[i], *(*o->element_types_)[i]))
                 return error;
-            }
         }
         return std::nullopt;
     }

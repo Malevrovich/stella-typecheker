@@ -3,8 +3,14 @@
 #include <loguru.hpp>
 #include <sstream>
 
+#include "stella/ast/auto.hpp"
+
 namespace stella {
 namespace ast {
+
+bool Type::ContainsAuto() const {
+    return Contains([](const Type& t) { return dynamic_cast<const TypeAuto*>(&t) != nullptr; });
+}
 
 std::string Type::ToString() const {
     std::ostringstream oss;

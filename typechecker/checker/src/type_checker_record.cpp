@@ -53,7 +53,7 @@ void TypeChecker::VisitExprRecord(const ast::NodeExprRecord& node) {
         }
         auto unknown_record_type = std::make_shared<ast::TypeRecord>(std::move(unknown_fields));
         if (has_concrete_expected) {
-            auto error = CheckCompatible(*unknown_record_type, *expected_record_type);
+            auto error = CheckCompatible(unknown_record_type, expected_record_type);
             if (error) {
                 OnError(TypeCheckNodeError{
                     *error,

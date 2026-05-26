@@ -11,6 +11,8 @@
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
+#include "stella/typecheck/reconstruction.hpp"
+#include "stella/typecheck/subtype.hpp"
 
 namespace stella {
 namespace typecheck {
@@ -42,16 +44,25 @@ void TypeChecker::Visit(const ast::NodeBase& node) {
                                 node.ToString());
 }
 
-std::optional<ErrorCode> TypeChecker::CheckCompatible(const ast::Type& given,
-                                                      const ast::Type& expected) const {
-    auto error = given.CheckCompatible(expected);
-    if (error) {
-        if (HasExtension("#structural-subtyping")) {
-            return subtype_checker_.IsSubtypeOrError(given, expected);
-        }
-        return error;
+std::optional<ErrorCode> TypeChecker::CheckCompatible(std::shared_ptr<const ast::Type> given,
+                                                      std::shared_ptr<const ast::Type> expected) {
+    if (!given || !expected) {
+        return std::nullopt;
     }
-    return std::nullopt;
+
+    if (HasExtension("#type-reconstruction")) {
+        const SubtypeChecker* sc =
+            HasExtension("#structural-subtyping") ? &subtype_checker_ : nullptr;
+        ReconstructionComparator cmp(unifier_, sc);
+        return cmp(*given, *expected);
+    }
+
+    if (HasExtension("#structural-subtyping")) {
+        SubtypeAwareComparator cmp(subtype_checker_);
+        return cmp(*given, *expected);
+    }
+
+    return given->CheckCompatible(*expected);
 }
 
 // Returns true if the error code is a "structural" same-family mismatch that should
@@ -82,7 +93,7 @@ void TypeChecker::ExpectType(const ast::NodeBase& node, ExpectedType&& expected_
     const auto* deduced_type = types_storage_.tryGet<DeducedType>(&node);
 
     if (deduced_type) {
-        auto error = CheckCompatible(*deduced_type->type, *expected_type.GetType());
+        auto error = CheckCompatible(deduced_type->type, expected_type.GetType());
 
         if (error) {
             const ErrorCode final_error =
@@ -104,7 +115,7 @@ void TypeChecker::SetProvisionalType(const ast::NodeBase& node, ProvisionalType&
     const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
 
     if (exp) {
-        auto error = CheckCompatible(*provisional_type.type, *exp->GetType());
+        auto error = CheckCompatible(provisional_type.type, exp->GetType());
 
         if (error) {
             const ErrorCode final_error =
@@ -126,7 +137,7 @@ void TypeChecker::SetDeducedType(const ast::NodeBase& node, DeducedType&& deduce
     const auto* exp = types_storage_.tryGet<ExpectedType>(&node);
 
     if (exp) {
-        auto error = CheckCompatible(*deduced_type.type, *exp->GetType());
+        auto error = CheckCompatible(deduced_type.type, exp->GetType());
 
         if (error) {
             const ErrorCode final_error =
@@ -204,6 +215,13 @@ void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
 
     if (!main_type) {
         OnError(TypeCheckError{ErrorCode::ERROR_MISSING_MAIN});
+    }
+
+    // After visiting all declarations, run unification to resolve type variables.
+    if (HasExtension("#type-reconstruction")) {
+        if (auto err = unifier_.UnifyAll()) {
+            OnError(TypeCheckError{*err, "Type unification failed during type reconstruction"});
+        }
     }
 
     SetDeducedType(node, {main_type});

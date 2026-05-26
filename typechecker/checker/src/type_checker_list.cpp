@@ -73,9 +73,17 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
 
     Visit(*tail);
 
-    const auto tail_type = std::dynamic_pointer_cast<const ast::TypeList>(
-        types_storage_.get<DeducedType>(tail.get()).type);
+    const auto tail_deduced = types_storage_.get<DeducedType>(tail.get()).type;
+    const auto tail_type = std::dynamic_pointer_cast<const ast::TypeList>(tail_deduced);
     if (!tail_type) {
+        // In type-reconstruction mode the tail may have type TypeAuto.
+        if (HasExtension("#type-reconstruction") &&
+            std::dynamic_pointer_cast<const ast::TypeAuto>(tail_deduced)) {
+            auto list_var = unifier_.FreshTypeVar();
+            unifier_.AddConstraint(tail_deduced, std::make_shared<ast::TypeList>(element_type));
+            SetDeducedType(node, {std::make_shared<ast::TypeList>(element_type)});
+            return;
+        }
         OnInternalError("Unexpected cons tail deduction type");
     }
 
@@ -98,9 +106,17 @@ void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
 
     Visit(*list);
 
-    const auto list_type = std::dynamic_pointer_cast<const ast::TypeList>(
-        types_storage_.get<DeducedType>(list.get()).type);
+    const auto list_deduced = types_storage_.get<DeducedType>(list.get()).type;
+    const auto list_type = std::dynamic_pointer_cast<const ast::TypeList>(list_deduced);
     if (!list_type) {
+        // In type-reconstruction mode the list may have type TypeAuto.
+        if (HasExtension("#type-reconstruction") &&
+            std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
+            auto elem_var = unifier_.FreshTypeVar();
+            unifier_.AddConstraint(list_deduced, std::make_shared<ast::TypeList>(elem_var));
+            SetDeducedType(node, {elem_var});
+            return;
+        }
         OnInternalError("Unexpected head list deduction type");
     }
 
@@ -122,9 +138,18 @@ void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
 
     Visit(*list);
 
-    const auto list_type = std::dynamic_pointer_cast<const ast::TypeList>(
-        types_storage_.get<DeducedType>(list.get()).type);
+    const auto list_deduced = types_storage_.get<DeducedType>(list.get()).type;
+    const auto list_type = std::dynamic_pointer_cast<const ast::TypeList>(list_deduced);
     if (!list_type) {
+        // In type-reconstruction mode the list may have type TypeAuto.
+        if (HasExtension("#type-reconstruction") &&
+            std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
+            auto elem_var = unifier_.FreshTypeVar();
+            auto inferred_list = std::make_shared<ast::TypeList>(elem_var);
+            unifier_.AddConstraint(*list_deduced, *inferred_list);
+            SetDeducedType(node, {inferred_list});
+            return;
+        }
         OnInternalError("Unexpected tail list deduction type");
     }
 

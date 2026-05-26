@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <ostream>
@@ -40,18 +41,7 @@ protected:
     const std::shared_ptr<SourceInfo> source_info_;
 };
 
-template <typename T, typename... Ancestors>
-class BaseTypeImpl : public Ancestors... {
-private:
-    // use only as CRTP
-    BaseTypeImpl() = default;
-
-    static std::optional<ErrorCode> DefaultCheckCompatible(const T& current, const Type& other);
-
-    friend T;
-};
-
-class Type : public BaseTypeImpl<Type> {
+class Type {
 public:
     virtual ~Type() = default;
 
@@ -59,20 +49,53 @@ public:
     virtual void Accept(TypeVisitor& visitor) const = 0;
     std::string ToString() const;
 
-    virtual std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const = 0;
+    using Comparator = std::function<std::optional<ErrorCode>(const Type&, const Type&)>;
 
-    // Returns true only for TypeUnknown (the wildcard sentinel).
-    virtual bool IsUnknown() const { return false; }
+    static Comparator DefaultComparator() {
+        return [](const Type& a, const Type& b) { return a.CheckCompatible(b); };
+    }
+
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type) const {
+        return CheckCompatible(expected_type, DefaultComparator());
+    }
+
+    std::optional<ErrorCode> CheckCompatible(const Type& expected_type,
+                                             const Comparator& cmp) const {
+        if (MatchesAny() || expected_type.MatchesAny())
+            return std::nullopt;
+        return CheckCompatibleImpl(expected_type, cmp);
+    }
+
     // Returns true if this is a family sentinel (elements/fields unspecified).
     virtual bool IsSentinel() const { return false; }
+
+    virtual bool Contains(const std::function<bool(const Type&)>& pred) const {
+        return pred(*this);
+    }
+
+    bool ContainsAuto() const;
 
     virtual std::optional<ErrorCode> GetFamilyErrorCode() const { return std::nullopt; }
     virtual std::optional<ErrorCode> GetUnexpectedErrorCode() const { return std::nullopt; }
 
     bool operator==(const Type& other) const = delete;
+
+protected:
+    virtual std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
+                                                         const Comparator& cmp) const = 0;
+
+    virtual bool MatchesAny() const { return false; }
+
+    ErrorCode FamilyMismatchError(const Type& expected) const {
+        if (auto e = expected.GetFamilyErrorCode())
+            return *e;
+        if (auto e = GetUnexpectedErrorCode())
+            return *e;
+        return ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION;
+    }
 };
 
-class TypeUnknown final : public BaseTypeImpl<TypeUnknown, Type> {
+class TypeUnknown final : public Type {
 public:
     void OutputTo(std::ostream& out) const override { out << "?"; }
 
@@ -80,28 +103,15 @@ public:
         throw std::logic_error("TypeUnknown::Accept should never be called");
     }
 
-    std::optional<ErrorCode> CheckCompatible(const Type& /*other*/) const override {
+    bool MatchesAny() const override { return true; }
+
+    bool operator==(const TypeUnknown&) const { return true; }
+
+protected:
+    std::optional<ErrorCode> CheckCompatibleImpl(const Type&, const Comparator&) const override {
         return std::nullopt;
     }
-
-    bool IsUnknown() const override { return true; }
-    bool operator==(const TypeUnknown&) const { return true; }
 };
-
-template <typename T, typename... Ancestors>
-std::optional<ErrorCode>
-BaseTypeImpl<T, Ancestors...>::DefaultCheckCompatible(const T& current, const Type& expected_type) {
-    if (expected_type.IsUnknown())
-        return std::nullopt;
-
-    const T* derived = dynamic_cast<const T*>(&expected_type);
-    if (!derived)
-        return expected_type.GetFamilyErrorCode().value_or(
-            current.GetUnexpectedErrorCode().value_or(
-                stella::ast::ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION));
-
-    return current.CheckCompatibleImpl(*derived);
-}
 
 class NodeExpr : public NodeBase {
     using NodeBase::NodeBase;
@@ -135,6 +145,8 @@ private:
     std::vector<std::shared_ptr<const NodeDecl>> decls_;
     std::unordered_set<std::string> extensions_;
 };
+
+using TypeComparator = Type::Comparator;
 
 } // namespace ast
 } // namespace stella

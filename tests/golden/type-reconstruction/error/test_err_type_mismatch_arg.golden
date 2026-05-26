@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #type-reconstruction;
+
+fn f(n : Nat) -> Nat {
+  return succ(n)
+}
+
+fn main(b : auto) -> auto {
+  return f(false)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:9:11:
+false
+Expected type Nat, but expr has type Bool
+
+EXIT_CODE: 1

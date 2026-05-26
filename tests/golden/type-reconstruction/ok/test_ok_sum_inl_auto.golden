@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #type-reconstruction, #sum-types;
+
+fn main(n : auto) -> auto {
+  return inl(n) as (auto + Bool)
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0
