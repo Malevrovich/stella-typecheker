@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+fn bad(x : T) -> T {
+  return x
+}
+
+fn main(n : Nat) -> Nat {
+  return n
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNDEFINED_TYPE_VARIABLE:
+Error type: T
+Undefined type variable 'T'
+
+EXIT_CODE: 1

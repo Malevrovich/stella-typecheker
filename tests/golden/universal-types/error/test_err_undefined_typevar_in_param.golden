@@ -1,0 +1,22 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+generic fn f[T](x : Y) -> T {
+  return x
+}
+
+fn main(n : Nat) -> Nat {
+  return f[Nat](n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNDEFINED_TYPE_VARIABLE:
+Error type: Y
+Undefined type variable 'Y'
+
+EXIT_CODE: 1

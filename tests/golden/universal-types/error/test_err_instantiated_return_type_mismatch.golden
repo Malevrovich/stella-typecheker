@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+generic fn identity[T](x : T) -> T {
+  return x
+}
+
+fn main(n : Nat) -> Bool {
+  return identity[Nat](n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:9:9:
+identity[Nat](n)
+Expected type Bool, but expr has type Nat
+
+EXIT_CODE: 1

@@ -1,10 +1,10 @@
 set(AST_SOURCES
     src/asc.cpp
-    src/auto.cpp
     src/base.cpp
     src/cast.cpp
     src/exception.cpp
     src/fun.cpp
+    src/generic.cpp
     src/let.cpp
     src/list.cpp
     src/logic.cpp

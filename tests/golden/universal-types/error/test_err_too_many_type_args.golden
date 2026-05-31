@@ -1,0 +1,27 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+generic fn identity[T](x : T) -> T {
+  return x
+}
+
+fn main(n : Nat) -> Nat {
+  return identity[Nat, Bool](n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_INCORRECT_NUMBER_OF_TYPE_ARGUMENTS:
+Error occured at <unknown>:9:9:
+identity[Nat, Bool]
+Expected 1 type arguments for the expression
+  <unknown>:9:9:
+identity as forall T. (T -> T)
+but got 2 type arguments
+in the type application
+
+EXIT_CODE: 1

@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+fn main(n : Nat) -> Nat {
+  return (fn(x : Nat) { return x })[Nat](n)
+}
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_GENERIC_FUNCTION:
+Error occured at <unknown>:5:10:
+fn(x : Nat) { return x }
+Expected type forall ..., but expr has type (? -> ?)
+
+EXIT_CODE: 1

@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+generic fn wrong[T](x : T) -> T {
+  return succ(0)
+}
+
+fn main(n : Nat) -> Nat {
+  return wrong[Bool](false)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:5:9:
+succ(0)
+Expected type T, but expr has type Nat
+
+EXIT_CODE: 1

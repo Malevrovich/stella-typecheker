@@ -12,6 +12,7 @@
 #include "stella/ast/auto.hpp"
 #include "stella/ast/base.hpp"
 #include "stella/ast/fun.hpp"
+#include "stella/ast/generic.hpp"
 #include "stella/ast/visitor.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
@@ -36,6 +37,12 @@ public:
     void VisitExprAbstraction(const ast::NodeExprAbstraction& node) override;
     void VisitExprApplication(const ast::NodeExprApplication& node) override;
     void VisitExprFix(const ast::NodeExprFix& node) override;
+
+    void VisitDeclFunGeneric(const ast::NodeDeclFunGeneric& node) override;
+    void VisitExprTypeAbstraction(const ast::NodeExprTypeAbstraction& node) override;
+    void VisitExprTypeApplication(const ast::NodeExprTypeApplication& node) override;
+    void VisitTypeForAll(const ast::TypeForAll& type) override;
+    void VisitTypeVar(const ast::TypeVar& type) override;
 
     void VisitExprConstInt(const ast::NodeExprConstInt& node) override;
     void VisitExprIsZero(const ast::NodeExprIsZero& node) override;
@@ -141,7 +148,8 @@ private:
     void VisitMatchSum(const ast::NodeExprMatch& node, const ast::TypeSum& scrutinee_type);
     void VisitMatchVariant(const ast::NodeExprMatch& node, const ast::TypeVariant& scrutinee_type);
 
-    NameContext name_context_;
+    NameContext<const ast::NodeBase> name_context_;
+    NameContext<const ast::TypeVar> type_var_context_;
     ast::AttributeStorage<ExpectedType, DeducedType, ProvisionalType> types_storage_;
 
     std::shared_ptr<const ast::Type> exception_type_{nullptr};

@@ -1,0 +1,27 @@
+INPUT:
+language core;
+extend with #universal-types, #pairs;
+
+generic fn f[T, Y](t : {T, T}) -> T {
+  return t.1
+}
+
+fn main(n : Nat) -> Nat {
+  return f[Nat]({n, n})
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_INCORRECT_NUMBER_OF_TYPE_ARGUMENTS:
+Error occured at <unknown>:9:9:
+f[Nat]
+Expected 2 type arguments for the expression
+  <unknown>:9:9:
+f as forall T, Y. ({T, T} -> T)
+but got 1 type arguments
+in the type application
+
+EXIT_CODE: 1

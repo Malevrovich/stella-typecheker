@@ -21,9 +21,14 @@ class NodeExprVar;
 class NodeExprAbstraction;
 class NodeExprApplication;
 class NodeExprFix;
+class NodeExprTypeAbstraction;
+class NodeExprTypeApplication;
 class NodeDeclFun;
+class NodeDeclFunGeneric;
 
 class TypeFun;
+class TypeForAll;
+class TypeVar;
 class TypeBool;
 class TypeNat;
 class TypeUnit;

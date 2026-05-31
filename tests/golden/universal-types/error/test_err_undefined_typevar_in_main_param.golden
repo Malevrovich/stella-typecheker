@@ -1,0 +1,18 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+fn main(n : T) -> Nat {
+  return succ(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNDEFINED_TYPE_VARIABLE:
+Error type: T
+Undefined type variable 'T'
+
+EXIT_CODE: 1

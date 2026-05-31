@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+generic fn identity[T](x : T) -> T {
+  return x
+}
+
+fn apply(f : fn(Nat) -> Nat, n : Nat) -> Nat {
+  return f(n)
+}
+
+fn main(n : Nat) -> Nat {
+  return apply(identity[Nat], n)
+}
+
+STDOUT:
+(empty)
+
+STDERR:
+Parsing error: Multiple parameters in function abstraction are not supported yet
+
+EXIT_CODE: 1

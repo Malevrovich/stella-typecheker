@@ -180,7 +180,7 @@ void TypeChecker::SetAmbiguousOrError(const ast::NodeBase& node,
 void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
     extensions_ = node.GetExtensions();
 
-    std::vector<NameContext::NameContextGuard> name_guards;
+    std::vector<NameContext<const ast::NodeBase>::NameContextGuard> name_guards;
     auto declarations = node.GetDeclarations();
     name_guards.reserve(declarations.size());
 
@@ -192,14 +192,15 @@ void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
             continue;
         }
 
-        auto func_decl = std::dynamic_pointer_cast<const ast::NodeDeclFun>(decl);
-
-        if (!func_decl) {
+        if (auto func_decl = std::dynamic_pointer_cast<const ast::NodeDeclFun>(decl)) {
+            name_guards.push_back(
+                name_context_.PushUnique(std::string{func_decl->GetName()}, *func_decl));
+        } else if (auto gen_decl = std::dynamic_pointer_cast<const ast::NodeDeclFunGeneric>(decl)) {
+            name_guards.push_back(
+                name_context_.PushUnique(std::string{gen_decl->GetName()}, *gen_decl));
+        } else {
             OnError(NotSupportedError(*decl));
         }
-
-        name_guards.push_back(
-            name_context_.PushUnique(std::string{func_decl->GetName()}, *func_decl));
     }
 
     std::shared_ptr<const ast::Type> main_type = nullptr;

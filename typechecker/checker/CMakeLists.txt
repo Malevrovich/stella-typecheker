@@ -1,7 +1,6 @@
 set(TYPE_CHECK_SOURCES
     src/error.cpp
     src/check.cpp
-    src/name_context.cpp
     src/subtype.cpp
     src/type_checker_asc.cpp
     src/type_checker_auto.cpp
@@ -9,6 +8,7 @@ set(TYPE_CHECK_SOURCES
     src/type_checker_bool.cpp
     src/type_checker_exception.cpp
     src/type_checker_fun.cpp
+    src/type_checker_generic.cpp
     src/type_checker_let.cpp
     src/type_checker_list.cpp
     src/type_checker_nat.cpp

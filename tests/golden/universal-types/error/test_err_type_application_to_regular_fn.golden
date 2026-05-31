@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+fn ordinary(x : Nat) -> Nat {
+  return x
+}
+
+fn main(n : Nat) -> Nat {
+  return ordinary[Nat](n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_GENERIC_FUNCTION:
+Error occured at <unknown>:9:9:
+ordinary
+Expected type forall ..., but expr has type (Nat -> Nat)
+
+EXIT_CODE: 1

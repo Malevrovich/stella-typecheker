@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+generic fn identity[T](x : T) -> T {
+  return x
+}
+
+fn main(n : Nat) -> Nat {
+  return identity[Nat](identity[Nat](n))
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

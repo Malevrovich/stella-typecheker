@@ -1,0 +1,20 @@
+INPUT:
+language core;
+extend with #universal-types;
+
+fn apply_poly(f : forall T . fn(T) -> T) -> Nat {
+  return f[Nat](succ(0))
+}
+
+fn main(n : Nat) -> Nat {
+  return apply_poly(generic [T] fn(x : T) { return x })
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

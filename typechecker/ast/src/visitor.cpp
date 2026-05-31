@@ -6,6 +6,7 @@
 #include "stella/ast/base.hpp"
 #include "stella/ast/cast.hpp"
 #include "stella/ast/exception.hpp"
+#include "stella/ast/generic.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
 #include "stella/ast/match.hpp"
@@ -36,11 +37,21 @@ void NodeExprAbstraction::Accept(NodeVisitor& visitor) const {
 
 void NodeDeclFun::Accept(NodeVisitor& visitor) const { visitor.VisitDeclFun(*this); }
 
+void NodeDeclFunGeneric::Accept(NodeVisitor& visitor) const { visitor.VisitDeclFunGeneric(*this); }
+
 void NodeExprApplication::Accept(NodeVisitor& visitor) const {
     visitor.VisitExprApplication(*this);
 }
 
 void NodeExprFix::Accept(NodeVisitor& visitor) const { visitor.VisitExprFix(*this); }
+
+void NodeExprTypeAbstraction::Accept(NodeVisitor& visitor) const {
+    visitor.VisitExprTypeAbstraction(*this);
+}
+
+void NodeExprTypeApplication::Accept(NodeVisitor& visitor) const {
+    visitor.VisitExprTypeApplication(*this);
+}
 
 void NodeExprConstInt::Accept(NodeVisitor& visitor) const { visitor.VisitExprConstInt(*this); }
 
@@ -275,6 +286,26 @@ void BaseTypeVisitor::VisitTypeRef(const TypeRef& type) { VisitDefaultType(type)
 void TypeAuto::Accept(TypeVisitor& visitor) const { visitor.VisitTypeAuto(*this); }
 
 void BaseTypeVisitor::VisitTypeAuto(const TypeAuto& type) { VisitDefaultType(type); }
+
+void TypeForAll::Accept(TypeVisitor& visitor) const { visitor.VisitTypeForAll(*this); }
+
+void TypeVar::Accept(TypeVisitor& visitor) const { visitor.VisitTypeVar(*this); }
+
+void BaseTypeVisitor::VisitTypeForAll(const TypeForAll& type) { VisitDefaultType(type); }
+
+void BaseTypeVisitor::VisitTypeVar(const TypeVar& type) { VisitDefaultType(type); }
+
+void BaseNodeVisitor::VisitDeclFunGeneric(const NodeDeclFunGeneric& node) {
+    VisitDefaultNode(node);
+}
+
+void BaseNodeVisitor::VisitExprTypeAbstraction(const NodeExprTypeAbstraction& node) {
+    VisitDefaultNode(node);
+}
+
+void BaseNodeVisitor::VisitExprTypeApplication(const NodeExprTypeApplication& node) {
+    VisitDefaultNode(node);
+}
 
 } // namespace ast
 } // namespace stella

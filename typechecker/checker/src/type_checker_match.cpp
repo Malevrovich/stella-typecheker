@@ -18,7 +18,7 @@ void TypeChecker::VisitMatchArm(const ast::NodePatternVar* pattern_var,
                                 const ast::NodeExprMatch& match_node,
                                 const ast::NodeBase& case_expr,
                                 std::shared_ptr<const ast::Type>& result_type) {
-    std::optional<NameContext::NameContextGuard> name_guard;
+    std::optional<NameContext<const ast::NodeBase>::NameContextGuard> name_guard;
     if (pattern_var && bound_type) {
         SetDeducedType(*pattern_var, {bound_type});
         name_guard = name_context_.Push(std::string{pattern_var->GetName()}, *pattern_var);
@@ -95,8 +95,8 @@ void TypeChecker::VisitExprMatch(const ast::NodeExprMatch& node) {
         if (all_var_patterns) {
             std::shared_ptr<const ast::Type> result_type = nullptr;
             for (const auto& match_case : cases) {
-                const auto var_pat = std::dynamic_pointer_cast<const ast::NodePatternVar>(
-                    match_case->GetPattern());
+                const auto var_pat =
+                    std::dynamic_pointer_cast<const ast::NodePatternVar>(match_case->GetPattern());
                 VisitMatchArm(var_pat.get(), deduced, node, *match_case->GetExpr(), result_type);
             }
         }

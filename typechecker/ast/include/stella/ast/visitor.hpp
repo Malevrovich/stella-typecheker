@@ -1,6 +1,7 @@
 #pragma once
 
 #include "stella/ast/ast_fwd.hpp"
+#include "stella/ast/generic.hpp"
 
 namespace stella {
 namespace ast {
@@ -15,6 +16,7 @@ public:
 
     virtual void VisitParamDecl(const NodeParamDecl& node) = 0;
     virtual void VisitDeclFun(const NodeDeclFun& node) = 0;
+    virtual void VisitDeclFunGeneric(const NodeDeclFunGeneric& node) = 0;
 
     virtual void VisitExprConstInt(const NodeExprConstInt& node) = 0;
     virtual void VisitExprSucc(const NodeExprSucc& node) = 0;
@@ -31,6 +33,8 @@ public:
     virtual void VisitExprAbstraction(const NodeExprAbstraction& node) = 0;
     virtual void VisitExprApplication(const NodeExprApplication& node) = 0;
     virtual void VisitExprFix(const NodeExprFix& node) = 0;
+    virtual void VisitExprTypeAbstraction(const NodeExprTypeAbstraction& node) = 0;
+    virtual void VisitExprTypeApplication(const NodeExprTypeApplication& node) = 0;
 
     virtual void VisitExprConstUnit(const NodeExprConstUnit& node) = 0;
 
@@ -88,6 +92,8 @@ public:
     virtual void Visit(const Type& type);
 
     virtual void VisitTypeFun(const TypeFun& type) = 0;
+    virtual void VisitTypeForAll(const TypeForAll& type) = 0;
+    virtual void VisitTypeVar(const TypeVar& type) = 0;
     virtual void VisitTypeBool(const TypeBool& type) = 0;
     virtual void VisitTypeNat(const TypeNat& type) = 0;
     virtual void VisitTypeUnit(const TypeUnit& type) = 0;
@@ -111,6 +117,7 @@ public:
     void VisitProgram(const NodeProgram& node) override;
     void VisitParamDecl(const NodeParamDecl& node) override;
     void VisitDeclFun(const NodeDeclFun& node) override;
+    void VisitDeclFunGeneric(const NodeDeclFunGeneric& node) override;
     void VisitExprConstInt(const NodeExprConstInt& node) override;
     void VisitExprSucc(const NodeExprSucc& node) override;
     void VisitExprPred(const NodeExprPred& node) override;
@@ -123,6 +130,8 @@ public:
     void VisitExprAbstraction(const NodeExprAbstraction& node) override;
     void VisitExprApplication(const NodeExprApplication& node) override;
     void VisitExprFix(const NodeExprFix& node) override;
+    void VisitExprTypeAbstraction(const NodeExprTypeAbstraction& node) override;
+    void VisitExprTypeApplication(const NodeExprTypeApplication& node) override;
     void VisitExprConstUnit(const NodeExprConstUnit& node) override;
     void VisitExprTypeAsc(const NodeExprTypeAsc& node) override;
     void VisitPatternVar(const NodePatternVar& node) override;
@@ -174,6 +183,8 @@ public:
     virtual void VisitDefaultType(const Type& type);
 
     void VisitTypeFun(const TypeFun& type) override;
+    void VisitTypeForAll(const TypeForAll& type) override;
+    void VisitTypeVar(const TypeVar& type) override;
     void VisitTypeBool(const TypeBool& type) override;
     void VisitTypeNat(const TypeNat& type) override;
     void VisitTypeUnit(const TypeUnit& type) override;

@@ -1,0 +1,23 @@
+INPUT:
+language core;
+extend with #universal-types, #pairs;
+
+generic fn f[T, Y](t : T) -> Y {
+  return t.1
+}
+
+fn main(n : Nat) -> Nat {
+  return f[{Nat, Nat}, Nat]({n, n})
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_NOT_A_TUPLE:
+Error occured at <unknown>:5:9:
+t
+Expected type {_}, but expr has type T
+
+EXIT_CODE: 1

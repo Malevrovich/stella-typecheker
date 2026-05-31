@@ -15,6 +15,7 @@
 #include "stella/ast/auto.hpp"
 #include "stella/ast/cast.hpp"
 #include "stella/ast/exception.hpp"
+#include "stella/ast/generic.hpp"
 #include "stella/ast/let.hpp"
 #include "stella/ast/list.hpp"
 #include "stella/ast/panic.hpp"
@@ -149,6 +150,17 @@ private:
         return type(std::make_shared<const ast::TypeFun>(param_type, return_type));
     }
 
+    antlrcpp::Any visitTypeForAll(antlr4_stella::StellaParser::TypeForAllContext* ctx) override {
+        std::vector<std::string> type_params;
+        for (auto* ident : ctx->types) {
+            type_params.push_back(ident->getText());
+        }
+
+        auto body = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
+
+        return type(std::make_shared<const ast::TypeForAll>(std::move(type_params), body));
+    }
+
     antlrcpp::Any visitTypeUnit(antlr4_stella::StellaParser::TypeUnitContext* ctx) override {
         return type(std::make_shared<const ast::TypeUnit>());
     }
@@ -163,6 +175,10 @@ private:
 
     antlrcpp::Any visitTypeAuto(antlr4_stella::StellaParser::TypeAutoContext* ctx) override {
         return type(std::make_shared<const ast::TypeAuto>());
+    }
+
+    antlrcpp::Any visitTypeVar(antlr4_stella::StellaParser::TypeVarContext* ctx) override {
+        return type(std::make_shared<const ast::TypeVar>(ctx->name->getText()));
     }
 
     antlrcpp::Any visitConstTrue(antlr4_stella::StellaParser::ConstTrueContext* ctx) override {
@@ -247,6 +263,30 @@ private:
     }
 
     antlrcpp::Any
+    visitTypeAbstraction(antlr4_stella::StellaParser::TypeAbstractionContext* ctx) override {
+        std::vector<std::string> type_params;
+        for (auto* ident : ctx->generics) {
+            type_params.push_back(ident->getText());
+        }
+
+        auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->expr_));
+
+        return make_expr<ast::NodeExprTypeAbstraction>(ctx, std::move(type_params), body);
+    }
+
+    antlrcpp::Any
+    visitTypeApplication(antlr4_stella::StellaParser::TypeApplicationContext* ctx) override {
+        auto function = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->fun));
+
+        std::vector<std::shared_ptr<const ast::Type>> type_args;
+        for (auto* type_ctx : ctx->types) {
+            type_args.push_back(try_any_cast<std::shared_ptr<const ast::Type>>(visit(type_ctx)));
+        }
+
+        return make_expr<ast::NodeExprTypeApplication>(ctx, function, std::move(type_args));
+    }
+
+    antlrcpp::Any
     visitParenthesisedExpr(antlr4_stella::StellaParser::ParenthesisedExprContext* ctx) override {
         return visit(ctx->expr_);
     }
@@ -277,6 +317,35 @@ private:
 
         return make_decl<ast::NodeDeclFun>(ctx, ctx->name->getText(), return_type, abstr,
                                            std::move(local_decls));
+    }
+
+    antlrcpp::Any
+    visitDeclFunGeneric(antlr4_stella::StellaParser::DeclFunGenericContext* ctx) override {
+        if (ctx->paramDecls.size() > 1) {
+            throw std::runtime_error(
+                "Multiple parameters in function abstraction are not supported yet");
+        }
+
+        std::vector<std::string> type_params;
+        for (auto* ident : ctx->generics) {
+            type_params.push_back(ident->getText());
+        }
+
+        auto param =
+            try_any_cast<std::shared_ptr<const ast::NodeParamDecl>>(visit(ctx->paramDecls[0]));
+        auto return_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->returnType));
+        auto body = try_any_cast<std::shared_ptr<const ast::NodeExpr>>(visit(ctx->returnExpr));
+
+        std::vector<std::shared_ptr<const ast::NodeDecl>> local_decls;
+        for (auto* local_ctx : ctx->localDecls) {
+            local_decls.push_back(
+                try_any_cast<std::shared_ptr<const ast::NodeDecl>>(visit(local_ctx)));
+        }
+
+        auto abstr = make_node<ast::NodeExprAbstraction>(ctx, param, body);
+
+        return make_decl<ast::NodeDeclFunGeneric>(ctx, ctx->name->getText(), std::move(type_params),
+                                                  return_type, abstr, std::move(local_decls));
     }
 
     antlrcpp::Any visitTypeList(antlr4_stella::StellaParser::TypeListContext* ctx) override {
