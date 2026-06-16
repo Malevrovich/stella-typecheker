@@ -7,15 +7,14 @@
 
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
-#include "stella/ast/generic.hpp"
 #include "stella/ast/fun.hpp"
+#include "stella/ast/generic.hpp"
 #include "stella/ast/list.hpp"
-#include "stella/ast/tuple.hpp"
 #include "stella/ast/record.hpp"
-#include "stella/ast/sum.hpp"
-#include "stella/ast/variant.hpp"
 #include "stella/ast/reference.hpp"
-#include "stella/ast/top_bottom.hpp"
+#include "stella/ast/sum.hpp"
+#include "stella/ast/tuple.hpp"
+#include "stella/ast/variant.hpp"
 #include "stella/typecheck/error.hpp"
 #include "stella/typecheck/expected_type.hpp"
 #include "stella/typecheck/name_context.hpp"
@@ -29,22 +28,26 @@ using Subst = std::unordered_map<std::string, std::shared_ptr<const ast::Type>>;
 
 std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type> type,
                                                 const Subst& subst) {
-    if (subst.empty()) return type;
+    if (subst.empty())
+        return type;
 
     if (const auto* tv = dynamic_cast<const ast::TypeVar*>(type.get())) {
         auto it = subst.find(std::string{tv->GetName()});
-        if (it != subst.end()) return it->second;
+        if (it != subst.end())
+            return it->second;
         return type;
     }
 
     if (const auto* tf = dynamic_cast<const ast::TypeFun*>(type.get())) {
-        if (tf->IsSentinel()) return type;
+        if (tf->IsSentinel())
+            return type;
         return std::make_shared<ast::TypeFun>(SubstituteType(tf->GetArgType(), subst),
                                               SubstituteType(tf->GetReturnType(), subst));
     }
 
     if (const auto* tfa = dynamic_cast<const ast::TypeForAll*>(type.get())) {
-        if (tfa->IsSentinel()) return type;
+        if (tfa->IsSentinel())
+            return type;
         // Remove shadowed params from subst
         Subst inner_subst = subst;
         for (const auto& param : tfa->GetTypeParams()) {
@@ -55,14 +58,17 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
     }
 
     if (const auto* tl = dynamic_cast<const ast::TypeList*>(type.get())) {
-        if (tl->IsSentinel()) return type;
+        if (tl->IsSentinel())
+            return type;
         return std::make_shared<ast::TypeList>(SubstituteType(tl->GetElementType(), subst));
     }
 
     if (const auto* tt = dynamic_cast<const ast::TypeTuple*>(type.get())) {
-        if (tt->IsSentinel()) return type;
+        if (tt->IsSentinel())
+            return type;
         const auto& elems = tt->GetElementTypes();
-        if (!elems) return type;
+        if (!elems)
+            return type;
         std::vector<std::shared_ptr<const ast::Type>> new_elems;
         new_elems.reserve(elems->size());
         for (const auto& e : *elems) {
@@ -73,7 +79,8 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
 
     if (const auto* tr = dynamic_cast<const ast::TypeRecord*>(type.get())) {
         const auto& fields = tr->GetFields();
-        if (!fields) return type; // sentinel
+        if (!fields)
+            return type; // sentinel
         std::vector<ast::TypeRecord::Field> new_fields;
         new_fields.reserve(fields->size());
         for (const auto& f : *fields) {
@@ -83,14 +90,16 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
     }
 
     if (const auto* ts = dynamic_cast<const ast::TypeSum*>(type.get())) {
-        if (ts->IsSentinel()) return type;
+        if (ts->IsSentinel())
+            return type;
         return std::make_shared<ast::TypeSum>(SubstituteType(ts->GetLeft(), subst),
                                               SubstituteType(ts->GetRight(), subst));
     }
 
     if (const auto* tv = dynamic_cast<const ast::TypeVariant*>(type.get())) {
         const auto& fields = tv->GetFields();
-        if (!fields) return type; // sentinel
+        if (!fields)
+            return type; // sentinel
         std::vector<ast::TypeVariant::Field> new_fields;
         new_fields.reserve(fields->size());
         for (const auto& f : *fields) {
@@ -104,7 +113,8 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
     }
 
     if (const auto* tref = dynamic_cast<const ast::TypeRef*>(type.get())) {
-        if (tref->IsSentinel()) return type;
+        if (tref->IsSentinel())
+            return type;
         return std::make_shared<ast::TypeRef>(SubstituteType(tref->GetInnerType(), subst));
     }
 
@@ -126,7 +136,8 @@ void TypeChecker::VisitTypeVar(const ast::TypeVar& type) {
 }
 
 void TypeChecker::VisitTypeForAll(const ast::TypeForAll& type) {
-    if (type.IsSentinel()) return;
+    if (type.IsSentinel())
+        return;
 
     // Push type params into scope, keeping the TypeVar objects alive in a local vector.
     std::vector<std::shared_ptr<ast::TypeVar>> type_var_nodes;
@@ -190,8 +201,10 @@ void TypeChecker::VisitDeclFunGeneric(const ast::NodeDeclFunGeneric& node) {
 
     auto param_type = types_storage_.get<DeducedType>(param.get()).type;
     auto body_type = types_storage_.get<DeducedType>(body.get()).type;
-    auto fn_type = std::make_shared<const ast::TypeFun>(std::move(param_type), std::move(body_type));
-    SetDeducedType(node, {std::make_shared<const ast::TypeForAll>(type_params, std::move(fn_type))});
+    auto fn_type =
+        std::make_shared<const ast::TypeFun>(std::move(param_type), std::move(body_type));
+    SetDeducedType(node,
+                   {std::make_shared<const ast::TypeForAll>(type_params, std::move(fn_type))});
 
     // tv_guards destruct → Pop type params
 }

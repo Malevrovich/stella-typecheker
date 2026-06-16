@@ -1,0 +1,24 @@
+INPUT:
+language core;
+
+extend with
+  #type-reconstruction,
+  #lists;
+  
+fn main(n : auto) -> Nat {
+  return if List::head(n) 
+            then List::head(n)(0) 
+            else 0;
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:8:23:
+n
+Cannot unify (auto -> auto) with Bool
+
+EXIT_CODE: 1

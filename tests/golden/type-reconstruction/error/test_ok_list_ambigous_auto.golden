@@ -1,0 +1,16 @@
+INPUT:
+language core;
+extend with #type-reconstruction, #lists;
+
+fn main(n : auto) -> auto {
+  return List::head(cons(n, []))
+}
+
+
+STDOUT:
+Well-typed
+
+STDERR:
+(empty)
+
+EXIT_CODE: 0

@@ -1,0 +1,26 @@
+INPUT:
+language core;
+
+extend with 
+#type-reconstruction, 
+#pairs;
+
+fn check_type_wrong(n : {Nat, Bool}) -> auto {
+  return if n.2 then n.1 else 0
+}
+
+fn main(n : auto) -> auto {
+  return if n.1 then n.2 else check_type_wrong(n)
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
+Error occured at <unknown>:12:12:
+n.1
+Cannot unify Bool with Nat
+
+EXIT_CODE: 1

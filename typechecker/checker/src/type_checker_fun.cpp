@@ -155,17 +155,12 @@ void TypeChecker::VisitExprApplication(const ast::NodeExprApplication& node) {
             std::dynamic_pointer_cast<const ast::TypeAuto>(deduced_fun)) {
             auto arg_var = unifier_.FreshTypeVar();
             auto ret_var = unifier_.FreshTypeVar();
-            auto inferred_fun = std::make_shared<ast::TypeFun>(arg_var, ret_var);
-            unifier_.AddConstraint(deduced_fun, inferred_fun);
-
-            const auto& arg = node.GetArgument();
-            ExpectType(*arg, ExpectedType::EqualsTo(arg_var));
-            Visit(*arg);
-
-            SetDeducedType(node, {ret_var});
-            return;
+            fun_type = std::make_shared<ast::TypeFun>(arg_var, ret_var);
+            unifier_.AddConstraint(deduced_fun, fun_type, &node);
+            unifier_.SaveNewType(fun_type);
+        } else {
+            OnInternalError("Unexpected function deduction type");
         }
-        OnInternalError("Unexpected function deduction type");
     }
 
     const auto& arg = node.GetArgument();

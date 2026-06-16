@@ -30,8 +30,11 @@ void TypeChecker::Visit(const ast::NodeBase& node) {
                                 node.ToString());
     if (!types_storage_.has<DeducedType>(&node)) {
         try {
+            current_node_stack_.push_back(&node);
             node.Accept(*this);
+            current_node_stack_.pop_back();
         } catch (const std::exception& exc) {
+            current_node_stack_.pop_back();
             DLOG_S(ERROR) << "Exception occured during processing of node\n" << node.ToString();
             DLOG_S(ERROR) << "Exception: " << exc.what();
             throw;
@@ -53,7 +56,7 @@ std::optional<ErrorCode> TypeChecker::CheckCompatible(std::shared_ptr<const ast:
     if (HasExtension("#type-reconstruction")) {
         const SubtypeChecker* sc =
             HasExtension("#structural-subtyping") ? &subtype_checker_ : nullptr;
-        ReconstructionComparator cmp(unifier_, sc);
+        ReconstructionComparator cmp(unifier_, GetCurrentNode(), sc);
         return cmp(*given, *expected);
     }
 
@@ -220,9 +223,9 @@ void TypeChecker::VisitProgram(const ast::NodeProgram& node) {
 
     // After visiting all declarations, run unification to resolve type variables.
     if (HasExtension("#type-reconstruction")) {
-        if (auto err = unifier_.UnifyAll()) {
-            OnError(TypeCheckError{*err, "Type unification failed during type reconstruction"});
-        }
+        const SubtypeChecker* sc =
+            HasExtension("#structural-subtyping") ? &subtype_checker_ : nullptr;
+        unifier_.UnifyAll(sc); // Теперь выбрасывает исключение при ошибке
     }
 
     SetDeducedType(node, {main_type});

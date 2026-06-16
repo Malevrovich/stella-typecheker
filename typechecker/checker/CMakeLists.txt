@@ -25,7 +25,8 @@ set(TYPE_CHECK_SOURCES
     src/type_checker_variant.cpp
     src/type_checker.cpp
     src/unifier.cpp
-    src/expected_type.cpp)
+    src/expected_type.cpp
+    src/reconstruction.cpp)
 
 add_library(stella-type-check ${TYPE_CHECK_SOURCES})
 target_include_directories(stella-type-check PUBLIC include)

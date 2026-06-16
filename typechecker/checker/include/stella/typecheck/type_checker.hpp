@@ -30,6 +30,10 @@ public:
     void Visit(const ast::NodeBase& node) override;
     void Visit(const ast::Type& type) override;
 
+    const ast::NodeBase* GetCurrentNode() const {
+        return current_node_stack_.empty() ? nullptr : current_node_stack_.back();
+    }
+
     void VisitProgram(const ast::NodeProgram& node) override;
 
     void VisitDeclFun(const ast::NodeDeclFun& node) override;
@@ -148,6 +152,8 @@ private:
     void VisitMatchSum(const ast::NodeExprMatch& node, const ast::TypeSum& scrutinee_type);
     void VisitMatchVariant(const ast::NodeExprMatch& node, const ast::TypeVariant& scrutinee_type);
 
+    std::vector<const ast::NodeBase*> current_node_stack_;
+
     NameContext<const ast::NodeBase> name_context_;
     NameContext<const ast::TypeVar> type_var_context_;
     ast::AttributeStorage<ExpectedType, DeducedType, ProvisionalType> types_storage_;
@@ -161,8 +167,8 @@ private:
     std::unordered_set<std::string> exception_variant_labels_;
     std::unordered_set<std::string> extensions_;
 
-    SubtypeChecker subtype_checker_;
     Unifier unifier_;
+    SubtypeChecker subtype_checker_;
 };
 
 template <typename T>

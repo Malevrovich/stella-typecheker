@@ -1,35 +1,67 @@
 #include "stella/typecheck/unifier.hpp"
 
+#include <format>
 #include <memory>
 #include <vector>
 
 #include "stella/ast/auto.hpp"
+#include "stella/ast/base.hpp"
+#include "stella/typecheck/reconstruction.hpp"
+#include "stella/typecheck/subtype.hpp"
 
 namespace stella {
 namespace typecheck {
 
+namespace {
+
+std::optional<ErrorCode> TryCompareWith(const ast::Type::Comparator& comparator,
+                                        const ast::Type& lhs, const ast::Type& rhs) {
+    if (comparator) {
+        return comparator(lhs, rhs);
+    } else {
+        return lhs.CheckCompatible(rhs);
+    }
+}
+
+} // namespace
+
+void Unifier::ReportUnificationError(ErrorCode error_code, const ast::Type& lhs,
+                                     const ast::Type& rhs, const ast::NodeBase* node) {
+    std::string message;
+    if (error_code == ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE) {
+        message = std::format("Occurs check failed: cannot unify {} with {}", lhs.ToString(),
+                              rhs.ToString());
+    } else {
+        message = std::format("Cannot unify {} with {}", lhs.ToString(), rhs.ToString());
+    }
+
+    if (node) {
+        OnError(TypeCheckNodeError{error_code, *node, message});
+    } else {
+        OnError(TypeCheckError{error_code, message});
+    }
+}
+
 void Unifier::AddConstraint(std::shared_ptr<const ast::Type> lhs,
-                            std::shared_ptr<const ast::Type> rhs) {
-    constraints_.emplace_back(std::move(lhs), std::move(rhs));
+                            std::shared_ptr<const ast::Type> rhs, const ast::NodeBase* node) {
+    constraints_.push_back({std::move(lhs), std::move(rhs), node});
 }
 
 std::shared_ptr<const ast::TypeAuto> Unifier::FreshTypeVar() {
-    ++next_type_var_id_;
     return std::make_shared<const ast::TypeAuto>();
 }
 
-std::optional<ErrorCode> Unifier::UnifyAll() {
-    std::vector<std::pair<std::shared_ptr<const ast::Type>, std::shared_ptr<const ast::Type>>>
-        worklist = std::move(constraints_);
-    constraints_.clear();
+void Unifier::UnifyAll(const SubtypeChecker* sc) {
+    do {
+        auto worklist = std::move(constraints_);
+        constraints_.clear();
 
-    while (!worklist.empty()) {
-        auto [lhs, rhs] = worklist.back();
-        worklist.pop_back();
-        if (auto err = UnifyOne(std::move(lhs), std::move(rhs)))
-            return err;
-    }
-    return std::nullopt;
+        while (!worklist.empty()) {
+            auto constraint = worklist.back();
+            worklist.pop_back();
+            UnifyOne(std::move(constraint.lhs), std::move(constraint.rhs), constraint.node, sc);
+        }
+    } while (!constraints_.empty());
 }
 
 std::size_t Unifier::FindClass(const ast::TypeAuto* var) {
@@ -45,11 +77,12 @@ std::size_t Unifier::FindClass(const ast::TypeAuto* var) {
 
 Unifier::EqClass& Unifier::ClassOf(const ast::TypeAuto* var) { return *classes_[FindClass(var)]; }
 
-std::optional<ErrorCode> Unifier::MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b) {
+void Unifier::MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b,
+                           const ast::NodeBase* node, const SubtypeChecker* sc) {
     const std::size_t ia = FindClass(a);
     const std::size_t ib = FindClass(b);
     if (ia == ib)
-        return std::nullopt;
+        return;
 
     EqClass& ca = *classes_[ia];
     EqClass& cb = *classes_[ib];
@@ -59,31 +92,20 @@ std::optional<ErrorCode> Unifier::MergeClasses(const ast::TypeAuto* a, const ast
             if (ca.bound_type->Contains([m](const ast::Type& t) {
                     return dynamic_cast<const ast::TypeAuto*>(&t) == m;
                 }))
-                return ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE;
+                ReportUnificationError(ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE, *ca.bound_type,
+                                       *cb.bound_type, node);
         }
         for (const auto* m : ca.members) {
             if (cb.bound_type->Contains([m](const ast::Type& t) {
                     return dynamic_cast<const ast::TypeAuto*>(&t) == m;
                 }))
-                return ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE;
+                ReportUnificationError(ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE, *ca.bound_type,
+                                       *cb.bound_type, node);
         }
 
-        if (auto error = ca.bound_type->CheckCompatible(*cb.bound_type)) {
-            return *error;
-        }
-
-        std::optional<ErrorCode> ca_family = ca.bound_type->GetFamilyErrorCode();
-        std::optional<ErrorCode> cb_family = cb.bound_type->GetFamilyErrorCode();
-
-        if (ca_family && cb_family && *ca_family != *cb_family) {
-            return *ca_family;
-        }
-
-        std::optional<ErrorCode> ca_unexpected = ca.bound_type->GetUnexpectedErrorCode();
-        std::optional<ErrorCode> cb_unexpected = cb.bound_type->GetUnexpectedErrorCode();
-
-        if (ca_unexpected && cb_unexpected && *ca_unexpected != *cb_unexpected) {
-            return *ca_unexpected;
+        ReconstructionComparator comparator{*this, node, sc};
+        if (auto error = comparator(*ca.bound_type, *cb.bound_type)) {
+            ReportUnificationError(*error, *ca.bound_type, *cb.bound_type, node);
         }
     }
 
@@ -95,46 +117,43 @@ std::optional<ErrorCode> Unifier::MergeClasses(const ast::TypeAuto* a, const ast
         ca.bound_type = std::move(cb.bound_type);
 
     classes_[ib] = std::make_unique<EqClass>();
-
-    return std::nullopt;
 }
 
-std::optional<ErrorCode> Unifier::BindClass(const ast::TypeAuto* var,
-                                            std::shared_ptr<const ast::Type> concrete) {
+void Unifier::BindClass(const ast::TypeAuto* var, std::shared_ptr<const ast::Type> concrete,
+                        const ast::NodeBase* node, const SubtypeChecker* sc) {
     EqClass& cls = ClassOf(var);
 
     if (cls.bound_type) {
-        return std::nullopt;
+        ReconstructionComparator comparator{*this, node, sc};
+        if (auto error = comparator(*cls.bound_type, *concrete)) {
+            ReportUnificationError(*error, *cls.bound_type, *concrete, node);
+        }
+        return;
     }
 
     for (const auto* m : cls.members) {
         if (concrete->Contains(
                 [m](const ast::Type& t) { return dynamic_cast<const ast::TypeAuto*>(&t) == m; }))
-            return ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE;
+            ReportUnificationError(ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE, ast::TypeAuto{},
+                                   *concrete, node);
     }
 
     cls.bound_type = std::move(concrete);
-    return std::nullopt;
 }
 
-std::optional<ErrorCode> Unifier::UnifyOne(std::shared_ptr<const ast::Type> lhs,
-                                           std::shared_ptr<const ast::Type> rhs) {
+void Unifier::UnifyOne(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs,
+                       const ast::NodeBase* node, const SubtypeChecker* sc) {
     const auto* lvar = dynamic_cast<const ast::TypeAuto*>(lhs.get());
     const auto* rvar = dynamic_cast<const ast::TypeAuto*>(rhs.get());
 
     if (lvar && rvar) {
-        return MergeClasses(lvar, rvar);
+        MergeClasses(lvar, rvar, node, sc);
+        return;
+    } else if (lvar) {
+        BindClass(lvar, std::move(rhs), node, sc);
+    } else if (rvar) {
+        BindClass(rvar, std::move(lhs), node, sc);
     }
-
-    if (lvar) {
-        return BindClass(lvar, std::move(rhs));
-    }
-
-    if (rvar) {
-        return BindClass(rvar, std::move(lhs));
-    }
-
-    return std::nullopt;
 }
 
 } // namespace typecheck

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -9,26 +8,36 @@
 #include "stella/ast/auto.hpp"
 #include "stella/ast/base.hpp"
 #include "stella/typecheck/error.hpp"
+#include "stella/typecheck/subtype.hpp"
 
 namespace stella {
 namespace typecheck {
+
+class TypeChecker;
 
 class Unifier final {
 public:
     Unifier() = default;
 
-    void AddConstraint(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs);
-
-    void AddConstraint(const ast::Type& lhs, const ast::Type& rhs) {
+    void AddConstraint(const ast::Type& lhs, const ast::Type& rhs, const ast::NodeBase* node) {
         AddConstraint(std::shared_ptr<const ast::Type>(std::shared_ptr<void>{}, &lhs),
-                      std::shared_ptr<const ast::Type>(std::shared_ptr<void>{}, &rhs));
+                      std::shared_ptr<const ast::Type>(std::shared_ptr<void>{}, &rhs), node);
     }
+    void AddConstraint(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs,
+                       const ast::NodeBase* node);
 
     std::shared_ptr<const ast::TypeAuto> FreshTypeVar();
+    void SaveNewType(std::shared_ptr<const ast::Type> type) { new_types_.push_back(type); }
 
-    std::optional<ErrorCode> UnifyAll();
+    void UnifyAll(const SubtypeChecker* subtype_checker);
 
 private:
+    struct Constraint {
+        std::shared_ptr<const ast::Type> lhs;
+        std::shared_ptr<const ast::Type> rhs;
+        const ast::NodeBase* node;
+    };
+
     struct EqClass {
         std::unordered_set<const ast::TypeAuto*> members;
         std::shared_ptr<const ast::Type> bound_type;
@@ -36,24 +45,24 @@ private:
 
     EqClass& ClassOf(const ast::TypeAuto* var);
 
-    std::optional<ErrorCode> MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b);
+    void MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b, const ast::NodeBase* node,
+                      const SubtypeChecker* sc);
 
-    std::optional<ErrorCode> BindClass(const ast::TypeAuto* var,
-                                       std::shared_ptr<const ast::Type> concrete);
+    void BindClass(const ast::TypeAuto* var, std::shared_ptr<const ast::Type> concrete,
+                   const ast::NodeBase* node, const SubtypeChecker* sc);
 
     std::size_t FindClass(const ast::TypeAuto* var);
 
-    std::optional<ErrorCode> UnifyOne(std::shared_ptr<const ast::Type> lhs,
-                                      std::shared_ptr<const ast::Type> rhs);
+    void UnifyOne(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs,
+                  const ast::NodeBase* node, const SubtypeChecker* sc);
 
-    uint64_t next_type_var_id_ = 0;
+    void ReportUnificationError(ErrorCode error_code, const ast::Type& lhs, const ast::Type& rhs,
+                                const ast::NodeBase* node);
 
-    std::vector<std::pair<std::shared_ptr<const ast::Type>, std::shared_ptr<const ast::Type>>>
-        constraints_;
-
+    std::vector<Constraint> constraints_;
     std::vector<std::unique_ptr<EqClass>> classes_;
-
     std::unordered_map<const ast::TypeAuto*, std::size_t> class_of_;
+    std::vector<std::shared_ptr<const ast::Type>> new_types_;
 };
 
 } // namespace typecheck

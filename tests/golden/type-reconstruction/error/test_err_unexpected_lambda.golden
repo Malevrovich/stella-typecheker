@@ -1,0 +1,20 @@
+INPUT:
+language core;
+
+extend with #lists;
+
+fn main(n : Nat) -> Nat {
+  return List::head([fn (x : Nat) { return x }]);
+}
+
+
+STDOUT:
+(empty)
+
+STDERR:
+ERROR_UNEXPECTED_LAMBDA:
+Error occured at <unknown>:6:21:
+fn (x : Nat) { return x }
+Expected type Nat, but expr has type (? -> ?)
+
+EXIT_CODE: 1

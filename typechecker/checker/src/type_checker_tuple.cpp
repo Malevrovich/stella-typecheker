@@ -2,6 +2,7 @@
 
 #include <format>
 #include <memory>
+#include <vector>
 
 #include "stella/ast/ast.hpp"
 #include "stella/ast/base.hpp"
@@ -51,15 +52,26 @@ void TypeChecker::VisitExprDotTuple(const ast::NodeExprDotTuple& node) {
 
     Visit(*expr);
 
-    const auto tuple_type = std::dynamic_pointer_cast<const ast::TypeTuple>(
-        types_storage_.get<DeducedType>(expr.get()).type);
+    const auto deduced_type = types_storage_.get<DeducedType>(expr.get()).type;
+    auto tuple_type = std::dynamic_pointer_cast<const ast::TypeTuple>(deduced_type);
     if (!tuple_type) {
-        OnError(TypeCheckNodeError{
-            ErrorCode::ERROR_NOT_A_TUPLE,
-            node,
-            std::format("Expected a tuple type but got {}",
-                        types_storage_.get<DeducedType>(expr.get()).type->ToString()),
-        });
+        if (HasExtension("#type-reconstruction") &&
+            std::dynamic_pointer_cast<const ast::TypeAuto>(deduced_type)) {
+            // type reconstruction works as pair deduced
+            auto lvar = unifier_.FreshTypeVar();
+            auto rvar = unifier_.FreshTypeVar();
+            tuple_type = std::make_shared<ast::TypeTuple>(
+                std::vector<std::shared_ptr<const ast::Type>>{lvar, rvar});
+            unifier_.AddConstraint(deduced_type, tuple_type, &node);
+            unifier_.SaveNewType(tuple_type);
+        } else {
+            OnError(TypeCheckNodeError{
+                ErrorCode::ERROR_NOT_A_TUPLE,
+                node,
+                std::format("Expected a tuple type but got {}",
+                            types_storage_.get<DeducedType>(expr.get()).type->ToString()),
+            });
+        }
     }
 
     const auto& element_types = *tuple_type->GetElementTypes();

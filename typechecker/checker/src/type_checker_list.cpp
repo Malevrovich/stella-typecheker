@@ -80,8 +80,10 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
         if (HasExtension("#type-reconstruction") &&
             std::dynamic_pointer_cast<const ast::TypeAuto>(tail_deduced)) {
             auto list_var = unifier_.FreshTypeVar();
-            unifier_.AddConstraint(tail_deduced, std::make_shared<ast::TypeList>(element_type));
-            SetDeducedType(node, {std::make_shared<ast::TypeList>(element_type)});
+            auto new_list_type = std::make_shared<ast::TypeList>(element_type);
+            unifier_.AddConstraint(tail_deduced, new_list_type, &node);
+            unifier_.SaveNewType(new_list_type);
+            SetDeducedType(node, {new_list_type});
             return;
         }
         OnInternalError("Unexpected cons tail deduction type");
@@ -113,7 +115,9 @@ void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
         if (HasExtension("#type-reconstruction") &&
             std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
             auto elem_var = unifier_.FreshTypeVar();
-            unifier_.AddConstraint(list_deduced, std::make_shared<ast::TypeList>(elem_var));
+            auto new_list_type = std::make_shared<ast::TypeList>(elem_var);
+            unifier_.AddConstraint(list_deduced, new_list_type, &node);
+            unifier_.SaveNewType(new_list_type);
             SetDeducedType(node, {elem_var});
             return;
         }
@@ -146,7 +150,8 @@ void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
             std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
             auto elem_var = unifier_.FreshTypeVar();
             auto inferred_list = std::make_shared<ast::TypeList>(elem_var);
-            unifier_.AddConstraint(*list_deduced, *inferred_list);
+            unifier_.AddConstraint(list_deduced, inferred_list, &node);
+            unifier_.SaveNewType(inferred_list);
             SetDeducedType(node, {inferred_list});
             return;
         }

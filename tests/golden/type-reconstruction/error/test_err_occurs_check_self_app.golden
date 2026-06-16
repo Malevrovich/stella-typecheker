@@ -12,6 +12,8 @@ STDOUT:
 
 STDERR:
 ERROR_OCCURS_CHECK_INFINITE_TYPE:
-Type unification failed during type reconstruction
+Error occured at <unknown>:5:9:
+f(f)
+Occurs check failed: cannot unify auto with (auto -> auto)
 
 EXIT_CODE: 1
