@@ -13,5 +13,7 @@ STDOUT:
 STDERR:
 ERROR_AMBIGUOUS_TYPE:
 Ambiguous type: type variable was not inferred
+Auto:: auto
+  Auto: from source: <unknown>:4:12
 
 EXIT_CODE: 1

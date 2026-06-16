@@ -29,7 +29,7 @@ namespace {
 
 std::string FormatTypeInfo(const ast::Type& type, std::string_view label) {
     std::string result = std::format("\n{}: {}", label, type.ToString());
-    
+
     if (type.HasOriginNode()) {
         const auto* origin_node = type.GetOriginNode();
         result += std::format("\n  {} is from: {}", label, origin_node->ToString());
@@ -39,7 +39,7 @@ std::string FormatTypeInfo(const ast::Type& type, std::string_view label) {
     } else if (type.HasSourceInfo()) {
         result += std::format("\n  {} from source: {}", label, type.GetSourceInfo()->GetLocation());
     }
-    
+
     return result;
 }
 
@@ -106,12 +106,14 @@ void Unifier::UnifyAll(const SubtypeChecker* sc) {
             if (!cls.bound_type) {
                 // This TypeAuto has no bound type - report error
                 std::string message = std::format("Ambiguous type: type variable was not inferred");
+                message += FormatTypeInfo(*type_auto, "Auto:");
                 OnError(TypeCheckError{ErrorCode::ERROR_AMBIGUOUS_TYPE, message});
             }
         } else {
-            // If TypeAuto is not in class_of_, it was never used in constraints, so no bound type exists
-            // This is also an ambiguous type error
+            // If TypeAuto is not in class_of_, it was never used in constraints, so no bound type
+            // exists This is also an ambiguous type error
             std::string message = std::format("Ambiguous type: type variable was not inferred");
+            message += FormatTypeInfo(*type_auto, "Auto:");
             OnError(TypeCheckError{ErrorCode::ERROR_AMBIGUOUS_TYPE, message});
         }
     }
@@ -158,7 +160,8 @@ void Unifier::MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b,
 
         ReconstructionComparator comparator{*this, sc};
         if (auto error = comparator(*ca.bound_type, *cb.bound_type)) {
-            ReportUnificationError(ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION, *ca.bound_type, *cb.bound_type);
+            ReportUnificationError(ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION, *ca.bound_type,
+                                   *cb.bound_type);
         }
     }
 
@@ -179,7 +182,8 @@ void Unifier::BindClass(const ast::TypeAuto* var, std::shared_ptr<const ast::Typ
     if (cls.bound_type) {
         ReconstructionComparator comparator{*this, sc};
         if (auto error = comparator(*cls.bound_type, *concrete)) {
-            ReportUnificationError(ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION, *cls.bound_type, *concrete);
+            ReportUnificationError(ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION, *cls.bound_type,
+                                   *concrete);
         }
         return;
     }
