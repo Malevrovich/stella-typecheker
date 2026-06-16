@@ -191,8 +191,7 @@ void Unifier::BindClass(const ast::TypeAuto* var, std::shared_ptr<const ast::Typ
     for (const auto* m : cls.members) {
         if (concrete->Contains(
                 [m](const ast::Type& t) { return dynamic_cast<const ast::TypeAuto*>(&t) == m; }))
-            ReportUnificationError(ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE, ast::TypeAuto{},
-                                   *concrete);
+            ReportUnificationError(ErrorCode::ERROR_OCCURS_CHECK_INFINITE_TYPE, *m, *concrete);
     }
 
     cls.bound_type = std::move(concrete);

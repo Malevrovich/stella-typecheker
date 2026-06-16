@@ -16,6 +16,7 @@ Error occured at <unknown>:5:9:
 cons(x, x)
 Occurs check failed: cannot unify auto with [auto]
 First type: auto
+  First type from source: <unknown>:4:12
 Second type: [auto]
   Second type is from: <unknown>:5:9:
 cons(x, x)
