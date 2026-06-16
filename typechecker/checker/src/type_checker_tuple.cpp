@@ -62,7 +62,7 @@ void TypeChecker::VisitExprDotTuple(const ast::NodeExprDotTuple& node) {
             auto rvar = unifier_.FreshTypeVar();
             tuple_type = CreateType<ast::TypeTuple>(
                 std::vector<std::shared_ptr<const ast::Type>>{lvar, rvar});
-            unifier_.AddConstraint(deduced_type, tuple_type, &node);
+            unifier_.AddConstraint(deduced_type, tuple_type);
             unifier_.SaveNewType(tuple_type);
         } else {
             OnError(TypeCheckNodeError{

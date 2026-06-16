@@ -12,13 +12,11 @@ namespace typecheck {
 
 class ReconstructionComparator {
 public:
-    explicit ReconstructionComparator(Unifier& unifier, const ast::NodeBase* ctx = nullptr,
-                                      const SubtypeChecker* subtype_checker = nullptr);
+    explicit ReconstructionComparator(Unifier& unifier, const SubtypeChecker* subtype_checker = nullptr);
 
     std::optional<ErrorCode> operator()(const ast::Type& a, const ast::Type& b) const;
 
 private:
-    const ast::NodeBase* ctx_node_;
     Unifier& unifier_;
     const SubtypeChecker* subtype_checker_; // non-owning; null if no subtyping
 };

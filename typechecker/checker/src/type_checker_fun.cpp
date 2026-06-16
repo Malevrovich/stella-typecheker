@@ -156,7 +156,7 @@ void TypeChecker::VisitExprApplication(const ast::NodeExprApplication& node) {
             auto arg_var = unifier_.FreshTypeVar();
             auto ret_var = unifier_.FreshTypeVar();
             fun_type = CreateType<ast::TypeFun>(arg_var, ret_var);
-            unifier_.AddConstraint(deduced_fun, fun_type, &node);
+            unifier_.AddConstraint(deduced_fun, fun_type);
             unifier_.SaveNewType(fun_type);
         } else {
             OnInternalError("Unexpected function deduction type");

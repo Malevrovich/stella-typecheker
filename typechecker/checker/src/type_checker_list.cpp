@@ -81,7 +81,7 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
             std::dynamic_pointer_cast<const ast::TypeAuto>(tail_deduced)) {
             auto list_var = unifier_.FreshTypeVar();
             auto new_list_type = CreateType<ast::TypeList>(element_type);
-            unifier_.AddConstraint(tail_deduced, new_list_type, &node);
+            unifier_.AddConstraint(tail_deduced, new_list_type);
             unifier_.SaveNewType(new_list_type);
             SetDeducedType(node, {new_list_type});
             return;
@@ -116,7 +116,7 @@ void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
             std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
             auto elem_var = unifier_.FreshTypeVar();
             auto new_list_type = CreateType<ast::TypeList>(elem_var);
-            unifier_.AddConstraint(list_deduced, new_list_type, &node);
+            unifier_.AddConstraint(list_deduced, new_list_type);
             unifier_.SaveNewType(new_list_type);
             SetDeducedType(node, {elem_var});
             return;
@@ -150,7 +150,7 @@ void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
             std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
             auto elem_var = unifier_.FreshTypeVar();
             auto inferred_list = CreateType<ast::TypeList>(elem_var);
-            unifier_.AddConstraint(list_deduced, inferred_list, &node);
+            unifier_.AddConstraint(list_deduced, inferred_list);
             unifier_.SaveNewType(inferred_list);
             SetDeducedType(node, {inferred_list});
             return;

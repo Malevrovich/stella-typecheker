@@ -56,7 +56,7 @@ std::optional<ErrorCode> TypeChecker::CheckCompatible(std::shared_ptr<const ast:
     if (HasExtension("#type-reconstruction")) {
         const SubtypeChecker* sc =
             HasExtension("#structural-subtyping") ? &subtype_checker_ : nullptr;
-        ReconstructionComparator cmp(unifier_, GetCurrentNode(), sc);
+        ReconstructionComparator cmp(unifier_, sc);
         return cmp(*given, *expected);
     }
 

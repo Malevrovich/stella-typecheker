@@ -15,8 +15,14 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at <unknown>:8:23:
-List::head(n)
+Error occured at <unknown>:8:9:
+if List::head(List::head(n)) then List::head(List::head(n)) else 0
 Cannot unify Nat with Bool
+First type: Nat
+  First type from source: <unknown>:7:21
+Second type: Bool
+  Second type is from: <unknown>:8:9:
+if List::head(List::head(n)) then List::head(List::head(n)) else 0
+  Location: <unknown>:8:9
 
 EXIT_CODE: 1

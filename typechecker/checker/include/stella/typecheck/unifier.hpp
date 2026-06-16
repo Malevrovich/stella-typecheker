@@ -19,12 +19,11 @@ class Unifier final {
 public:
     Unifier() = default;
 
-    void AddConstraint(const ast::Type& lhs, const ast::Type& rhs, const ast::NodeBase* node) {
+    void AddConstraint(const ast::Type& lhs, const ast::Type& rhs) {
         AddConstraint(std::shared_ptr<const ast::Type>(std::shared_ptr<void>{}, &lhs),
-                      std::shared_ptr<const ast::Type>(std::shared_ptr<void>{}, &rhs), node);
+                      std::shared_ptr<const ast::Type>(std::shared_ptr<void>{}, &rhs));
     }
-    void AddConstraint(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs,
-                       const ast::NodeBase* node);
+    void AddConstraint(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs);
 
     std::shared_ptr<const ast::TypeAuto> FreshTypeVar();
     void SaveNewType(std::shared_ptr<const ast::Type> type) { new_types_.push_back(type); }
@@ -35,7 +34,6 @@ private:
     struct Constraint {
         std::shared_ptr<const ast::Type> lhs;
         std::shared_ptr<const ast::Type> rhs;
-        const ast::NodeBase* node;
     };
 
     struct EqClass {
@@ -45,19 +43,17 @@ private:
 
     EqClass& ClassOf(const ast::TypeAuto* var);
 
-    void MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b, const ast::NodeBase* node,
-                      const SubtypeChecker* sc);
+    void MergeClasses(const ast::TypeAuto* a, const ast::TypeAuto* b, const SubtypeChecker* sc);
 
     void BindClass(const ast::TypeAuto* var, std::shared_ptr<const ast::Type> concrete,
-                   const ast::NodeBase* node, const SubtypeChecker* sc);
+                   const SubtypeChecker* sc);
 
     std::size_t FindClass(const ast::TypeAuto* var);
 
     void UnifyOne(std::shared_ptr<const ast::Type> lhs, std::shared_ptr<const ast::Type> rhs,
-                  const ast::NodeBase* node, const SubtypeChecker* sc);
+                  const SubtypeChecker* sc);
 
-    void ReportUnificationError(ErrorCode error_code, const ast::Type& lhs, const ast::Type& rhs,
-                                const ast::NodeBase* node);
+    void ReportUnificationError(ErrorCode error_code, const ast::Type& lhs, const ast::Type& rhs);
 
     std::vector<Constraint> constraints_;
     std::vector<std::unique_ptr<EqClass>> classes_;

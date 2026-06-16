@@ -18,8 +18,16 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at <unknown>:11:12:
-id(false)
+Error occured at <unknown>:11:41:
+succ(0)
 Cannot unify Nat with Bool
+First type: Nat
+  First type is from: <unknown>:11:41:
+succ(0)
+  Location: <unknown>:11:41
+Second type: Bool
+  Second type is from: <unknown>:11:9:
+if id(false) then id(0) else id(succ(0))
+  Location: <unknown>:11:9
 
 EXIT_CODE: 1

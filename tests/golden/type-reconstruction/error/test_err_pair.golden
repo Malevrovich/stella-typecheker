@@ -19,8 +19,14 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at <unknown>:12:12:
-n.1
+Error occured at <unknown>:12:9:
+if n.1 then n.2 else check_type_wrong(n)
 Cannot unify Bool with Nat
+First type: Bool
+  First type is from: <unknown>:12:9:
+if n.1 then n.2 else check_type_wrong(n)
+  Location: <unknown>:12:9
+Second type: Nat
+  Second type from source: <unknown>:7:25
 
 EXIT_CODE: 1

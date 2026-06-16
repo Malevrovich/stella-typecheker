@@ -17,8 +17,18 @@ STDOUT:
 
 STDERR:
 ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION:
-Error occured at <unknown>:8:23:
-n
+Error occured at <unknown>:9:17:
+List::head(n)(0)
 Cannot unify (auto -> auto) with Bool
+First type: (auto -> auto)
+  First type is from: <unknown>:9:17:
+List::head(n)(0)
+  Location: <unknown>:9:17
+Second type: Bool
+  Second type is from: <unknown>:8:9:
+if List::head(n) 
+            then List::head(n)(0) 
+            else 0
+  Location: <unknown>:8:9
 
 EXIT_CODE: 1

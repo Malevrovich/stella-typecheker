@@ -15,5 +15,10 @@ ERROR_OCCURS_CHECK_INFINITE_TYPE:
 Error occured at <unknown>:5:9:
 f(f)
 Occurs check failed: cannot unify auto with (auto -> auto)
+First type: auto
+Second type: (auto -> auto)
+  Second type is from: <unknown>:5:9:
+f(f)
+  Location: <unknown>:5:9
 
 EXIT_CODE: 1
