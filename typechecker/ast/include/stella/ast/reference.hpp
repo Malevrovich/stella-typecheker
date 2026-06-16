@@ -14,7 +14,9 @@ public:
     struct SentinelTag {};
 
     // Concrete reference type.
-    explicit TypeRef(std::shared_ptr<const Type> inner_type);
+    TypeRef(std::shared_ptr<const Type> inner_type,
+            const NodeBase* origin_node = nullptr,
+            std::shared_ptr<const SourceInfo> source_info = nullptr);
     // Family sentinel: "some reference, inner type unknown".
     explicit TypeRef(SentinelTag) {}
     static std::shared_ptr<TypeRef> MakeSentinel();

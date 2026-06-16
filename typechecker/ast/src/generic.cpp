@@ -8,8 +8,11 @@ namespace ast {
 
 // TypeVar implementation
 
-TypeVar::TypeVar(std::string name)
-    : name_(std::move(name)) {}
+TypeVar::TypeVar(std::string name,
+                 const NodeBase* origin_node,
+                 std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      name_(std::move(name)) {}
 
 void TypeVar::OutputTo(std::ostream& out) const { out << name_; }
 
@@ -29,8 +32,12 @@ std::optional<ErrorCode> TypeVar::CheckCompatibleImpl(const Type& other,
 
 // TypeForAll implementation
 
-TypeForAll::TypeForAll(std::vector<std::string> type_params, std::shared_ptr<const Type> body)
-    : type_params_(std::move(type_params)),
+TypeForAll::TypeForAll(std::vector<std::string> type_params,
+                      std::shared_ptr<const Type> body,
+                      const NodeBase* origin_node,
+                      std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      type_params_(std::move(type_params)),
       body_(std::move(body)) {}
 
 std::shared_ptr<TypeForAll> TypeForAll::MakeSentinel() {

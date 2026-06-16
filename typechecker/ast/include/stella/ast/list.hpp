@@ -77,7 +77,9 @@ public:
     struct SentinelTag {};
 
     // Concrete list type with a known element type.
-    explicit TypeList(std::shared_ptr<const Type> element_type);
+    TypeList(std::shared_ptr<const Type> element_type,
+             const NodeBase* origin_node = nullptr,
+             std::shared_ptr<const SourceInfo> source_info = nullptr);
     // Family sentinel: "some list, element type unknown".
     explicit TypeList(SentinelTag) {}
     static std::shared_ptr<TypeList> MakeSentinel();

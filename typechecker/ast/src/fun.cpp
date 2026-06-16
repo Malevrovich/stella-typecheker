@@ -48,8 +48,12 @@ NodeExprFix::NodeExprFix(std::shared_ptr<SourceInfo> source_info,
     CHECK_F(expr_ != nullptr);
 }
 
-TypeFun::TypeFun(std::shared_ptr<const Type> arg_type, std::shared_ptr<const Type> return_type)
-    : arg_type_(std::move(arg_type)),
+TypeFun::TypeFun(std::shared_ptr<const Type> arg_type,
+                 std::shared_ptr<const Type> return_type,
+                 const NodeBase* origin_node,
+                 std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      arg_type_(std::move(arg_type)),
       return_type_(std::move(return_type)) {
     CHECK_F(arg_type_ != nullptr);
     CHECK_F(return_type_ != nullptr);

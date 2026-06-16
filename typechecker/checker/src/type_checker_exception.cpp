@@ -190,7 +190,7 @@ void TypeChecker::VisitDeclExceptionVariant(const ast::NodeDeclExceptionVariant&
     }
     fields.push_back({label, node.GetVariantType()});
 
-    exception_type_ = std::make_shared<ast::TypeVariant>(std::move(fields));
+    exception_type_ = CreateType<ast::TypeVariant>(std::move(fields), std::nullopt);
 
     SetDeducedType(node, {exception_type_});
 }

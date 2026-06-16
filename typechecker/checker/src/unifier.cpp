@@ -48,7 +48,7 @@ void Unifier::AddConstraint(std::shared_ptr<const ast::Type> lhs,
 }
 
 std::shared_ptr<const ast::TypeAuto> Unifier::FreshTypeVar() {
-    return std::make_shared<const ast::TypeAuto>();
+    return std::make_shared<const ast::TypeAuto>(nullptr, nullptr);
 }
 
 void Unifier::UnifyAll(const SubtypeChecker* sc) {
@@ -62,6 +62,25 @@ void Unifier::UnifyAll(const SubtypeChecker* sc) {
             UnifyOne(std::move(constraint.lhs), std::move(constraint.rhs), constraint.node, sc);
         }
     } while (!constraints_.empty());
+
+    // After unification, check that all TypeAuto instances have been bound to a concrete type
+    auto all_auto = ast::TypeAuto::Registry::GetInstance().GetAll();
+    for (const auto* type_auto : all_auto) {
+        auto it = class_of_.find(type_auto);
+        if (it != class_of_.end()) {
+            const EqClass& cls = *classes_[it->second];
+            if (!cls.bound_type) {
+                // This TypeAuto has no bound type - report error
+                std::string message = std::format("Ambiguous type: type variable was not inferred");
+                OnError(TypeCheckError{ErrorCode::ERROR_AMBIGUOUS_TYPE, message});
+            }
+        } else {
+            // If TypeAuto is not in class_of_, it was never used in constraints, so no bound type exists
+            // This is also an ambiguous type error
+            std::string message = std::format("Ambiguous type: type variable was not inferred");
+            OnError(TypeCheckError{ErrorCode::ERROR_AMBIGUOUS_TYPE, message});
+        }
+    }
 }
 
 std::size_t Unifier::FindClass(const ast::TypeAuto* var) {

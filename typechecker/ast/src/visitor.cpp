@@ -143,6 +143,10 @@ void NodePatternVar::Accept(NodeVisitor& visitor) const { visitor.VisitPatternVa
 
 void NodeExprLet::Accept(NodeVisitor& visitor) const { visitor.VisitExprLet(*this); }
 
+TypeUnit::TypeUnit(const NodeBase* origin_node,
+                   std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)) {}
+
 void TypeUnit::Accept(TypeVisitor& visitor) const { visitor.VisitTypeUnit(*this); }
 
 void BaseTypeVisitor::VisitDefaultType(const Type& type) {}
@@ -207,7 +211,15 @@ void NodeExprSequence::Accept(NodeVisitor& visitor) const { visitor.VisitExprSeq
 
 void BaseNodeVisitor::VisitExprSequence(const NodeExprSequence& node) { VisitDefaultNode(node); }
 
+TypeTop::TypeTop(const NodeBase* origin_node,
+                 std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)) {}
+
 void TypeTop::Accept(TypeVisitor& visitor) const { visitor.VisitTypeTop(*this); }
+
+TypeBottom::TypeBottom(const NodeBase* origin_node,
+                       std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)) {}
 
 void TypeBottom::Accept(TypeVisitor& visitor) const { visitor.VisitTypeBottom(*this); }
 

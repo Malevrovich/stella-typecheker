@@ -7,8 +7,11 @@
 namespace stella {
 namespace ast {
 
-TypeRef::TypeRef(std::shared_ptr<const Type> inner_type)
-    : inner_type_(std::move(inner_type)) {
+TypeRef::TypeRef(std::shared_ptr<const Type> inner_type,
+                 const NodeBase* origin_node,
+                 std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      inner_type_(std::move(inner_type)) {
     CHECK_F(inner_type_ != nullptr);
 }
 

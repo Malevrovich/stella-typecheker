@@ -32,7 +32,28 @@ TypeCheckNodeError::TypeCheckNodeError(ErrorCode error_code, const ast::NodeBase
 
 TypeCheckTypeError::TypeCheckTypeError(ErrorCode error_code, const ast::Type& type,
                                        std::string_view message)
-    : TypeCheckError(error_code, std::format("Error type: {}\n{}", type.ToString(), message)) {}
+    : TypeCheckError(error_code, BuildErrorMessage(type, message)) {}
+
+std::string TypeCheckTypeError::BuildErrorMessage(const ast::Type& type, std::string_view message) {
+    std::string type_info = std::format("Error type: {}", type.ToString());
+    
+    // Add origin information if available
+    if (type.HasOriginNode()) {
+        const auto* origin_node = type.GetOriginNode();
+        type_info += std::format("\n  Type originated from: {}", origin_node->ToString());
+        
+        // Add source location if available
+        if (origin_node->GetSourceInfo()) {
+            const auto& source_info = origin_node->GetSourceInfo();
+            type_info += std::format("\n  Location: {}", source_info->GetLocation());
+        }
+    } else if (type.HasSourceInfo()) {
+        const auto& source_info = type.GetSourceInfo();
+        type_info += std::format("\n  Type from source: {}", source_info->GetLocation());
+    }
+    
+    return std::format("{}\n{}", type_info, message);
+}
 
 void OnError(TypeCheckError&& error) { throw error; }
 

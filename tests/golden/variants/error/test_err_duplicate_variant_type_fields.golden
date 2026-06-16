@@ -15,6 +15,7 @@ STDOUT:
 STDERR:
 ERROR_DUPLICATE_VARIANT_TYPE_FIELDS:
 Error type: <|a : Nat, a : Bool|>
+  Type from source: <unknown>:4:12
 Duplicate field 'a' in variant type
 
 EXIT_CODE: 1

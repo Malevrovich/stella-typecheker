@@ -17,6 +17,7 @@ STDOUT:
 STDERR:
 ERROR_UNDEFINED_TYPE_VARIABLE:
 Error type: T
+  Type from source: <unknown>:4:17
 Undefined type variable 'T'
 
 EXIT_CODE: 1

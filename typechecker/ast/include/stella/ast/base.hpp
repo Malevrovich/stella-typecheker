@@ -80,7 +80,18 @@ public:
 
     bool operator==(const Type& other) const = delete;
 
+    // Origin tracking methods
+    const NodeBase* GetOriginNode() const { return origin_node_; }
+    std::shared_ptr<const SourceInfo> GetSourceInfo() const { return source_info_; }
+    
+    bool HasOriginNode() const { return origin_node_ != nullptr; }
+    bool HasSourceInfo() const { return source_info_ != nullptr; }
+
 protected:
+    Type(const NodeBase* origin_node = nullptr,
+         std::shared_ptr<const SourceInfo> source_info = nullptr)
+        : origin_node_(origin_node), source_info_(std::move(source_info)) {}
+
     virtual std::optional<ErrorCode> CheckCompatibleImpl(const Type& other,
                                                          const Comparator& cmp) const = 0;
 
@@ -93,6 +104,10 @@ protected:
             return *e;
         return ErrorCode::ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION;
     }
+
+private:
+    const NodeBase* origin_node_ = nullptr;
+    std::shared_ptr<const SourceInfo> source_info_;
 };
 
 class TypeUnknown final : public Type {

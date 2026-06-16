@@ -152,6 +152,17 @@ private:
     void VisitMatchSum(const ast::NodeExprMatch& node, const ast::TypeSum& scrutinee_type);
     void VisitMatchVariant(const ast::NodeExprMatch& node, const ast::TypeVariant& scrutinee_type);
 
+    // Helper for type substitution in generic types
+    std::shared_ptr<const ast::Type> SubstituteType(
+        std::shared_ptr<const ast::Type> type,
+        const std::unordered_map<std::string, std::shared_ptr<const ast::Type>>& subst);
+
+    // Helper for creating types with automatic NodeBase origin tracking
+    template<typename T, typename... Args>
+    std::shared_ptr<const T> CreateType(Args&&... args) {
+        return std::make_shared<const T>(std::forward<Args>(args)..., GetCurrentNode(), nullptr);
+    }
+
     std::vector<const ast::NodeBase*> current_node_stack_;
 
     NameContext<const ast::NodeBase> name_context_;

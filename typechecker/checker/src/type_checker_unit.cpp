@@ -9,7 +9,7 @@ namespace stella {
 namespace typecheck {
 
 void TypeChecker::VisitExprConstUnit(const ast::NodeExprConstUnit& node) {
-    SetDeducedType(node, {std::make_shared<ast::TypeUnit>()});
+    SetDeducedType(node, {CreateType<ast::TypeUnit>()});
 }
 
 } // namespace typecheck

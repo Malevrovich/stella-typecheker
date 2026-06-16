@@ -42,6 +42,9 @@ private:
 
 class TypeBool final : public Type {
 public:
+    TypeBool(const NodeBase* origin_node = nullptr,
+             std::shared_ptr<const SourceInfo> source_info = nullptr);
+
     void OutputTo(std::ostream& out) const override { out << "Bool"; }
     void Accept(TypeVisitor& visitor) const override;
 

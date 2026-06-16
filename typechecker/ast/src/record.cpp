@@ -16,8 +16,11 @@ NodeExprDotRecord::NodeExprDotRecord(std::shared_ptr<SourceInfo> source_info,
       label_(std::move(label)) {}
 
 TypeRecord::TypeRecord(std::optional<std::vector<Field>> fields,
-                       std::optional<std::string> duplicate_label)
-    : fields_(std::move(fields)),
+                       std::optional<std::string> duplicate_label,
+                       const NodeBase* origin_node,
+                       std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      fields_(std::move(fields)),
       duplicate_label_(std::move(duplicate_label)) {}
 
 std::shared_ptr<TypeRecord> TypeRecord::MakeSentinel() { return std::make_shared<TypeRecord>(); }

@@ -5,6 +5,10 @@
 namespace stella {
 namespace ast {
 
+TypeNat::TypeNat(const NodeBase* origin_node,
+                 std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)) {}
+
 NodeExprSucc::NodeExprSucc(std::shared_ptr<SourceInfo> source_info,
                            std::shared_ptr<const NodeExpr> operand)
     : NodeExpr(std::move(source_info)),

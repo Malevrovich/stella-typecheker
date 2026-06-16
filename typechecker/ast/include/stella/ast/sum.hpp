@@ -64,7 +64,10 @@ public:
     struct SentinelTag {};
 
     // Concrete sum type.
-    TypeSum(std::shared_ptr<const Type> left, std::shared_ptr<const Type> right);
+    TypeSum(std::shared_ptr<const Type> left,
+           std::shared_ptr<const Type> right,
+           const NodeBase* origin_node = nullptr,
+           std::shared_ptr<const SourceInfo> source_info = nullptr);
     // Family sentinel: "some sum type, left/right unknown".
     explicit TypeSum(SentinelTag) {}
     static std::shared_ptr<TypeSum> MakeSentinel();

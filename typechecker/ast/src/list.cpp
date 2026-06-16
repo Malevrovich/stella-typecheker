@@ -32,8 +32,11 @@ NodeExprIsEmpty::NodeExprIsEmpty(std::shared_ptr<SourceInfo> source_info,
     : NodeExpr(std::move(source_info)),
       list_(std::move(list)) {}
 
-TypeList::TypeList(std::shared_ptr<const Type> element_type)
-    : element_type_(std::move(element_type)) {}
+TypeList::TypeList(std::shared_ptr<const Type> element_type,
+                   const NodeBase* origin_node,
+                   std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      element_type_(std::move(element_type)) {}
 
 std::shared_ptr<TypeList> TypeList::MakeSentinel() {
     return std::make_shared<TypeList>(TypeList::SentinelTag{});

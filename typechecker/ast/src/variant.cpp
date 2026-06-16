@@ -21,8 +21,12 @@ NodePatternVariant::NodePatternVariant(std::shared_ptr<SourceInfo> source_info, 
 
 void NodePatternVariant::Accept(NodeVisitor& visitor) const { visitor.VisitPatternVariant(*this); }
 
-TypeVariant::TypeVariant(std::vector<Field> fields, std::optional<std::string> duplicate_label)
-    : fields_(std::move(fields)),
+TypeVariant::TypeVariant(std::vector<Field> fields,
+                         std::optional<std::string> duplicate_label,
+                         const NodeBase* origin_node,
+                         std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      fields_(std::move(fields)),
       duplicate_label_(std::move(duplicate_label)) {}
 
 std::shared_ptr<TypeVariant> TypeVariant::MakeSentinel() {

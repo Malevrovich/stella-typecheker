@@ -13,42 +13,42 @@ namespace stella {
 namespace typecheck {
 
 void TypeChecker::VisitExprConstInt(const ast::NodeExprConstInt& node) {
-    SetDeducedType(node, {std::make_shared<ast::TypeNat>()});
+    SetDeducedType(node, {CreateType<ast::TypeNat>()});
 }
 
 void TypeChecker::VisitExprIsZero(const ast::NodeExprIsZero& node) {
-    SetProvisionalType(node, {std::make_shared<ast::TypeBool>()});
+    SetProvisionalType(node, {CreateType<ast::TypeBool>()});
 
     const auto& operand = node.GetOperand();
-    ExpectType(*operand, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
+    ExpectType(*operand, ExpectedType::EqualsTo(CreateType<ast::TypeNat>()));
     Visit(*operand);
 
-    SetDeducedType(node, {std::make_shared<ast::TypeBool>()});
+    SetDeducedType(node, {CreateType<ast::TypeBool>()});
 }
 
 void TypeChecker::VisitExprSucc(const ast::NodeExprSucc& node) {
-    SetProvisionalType(node, {std::make_shared<ast::TypeNat>()});
+    SetProvisionalType(node, {CreateType<ast::TypeNat>()});
 
     const auto& operand = node.GetOperand();
-    ExpectType(*operand, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
+    ExpectType(*operand, ExpectedType::EqualsTo(CreateType<ast::TypeNat>()));
     Visit(*operand);
 
-    SetDeducedType(node, {std::make_shared<ast::TypeNat>()});
+    SetDeducedType(node, {CreateType<ast::TypeNat>()});
 }
 
 void TypeChecker::VisitExprPred(const ast::NodeExprPred& node) {
-    SetProvisionalType(node, {std::make_shared<ast::TypeNat>()});
+    SetProvisionalType(node, {CreateType<ast::TypeNat>()});
 
     const auto& operand = node.GetOperand();
-    ExpectType(*operand, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
+    ExpectType(*operand, ExpectedType::EqualsTo(CreateType<ast::TypeNat>()));
     Visit(*operand);
 
-    SetDeducedType(node, {std::make_shared<ast::TypeNat>()});
+    SetDeducedType(node, {CreateType<ast::TypeNat>()});
 }
 
 void TypeChecker::VisitExprNatRec(const ast::NodeExprNatRec& node) {
     const auto& n = node.GetN();
-    ExpectType(*n, ExpectedType::EqualsTo(std::make_shared<ast::TypeNat>()));
+    ExpectType(*n, ExpectedType::EqualsTo(CreateType<ast::TypeNat>()));
     Visit(*n);
 
     const auto& initial = node.GetInitial();
@@ -67,8 +67,8 @@ void TypeChecker::VisitExprNatRec(const ast::NodeExprNatRec& node) {
 
     const auto& step = node.GetStep();
     const auto& step_type =
-        std::make_shared<ast::TypeFun>(std::make_shared<ast::TypeNat>(),
-                                       std::make_shared<ast::TypeFun>(deduced_type, deduced_type));
+        CreateType<ast::TypeFun>(CreateType<ast::TypeNat>(),
+                                       CreateType<ast::TypeFun>(deduced_type, deduced_type));
     // Use ERROR_UNEXPECTED_TYPE_FOR_EXPRESSION (not ERROR_NOT_A_FUNCTION) because
     // this is a type-mismatch at a specific argument position, not a function-call context.
     ExpectType(*step,

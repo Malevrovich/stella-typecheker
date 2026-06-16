@@ -13,7 +13,9 @@ namespace ast {
 
 class TypeVar final : public Type {
 public:
-    explicit TypeVar(std::string name);
+    TypeVar(std::string name,
+           const NodeBase* origin_node = nullptr,
+           std::shared_ptr<const SourceInfo> source_info = nullptr);
 
     void OutputTo(std::ostream& out) const override;
     void Accept(TypeVisitor& visitor) const override;
@@ -35,7 +37,10 @@ public:
     struct SentinelTag {};
 
     // Concrete forall type: forall T1, T2. T
-    TypeForAll(std::vector<std::string> type_params, std::shared_ptr<const Type> body);
+    TypeForAll(std::vector<std::string> type_params,
+               std::shared_ptr<const Type> body,
+               const NodeBase* origin_node = nullptr,
+               std::shared_ptr<const SourceInfo> source_info = nullptr);
 
     explicit TypeForAll(SentinelTag) {}
     static std::shared_ptr<TypeForAll> MakeSentinel();

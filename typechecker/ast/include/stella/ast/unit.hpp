@@ -16,6 +16,9 @@ public:
 
 class TypeUnit final : public Type {
 public:
+    TypeUnit(const NodeBase* origin_node = nullptr,
+             std::shared_ptr<const SourceInfo> source_info = nullptr);
+
     void OutputTo(std::ostream& out) const override { out << "Unit"; }
     void Accept(TypeVisitor& visitor) const override;
 

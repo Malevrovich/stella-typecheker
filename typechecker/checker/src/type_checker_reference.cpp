@@ -45,7 +45,7 @@ void TypeChecker::VisitExprRef(const ast::NodeExprRef& node) {
         }
     }
 
-    SetDeducedType(node, {std::make_shared<ast::TypeRef>(inner_type)});
+    SetDeducedType(node, {CreateType<ast::TypeRef>(inner_type)});
 }
 
 void TypeChecker::VisitExprDeref(const ast::NodeExprDeref& node) {
@@ -65,7 +65,7 @@ void TypeChecker::VisitExprDeref(const ast::NodeExprDeref& node) {
     // be accepted where {a} is expected via *n.
     if (concrete_inner && !HasExtension("#structural-subtyping")) {
         ExpectType(*expr, ExpectedType::EqualsTo(
-                              std::make_shared<ast::TypeRef>(concrete_inner),
+                              CreateType<ast::TypeRef>(concrete_inner),
                               ErrorCode::ERROR_NOT_A_REFERENCE));
     } else {
         ExpectType(*expr, ExpectedType::EqualsTo(ast::TypeRef::MakeSentinel(),
@@ -98,7 +98,7 @@ void TypeChecker::VisitExprAssign(const ast::NodeExprAssign& node) {
     ExpectType(*rhs, ExpectedType::EqualsTo(ref_type->GetInnerType()));
     Visit(*rhs);
 
-    SetDeducedType(node, {std::make_shared<ast::TypeUnit>()});
+    SetDeducedType(node, {CreateType<ast::TypeUnit>()});
 }
 
 void TypeChecker::VisitExprConstMemory(const ast::NodeExprConstMemory& node) {
@@ -121,7 +121,7 @@ void TypeChecker::VisitExprConstMemory(const ast::NodeExprConstMemory& node) {
                             exp->ToString()),
             });
         }
-        SetAmbiguousOrError(node, std::make_shared<ast::TypeRef>(ast::TypeBottom::Get()),
+        SetAmbiguousOrError(node, CreateType<ast::TypeRef>(ast::TypeBottom::Get()),
                             ErrorCode::ERROR_AMBIGUOUS_REFERENCE_TYPE,
                             std::format("Cannot determine concrete reference type of memory address"
                                         " (context expects: {})",
@@ -129,7 +129,7 @@ void TypeChecker::VisitExprConstMemory(const ast::NodeExprConstMemory& node) {
         return;
     }
 
-    SetAmbiguousOrError(node, std::make_shared<ast::TypeRef>(ast::TypeBottom::Get()),
+    SetAmbiguousOrError(node, CreateType<ast::TypeRef>(ast::TypeBottom::Get()),
                         ErrorCode::ERROR_AMBIGUOUS_REFERENCE_TYPE,
                         "Cannot determine type of memory address: no type context provided");
 }

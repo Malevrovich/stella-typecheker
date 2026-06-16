@@ -12,16 +12,16 @@ namespace stella {
 namespace typecheck {
 
 void TypeChecker::VisitExprConstFalse(const ast::NodeExprConstFalse& node) {
-    SetDeducedType(node, {std::make_shared<ast::TypeBool>()});
+    SetDeducedType(node, {CreateType<ast::TypeBool>()});
 }
 
 void TypeChecker::VisitExprConstTrue(const ast::NodeExprConstTrue& node) {
-    SetDeducedType(node, {std::make_shared<ast::TypeBool>()});
+    SetDeducedType(node, {CreateType<ast::TypeBool>()});
 }
 
 void TypeChecker::VisitExprIf(const ast::NodeExprIf& node) {
     const auto& condition = node.GetCondition();
-    ExpectType(*condition, ExpectedType::EqualsTo(std::make_shared<ast::TypeBool>()));
+    ExpectType(*condition, ExpectedType::EqualsTo(CreateType<ast::TypeBool>()));
     Visit(*condition);
 
     const auto& then_branch = node.GetThenBranch();

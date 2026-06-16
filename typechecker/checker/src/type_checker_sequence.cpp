@@ -12,7 +12,7 @@ void TypeChecker::VisitExprSequence(const ast::NodeExprSequence& node) {
     const auto& expr2 = node.GetExpr2();
 
     // expr1 must have type Unit
-    ExpectType(*expr1, ExpectedType::EqualsTo(std::make_shared<ast::TypeUnit>()));
+    ExpectType(*expr1, ExpectedType::EqualsTo(CreateType<ast::TypeUnit>()));
     Visit(*expr1);
 
     // expr2 inherits the expected type from the sequence node

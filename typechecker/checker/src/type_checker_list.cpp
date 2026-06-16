@@ -21,7 +21,7 @@ void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
     }
 
     if (!element_type && node.GetElements().empty()) {
-        SetAmbiguousOrError(node, std::make_shared<ast::TypeList>(ast::TypeBottom::Get()),
+        SetAmbiguousOrError(node, CreateType<ast::TypeList>(ast::TypeBottom::Get()),
                             ErrorCode::ERROR_AMBIGUOUS_LIST,
                             "Cannot determine element type of empty list literal");
         return;
@@ -38,7 +38,7 @@ void TypeChecker::VisitExprList(const ast::NodeExprList& node) {
         }
     }
 
-    SetDeducedType(node, {std::make_shared<ast::TypeList>(element_type)});
+    SetDeducedType(node, {CreateType<ast::TypeList>(element_type)});
 }
 
 void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
@@ -60,7 +60,7 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
     if (element_type) {
         ExpectType(*head, ExpectedType::EqualsTo(element_type));
         // Phase 2: refine to concrete list type (overwrites the sentinel expectation).
-        ExpectType(*tail, ExpectedType::EqualsTo(std::make_shared<ast::TypeList>(element_type)));
+        ExpectType(*tail, ExpectedType::EqualsTo(CreateType<ast::TypeList>(element_type)));
     }
 
     Visit(*head);
@@ -68,7 +68,7 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
     if (!element_type) {
         element_type = types_storage_.get<DeducedType>(head.get()).type;
         // Phase 2: refine after deducing head type.
-        ExpectType(*tail, ExpectedType::EqualsTo(std::make_shared<ast::TypeList>(element_type)));
+        ExpectType(*tail, ExpectedType::EqualsTo(CreateType<ast::TypeList>(element_type)));
     }
 
     Visit(*tail);
@@ -80,7 +80,7 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
         if (HasExtension("#type-reconstruction") &&
             std::dynamic_pointer_cast<const ast::TypeAuto>(tail_deduced)) {
             auto list_var = unifier_.FreshTypeVar();
-            auto new_list_type = std::make_shared<ast::TypeList>(element_type);
+            auto new_list_type = CreateType<ast::TypeList>(element_type);
             unifier_.AddConstraint(tail_deduced, new_list_type, &node);
             unifier_.SaveNewType(new_list_type);
             SetDeducedType(node, {new_list_type});
@@ -89,7 +89,7 @@ void TypeChecker::VisitExprConsList(const ast::NodeExprConsList& node) {
         OnInternalError("Unexpected cons tail deduction type");
     }
 
-    SetDeducedType(node, {std::make_shared<ast::TypeList>(element_type)});
+    SetDeducedType(node, {CreateType<ast::TypeList>(element_type)});
 }
 
 void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
@@ -101,7 +101,7 @@ void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
 
     if (exact_element_type && !exact_element_type->IsSentinel()) {
         ExpectType(*list,
-                   ExpectedType::EqualsTo(std::make_shared<ast::TypeList>(exact_element_type)));
+                   ExpectedType::EqualsTo(CreateType<ast::TypeList>(exact_element_type)));
     } else {
         ExpectType(*list, ExpectedType::EqualsTo(ast::TypeList::MakeSentinel()));
     }
@@ -115,7 +115,7 @@ void TypeChecker::VisitExprHead(const ast::NodeExprHead& node) {
         if (HasExtension("#type-reconstruction") &&
             std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
             auto elem_var = unifier_.FreshTypeVar();
-            auto new_list_type = std::make_shared<ast::TypeList>(elem_var);
+            auto new_list_type = CreateType<ast::TypeList>(elem_var);
             unifier_.AddConstraint(list_deduced, new_list_type, &node);
             unifier_.SaveNewType(new_list_type);
             SetDeducedType(node, {elem_var});
@@ -149,7 +149,7 @@ void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
         if (HasExtension("#type-reconstruction") &&
             std::dynamic_pointer_cast<const ast::TypeAuto>(list_deduced)) {
             auto elem_var = unifier_.FreshTypeVar();
-            auto inferred_list = std::make_shared<ast::TypeList>(elem_var);
+            auto inferred_list = CreateType<ast::TypeList>(elem_var);
             unifier_.AddConstraint(list_deduced, inferred_list, &node);
             unifier_.SaveNewType(inferred_list);
             SetDeducedType(node, {inferred_list});
@@ -162,13 +162,13 @@ void TypeChecker::VisitExprTail(const ast::NodeExprTail& node) {
 }
 
 void TypeChecker::VisitExprIsEmpty(const ast::NodeExprIsEmpty& node) {
-    SetProvisionalType(node, {std::make_shared<ast::TypeBool>()});
+    SetProvisionalType(node, {CreateType<ast::TypeBool>()});
 
     const auto& list = node.GetList();
     ExpectType(*list, ExpectedType::EqualsTo(ast::TypeList::MakeSentinel()));
     Visit(*list);
 
-    SetDeducedType(node, {std::make_shared<ast::TypeBool>()});
+    SetDeducedType(node, {CreateType<ast::TypeBool>()});
 }
 
 } // namespace typecheck

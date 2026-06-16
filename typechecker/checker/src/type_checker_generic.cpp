@@ -26,8 +26,22 @@ namespace {
 
 using Subst = std::unordered_map<std::string, std::shared_ptr<const ast::Type>>;
 
-std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type> type,
-                                                const Subst& subst) {
+} // namespace
+
+void TypeChecker::VisitTypeVar(const ast::TypeVar& type) {
+    if (!type_var_context_.TryGet(type.GetName())) {
+        OnError(TypeCheckTypeError{
+            ErrorCode::ERROR_UNDEFINED_TYPE_VARIABLE,
+            type,
+            std::format("Undefined type variable '{}'", type.GetName()),
+        });
+    }
+    // Types have no DeducedType — just validate.
+}
+
+std::shared_ptr<const ast::Type> TypeChecker::SubstituteType(
+    std::shared_ptr<const ast::Type> type,
+    const std::unordered_map<std::string, std::shared_ptr<const ast::Type>>& subst) {
     if (subst.empty())
         return type;
 
@@ -41,7 +55,7 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
     if (const auto* tf = dynamic_cast<const ast::TypeFun*>(type.get())) {
         if (tf->IsSentinel())
             return type;
-        return std::make_shared<ast::TypeFun>(SubstituteType(tf->GetArgType(), subst),
+        return CreateType<ast::TypeFun>(SubstituteType(tf->GetArgType(), subst),
                                               SubstituteType(tf->GetReturnType(), subst));
     }
 
@@ -49,18 +63,18 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
         if (tfa->IsSentinel())
             return type;
         // Remove shadowed params from subst
-        Subst inner_subst = subst;
+        std::unordered_map<std::string, std::shared_ptr<const ast::Type>> inner_subst = subst;
         for (const auto& param : tfa->GetTypeParams()) {
             inner_subst.erase(param);
         }
-        return std::make_shared<ast::TypeForAll>(tfa->GetTypeParams(),
+        return CreateType<ast::TypeForAll>(tfa->GetTypeParams(),
                                                  SubstituteType(tfa->GetBody(), inner_subst));
     }
 
     if (const auto* tl = dynamic_cast<const ast::TypeList*>(type.get())) {
         if (tl->IsSentinel())
             return type;
-        return std::make_shared<ast::TypeList>(SubstituteType(tl->GetElementType(), subst));
+        return CreateType<ast::TypeList>(SubstituteType(tl->GetElementType(), subst));
     }
 
     if (const auto* tt = dynamic_cast<const ast::TypeTuple*>(type.get())) {
@@ -74,7 +88,7 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
         for (const auto& e : *elems) {
             new_elems.push_back(SubstituteType(e, subst));
         }
-        return std::make_shared<ast::TypeTuple>(std::move(new_elems));
+        return CreateType<ast::TypeTuple>(std::move(new_elems));
     }
 
     if (const auto* tr = dynamic_cast<const ast::TypeRecord*>(type.get())) {
@@ -86,13 +100,13 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
         for (const auto& f : *fields) {
             new_fields.push_back({f.label, SubstituteType(f.type, subst)});
         }
-        return std::make_shared<ast::TypeRecord>(std::move(new_fields));
+        return CreateType<ast::TypeRecord>(std::move(new_fields), std::nullopt);
     }
 
     if (const auto* ts = dynamic_cast<const ast::TypeSum*>(type.get())) {
         if (ts->IsSentinel())
             return type;
-        return std::make_shared<ast::TypeSum>(SubstituteType(ts->GetLeft(), subst),
+        return CreateType<ast::TypeSum>(SubstituteType(ts->GetLeft(), subst),
                                               SubstituteType(ts->GetRight(), subst));
     }
 
@@ -109,30 +123,17 @@ std::shared_ptr<const ast::Type> SubstituteType(std::shared_ptr<const ast::Type>
             }
             new_fields.push_back({f.label, new_type});
         }
-        return std::make_shared<ast::TypeVariant>(std::move(new_fields));
+        return CreateType<ast::TypeVariant>(std::move(new_fields), std::nullopt);
     }
 
     if (const auto* tref = dynamic_cast<const ast::TypeRef*>(type.get())) {
         if (tref->IsSentinel())
             return type;
-        return std::make_shared<ast::TypeRef>(SubstituteType(tref->GetInnerType(), subst));
+        return CreateType<ast::TypeRef>(SubstituteType(tref->GetInnerType(), subst));
     }
 
     // Leaves: TypeNat, TypeBool, TypeUnit, TypeTop, TypeBottom, TypeUnknown, TypeAuto — no subst
     return type;
-}
-
-} // namespace
-
-void TypeChecker::VisitTypeVar(const ast::TypeVar& type) {
-    if (!type_var_context_.TryGet(type.GetName())) {
-        OnError(TypeCheckTypeError{
-            ErrorCode::ERROR_UNDEFINED_TYPE_VARIABLE,
-            type,
-            std::format("Undefined type variable '{}'", type.GetName()),
-        });
-    }
-    // Types have no DeducedType — just validate.
 }
 
 void TypeChecker::VisitTypeForAll(const ast::TypeForAll& type) {
@@ -140,12 +141,12 @@ void TypeChecker::VisitTypeForAll(const ast::TypeForAll& type) {
         return;
 
     // Push type params into scope, keeping the TypeVar objects alive in a local vector.
-    std::vector<std::shared_ptr<ast::TypeVar>> type_var_nodes;
+    std::vector<std::shared_ptr<const ast::TypeVar>> type_var_nodes;
     std::vector<NameContext<const ast::TypeVar>::NameContextGuard> tv_guards;
     type_var_nodes.reserve(type.GetTypeParams().size());
     tv_guards.reserve(type.GetTypeParams().size());
     for (const auto& param : type.GetTypeParams()) {
-        type_var_nodes.push_back(std::make_shared<ast::TypeVar>(param));
+        type_var_nodes.push_back(CreateType<ast::TypeVar>(param));
         tv_guards.push_back(type_var_context_.Push(param, *type_var_nodes.back()));
     }
 
@@ -159,12 +160,12 @@ void TypeChecker::VisitDeclFunGeneric(const ast::NodeDeclFunGeneric& node) {
     const auto& type_params = node.GetTypeParams();
 
     // Push type params into type_var_context_
-    std::vector<std::shared_ptr<ast::TypeVar>> type_var_nodes;
+    std::vector<std::shared_ptr<const ast::TypeVar>> type_var_nodes;
     std::vector<NameContext<const ast::TypeVar>::NameContextGuard> tv_guards;
     type_var_nodes.reserve(type_params.size());
     tv_guards.reserve(type_params.size());
     for (const auto& param : type_params) {
-        type_var_nodes.push_back(std::make_shared<ast::TypeVar>(param));
+        type_var_nodes.push_back(CreateType<ast::TypeVar>(param));
         tv_guards.push_back(type_var_context_.Push(param, *type_var_nodes.back()));
     }
 
@@ -179,9 +180,9 @@ void TypeChecker::VisitDeclFunGeneric(const ast::NodeDeclFunGeneric& node) {
     {
         auto param_type = types_storage_.get<DeducedType>(param.get()).type;
         auto return_type = node.GetReturnType();
-        auto fn_type = std::make_shared<const ast::TypeFun>(param_type, return_type);
+        auto fn_type = CreateType<ast::TypeFun>(param_type, return_type);
         types_storage_.set<DeducedType>(
-            &node, {std::make_shared<const ast::TypeForAll>(type_params, fn_type)});
+            &node, {CreateType<ast::TypeForAll>(type_params, fn_type)});
     }
 
     auto name_guard = name_context_.Push(std::string{param->GetName()}, *param);
@@ -202,9 +203,9 @@ void TypeChecker::VisitDeclFunGeneric(const ast::NodeDeclFunGeneric& node) {
     auto param_type = types_storage_.get<DeducedType>(param.get()).type;
     auto body_type = types_storage_.get<DeducedType>(body.get()).type;
     auto fn_type =
-        std::make_shared<const ast::TypeFun>(std::move(param_type), std::move(body_type));
+        CreateType<ast::TypeFun>(std::move(param_type), std::move(body_type));
     SetDeducedType(node,
-                   {std::make_shared<const ast::TypeForAll>(type_params, std::move(fn_type))});
+                   {CreateType<ast::TypeForAll>(type_params, std::move(fn_type))});
 
     // tv_guards destruct → Pop type params
 }
@@ -214,12 +215,12 @@ void TypeChecker::VisitExprTypeAbstraction(const ast::NodeExprTypeAbstraction& n
 
     const auto& type_params = node.GetTypeParams();
 
-    std::vector<std::shared_ptr<ast::TypeVar>> type_var_nodes;
+    std::vector<std::shared_ptr<const ast::TypeVar>> type_var_nodes;
     std::vector<NameContext<const ast::TypeVar>::NameContextGuard> tv_guards;
     type_var_nodes.reserve(type_params.size());
     tv_guards.reserve(type_params.size());
     for (const auto& param : type_params) {
-        type_var_nodes.push_back(std::make_shared<ast::TypeVar>(param));
+        type_var_nodes.push_back(CreateType<ast::TypeVar>(param));
         tv_guards.push_back(type_var_context_.Push(param, *type_var_nodes.back()));
     }
 
@@ -228,7 +229,7 @@ void TypeChecker::VisitExprTypeAbstraction(const ast::NodeExprTypeAbstraction& n
 
     auto body_type = types_storage_.get<DeducedType>(body.get()).type;
     SetDeducedType(node,
-                   {std::make_shared<const ast::TypeForAll>(type_params, std::move(body_type))});
+                   {CreateType<ast::TypeForAll>(type_params, std::move(body_type))});
 
     // tv_guards destruct → Pop type params
 }

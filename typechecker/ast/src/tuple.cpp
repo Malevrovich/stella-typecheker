@@ -16,8 +16,11 @@ NodeExprDotTuple::NodeExprDotTuple(std::shared_ptr<SourceInfo> source_info,
       expr_(std::move(expr)),
       index_(index) {}
 
-TypeTuple::TypeTuple(std::vector<std::shared_ptr<const Type>> element_types)
-    : element_types_(std::move(element_types)) {}
+TypeTuple::TypeTuple(std::vector<std::shared_ptr<const Type>> element_types,
+                     const NodeBase* origin_node,
+                     std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      element_types_(std::move(element_types)) {}
 
 std::shared_ptr<TypeTuple> TypeTuple::MakeSentinel() {
     return std::make_shared<TypeTuple>(TypeTuple::SentinelTag{});

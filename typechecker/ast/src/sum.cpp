@@ -25,8 +25,12 @@ NodePatternInr::NodePatternInr(std::shared_ptr<SourceInfo> source_info,
     : NodePattern(std::move(source_info)),
       pattern_(std::move(pattern)) {}
 
-TypeSum::TypeSum(std::shared_ptr<const Type> left, std::shared_ptr<const Type> right)
-    : left_(std::move(left)),
+TypeSum::TypeSum(std::shared_ptr<const Type> left,
+                 std::shared_ptr<const Type> right,
+                 const NodeBase* origin_node,
+                 std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)),
+      left_(std::move(left)),
       right_(std::move(right)) {}
 
 std::shared_ptr<TypeSum> TypeSum::MakeSentinel() {

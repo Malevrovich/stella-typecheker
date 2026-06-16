@@ -13,6 +13,7 @@ STDOUT:
 STDERR:
 ERROR_DUPLICATE_RECORD_TYPE_FIELDS:
 Error type: {x : Nat, x : Bool}
+  Type from source: <unknown>:5:17
 Duplicate field 'x' in record type
 
 EXIT_CODE: 1

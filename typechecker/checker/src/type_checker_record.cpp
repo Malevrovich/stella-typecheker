@@ -51,7 +51,7 @@ void TypeChecker::VisitExprRecord(const ast::NodeExprRecord& node) {
         for (const auto& field : node.GetFields()) {
             unknown_fields.push_back({field.label, std::make_shared<ast::TypeUnknown>()});
         }
-        auto unknown_record_type = std::make_shared<ast::TypeRecord>(std::move(unknown_fields));
+        auto unknown_record_type = CreateType<ast::TypeRecord>(std::move(unknown_fields), std::nullopt);
         if (has_concrete_expected) {
             auto error = CheckCompatible(unknown_record_type, expected_record_type);
             if (error) {
@@ -83,7 +83,7 @@ void TypeChecker::VisitExprRecord(const ast::NodeExprRecord& node) {
             {field.label, types_storage_.get<DeducedType>(field.expr.get()).type});
     }
 
-    SetDeducedType(node, {std::make_shared<ast::TypeRecord>(std::move(deduced_fields))});
+    SetDeducedType(node, {CreateType<ast::TypeRecord>(std::move(deduced_fields), std::nullopt)});
 }
 
 void TypeChecker::VisitExprDotRecord(const ast::NodeExprDotRecord& node) {

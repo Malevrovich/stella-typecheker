@@ -25,7 +25,7 @@ void TypeChecker::VisitExprInl(const ast::NodeExprInl& node) {
         Visit(*inner);
         const auto inner_type = types_storage_.get<DeducedType>(inner.get()).type;
         SetAmbiguousOrError(
-            node, std::make_shared<ast::TypeSum>(inner_type, ast::TypeBottom::Get()),
+            node, CreateType<ast::TypeSum>(inner_type, ast::TypeBottom::Get()),
             ErrorCode::ERROR_AMBIGUOUS_SUM_TYPE,
             "Cannot determine sum type for inl injection: no expected type provided");
         return;
@@ -49,7 +49,7 @@ void TypeChecker::VisitExprInr(const ast::NodeExprInr& node) {
         Visit(*inner);
         const auto inner_type = types_storage_.get<DeducedType>(inner.get()).type;
         SetAmbiguousOrError(
-            node, std::make_shared<ast::TypeSum>(ast::TypeBottom::Get(), inner_type),
+            node, CreateType<ast::TypeSum>(ast::TypeBottom::Get(), inner_type),
             ErrorCode::ERROR_AMBIGUOUS_SUM_TYPE,
             "Cannot determine sum type for inr injection: no expected type provided");
         return;

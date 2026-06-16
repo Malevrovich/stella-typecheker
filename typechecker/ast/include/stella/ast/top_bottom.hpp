@@ -8,6 +8,9 @@ namespace ast {
 
 class TypeTop final : public Type {
 public:
+    TypeTop(const NodeBase* origin_node = nullptr,
+            std::shared_ptr<const SourceInfo> source_info = nullptr);
+
     void OutputTo(std::ostream& out) const override { out << "Top"; }
     void Accept(TypeVisitor& visitor) const override;
 
@@ -21,6 +24,9 @@ protected:
 
 class TypeBottom final : public Type {
 public:
+    TypeBottom(const NodeBase* origin_node = nullptr,
+               std::shared_ptr<const SourceInfo> source_info = nullptr);
+
     static std::shared_ptr<TypeBottom> Get() {
         static auto instance = std::make_shared<TypeBottom>();
         return instance;

@@ -95,7 +95,10 @@ public:
     struct SentinelTag {};
 
     // Concrete function type.
-    TypeFun(std::shared_ptr<const Type> arg_type, std::shared_ptr<const Type> return_type);
+    TypeFun(std::shared_ptr<const Type> arg_type,
+            std::shared_ptr<const Type> return_type,
+            const NodeBase* origin_node = nullptr,
+            std::shared_ptr<const SourceInfo> source_info = nullptr);
     // Family sentinel: "some function, argument/return types unknown".
     explicit TypeFun(SentinelTag) {}
     static std::shared_ptr<TypeFun> MakeSentinel();

@@ -131,11 +131,11 @@ private:
     }
 
     antlrcpp::Any visitTypeNat(antlr4_stella::StellaParser::TypeNatContext* ctx) override {
-        return type(std::make_shared<const ast::TypeNat>());
+        return type(std::make_shared<const ast::TypeNat>(nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeBool(antlr4_stella::StellaParser::TypeBoolContext* ctx) override {
-        return type(std::make_shared<const ast::TypeBool>());
+        return type(std::make_shared<const ast::TypeBool>(nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeFun(antlr4_stella::StellaParser::TypeFunContext* ctx) override {
@@ -147,7 +147,7 @@ private:
         auto param_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->paramTypes[0]));
         auto return_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->returnType));
 
-        return type(std::make_shared<const ast::TypeFun>(param_type, return_type));
+        return type(std::make_shared<const ast::TypeFun>(param_type, return_type, nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeForAll(antlr4_stella::StellaParser::TypeForAllContext* ctx) override {
@@ -158,27 +158,27 @@ private:
 
         auto body = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
 
-        return type(std::make_shared<const ast::TypeForAll>(std::move(type_params), body));
+        return type(std::make_shared<const ast::TypeForAll>(std::move(type_params), body, nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeUnit(antlr4_stella::StellaParser::TypeUnitContext* ctx) override {
-        return type(std::make_shared<const ast::TypeUnit>());
+        return type(std::make_shared<const ast::TypeUnit>(nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeTop(antlr4_stella::StellaParser::TypeTopContext* ctx) override {
-        return type(std::make_shared<const ast::TypeTop>());
+        return type(std::make_shared<const ast::TypeTop>(nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeBottom(antlr4_stella::StellaParser::TypeBottomContext* ctx) override {
-        return type(std::make_shared<const ast::TypeBottom>());
+        return type(std::make_shared<const ast::TypeBottom>(nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeAuto(antlr4_stella::StellaParser::TypeAutoContext* ctx) override {
-        return type(std::make_shared<const ast::TypeAuto>());
+        return type(std::make_shared<const ast::TypeAuto>(nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTypeVar(antlr4_stella::StellaParser::TypeVarContext* ctx) override {
-        return type(std::make_shared<const ast::TypeVar>(ctx->name->getText()));
+        return type(std::make_shared<const ast::TypeVar>(ctx->name->getText(), nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitConstTrue(antlr4_stella::StellaParser::ConstTrueContext* ctx) override {
@@ -350,7 +350,7 @@ private:
 
     antlrcpp::Any visitTypeList(antlr4_stella::StellaParser::TypeListContext* ctx) override {
         auto element_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
-        return type(std::make_shared<const ast::TypeList>(element_type));
+        return type(std::make_shared<const ast::TypeList>(element_type, nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitList(antlr4_stella::StellaParser::ListContext* ctx) override {
@@ -388,7 +388,7 @@ private:
             element_types.push_back(
                 try_any_cast<std::shared_ptr<const ast::Type>>(visit(type_ctx)));
         }
-        return type(std::make_shared<const ast::TypeTuple>(std::move(element_types)));
+        return type(std::make_shared<const ast::TypeTuple>(std::move(element_types), nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitTuple(antlr4_stella::StellaParser::TupleContext* ctx) override {
@@ -419,7 +419,7 @@ private:
             fields.push_back({label, std::move(field_type)});
         }
         return type(
-            std::make_shared<const ast::TypeRecord>(std::move(fields), std::move(duplicate_label)));
+            std::make_shared<const ast::TypeRecord>(std::move(fields), std::move(duplicate_label), nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitRecord(antlr4_stella::StellaParser::RecordContext* ctx) override {
@@ -443,7 +443,7 @@ private:
     antlrcpp::Any visitTypeSum(antlr4_stella::StellaParser::TypeSumContext* ctx) override {
         auto left = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->left));
         auto right = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->right));
-        return type(std::make_shared<const ast::TypeSum>(left, right));
+        return type(std::make_shared<const ast::TypeSum>(left, right, nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitInl(antlr4_stella::StellaParser::InlContext* ctx) override {
@@ -500,7 +500,7 @@ private:
             fields.push_back({label, std::move(field_type)});
         }
         return type(std::make_shared<const ast::TypeVariant>(std::move(fields),
-                                                             std::move(duplicate_label)));
+                                                             std::move(duplicate_label), nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitVariant(antlr4_stella::StellaParser::VariantContext* ctx) override {
@@ -623,7 +623,7 @@ private:
 
     antlrcpp::Any visitTypeRef(antlr4_stella::StellaParser::TypeRefContext* ctx) override {
         auto inner_type = try_any_cast<std::shared_ptr<const ast::Type>>(visit(ctx->type_));
-        return type(std::make_shared<const ast::TypeRef>(inner_type));
+        return type(std::make_shared<const ast::TypeRef>(inner_type, nullptr, GetSourceInfo(ctx, stream_)));
     }
 
     antlrcpp::Any visitRef(antlr4_stella::StellaParser::RefContext* ctx) override {

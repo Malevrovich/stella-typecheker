@@ -76,6 +76,9 @@ private:
 
 class TypeNat final : public Type {
 public:
+    TypeNat(const NodeBase* origin_node = nullptr,
+            std::shared_ptr<const SourceInfo> source_info = nullptr);
+
     void OutputTo(std::ostream& out) const override { out << "Nat"; }
     void Accept(TypeVisitor& visitor) const override;
 

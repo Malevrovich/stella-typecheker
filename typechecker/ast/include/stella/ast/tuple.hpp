@@ -42,7 +42,9 @@ public:
     struct SentinelTag {};
 
     // Concrete tuple type (may have zero elements — that is valid Stella).
-    explicit TypeTuple(std::vector<std::shared_ptr<const Type>> element_types);
+    TypeTuple(std::vector<std::shared_ptr<const Type>> element_types,
+              const NodeBase* origin_node = nullptr,
+              std::shared_ptr<const SourceInfo> source_info = nullptr);
     // Family sentinel: "some tuple, element types unknown".
     explicit TypeTuple(SentinelTag) {}
     static std::shared_ptr<TypeTuple> MakeSentinel();

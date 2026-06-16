@@ -31,7 +31,7 @@ void TypeChecker::VisitDeclFun(const ast::NodeDeclFun& node) {
         auto param_type = types_storage_.get<DeducedType>(param.get()).type;
         auto return_type = node.GetReturnType();
         types_storage_.set<DeducedType>(
-            &node, {std::make_shared<const ast::TypeFun>(param_type, return_type)});
+            &node, {CreateType<ast::TypeFun>(param_type, return_type)});
     }
 
     auto name_guard = name_context_.Push(std::string{param->GetName()}, *param);
@@ -53,7 +53,7 @@ void TypeChecker::VisitDeclFun(const ast::NodeDeclFun& node) {
     auto param_type = types_storage_.get<DeducedType>(param.get()).type;
     auto body_type = types_storage_.get<DeducedType>(body.get()).type;
     SetDeducedType(
-        node, {std::make_shared<const ast::TypeFun>(std::move(param_type), std::move(body_type))});
+        node, {CreateType<ast::TypeFun>(std::move(param_type), std::move(body_type))});
 }
 
 void TypeChecker::VisitParamDecl(const ast::NodeParamDecl& node) {
@@ -105,7 +105,7 @@ void TypeChecker::VisitExprAbstraction(const ast::NodeExprAbstraction& node) {
     auto param_type = types_storage_.get<DeducedType>(param.get()).type;
     auto body_type = types_storage_.get<DeducedType>(body.get()).type;
     SetDeducedType(node,
-                   {std::make_shared<ast::TypeFun>(std::move(param_type), std::move(body_type))});
+                   {CreateType<ast::TypeFun>(std::move(param_type), std::move(body_type))});
 }
 
 void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
@@ -118,7 +118,7 @@ void TypeChecker::VisitExprFix(const ast::NodeExprFix& node) {
         const auto expected_type_type = exp->GetType();
         const auto expected_fun = std::dynamic_pointer_cast<const ast::TypeFun>(expected_type_type);
         if (expected_fun && !expected_fun->IsSentinel()) {
-            ExpectType(*expr, ExpectedType::EqualsTo(std::make_shared<ast::TypeFun>(
+            ExpectType(*expr, ExpectedType::EqualsTo(CreateType<ast::TypeFun>(
                                   expected_type_type, expected_type_type)));
         }
     }
@@ -155,7 +155,7 @@ void TypeChecker::VisitExprApplication(const ast::NodeExprApplication& node) {
             std::dynamic_pointer_cast<const ast::TypeAuto>(deduced_fun)) {
             auto arg_var = unifier_.FreshTypeVar();
             auto ret_var = unifier_.FreshTypeVar();
-            fun_type = std::make_shared<ast::TypeFun>(arg_var, ret_var);
+            fun_type = CreateType<ast::TypeFun>(arg_var, ret_var);
             unifier_.AddConstraint(deduced_fun, fun_type, &node);
             unifier_.SaveNewType(fun_type);
         } else {

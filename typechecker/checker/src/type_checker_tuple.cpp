@@ -20,7 +20,7 @@ void TypeChecker::VisitExprTuple(const ast::NodeExprTuple& node) {
         const auto unknown = std::make_shared<ast::TypeUnknown>();
         std::vector<std::shared_ptr<const ast::Type>> unknown_elements(node.GetElements().size(),
                                                                        unknown);
-        SetProvisionalType(node, {std::make_shared<ast::TypeTuple>(std::move(unknown_elements))});
+        SetProvisionalType(node, {CreateType<ast::TypeTuple>(std::move(unknown_elements))});
     }
 
     const auto expected_tuple_type = TryGetExpectedType<ast::TypeTuple>(node);
@@ -41,7 +41,7 @@ void TypeChecker::VisitExprTuple(const ast::NodeExprTuple& node) {
         element_types.push_back(types_storage_.get<DeducedType>(elem.get()).type);
     }
 
-    SetDeducedType(node, {std::make_shared<ast::TypeTuple>(std::move(element_types))});
+    SetDeducedType(node, {CreateType<ast::TypeTuple>(std::move(element_types))});
 }
 
 void TypeChecker::VisitExprDotTuple(const ast::NodeExprDotTuple& node) {
@@ -60,7 +60,7 @@ void TypeChecker::VisitExprDotTuple(const ast::NodeExprDotTuple& node) {
             // type reconstruction works as pair deduced
             auto lvar = unifier_.FreshTypeVar();
             auto rvar = unifier_.FreshTypeVar();
-            tuple_type = std::make_shared<ast::TypeTuple>(
+            tuple_type = CreateType<ast::TypeTuple>(
                 std::vector<std::shared_ptr<const ast::Type>>{lvar, rvar});
             unifier_.AddConstraint(deduced_type, tuple_type, &node);
             unifier_.SaveNewType(tuple_type);

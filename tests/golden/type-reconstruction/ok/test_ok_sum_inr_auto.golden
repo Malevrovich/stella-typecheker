@@ -8,9 +8,10 @@ fn main(b : auto) -> auto {
 
 
 STDOUT:
-Well-typed
-
-STDERR:
 (empty)
 
-EXIT_CODE: 0
+STDERR:
+ERROR_AMBIGUOUS_TYPE:
+Ambiguous type: type variable was not inferred
+
+EXIT_CODE: 1

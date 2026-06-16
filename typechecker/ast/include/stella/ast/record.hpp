@@ -50,8 +50,10 @@ public:
         std::shared_ptr<const Type> type;
     };
 
-    explicit TypeRecord(std::optional<std::vector<Field>> fields = std::nullopt,
-                        std::optional<std::string> duplicate_label = std::nullopt);
+    TypeRecord(std::optional<std::vector<Field>> fields = std::nullopt,
+               std::optional<std::string> duplicate_label = std::nullopt,
+               const NodeBase* origin_node = nullptr,
+               std::shared_ptr<const SourceInfo> source_info = nullptr);
 
     static std::shared_ptr<TypeRecord> MakeSentinel();
 

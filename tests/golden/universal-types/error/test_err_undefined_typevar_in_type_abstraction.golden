@@ -13,6 +13,7 @@ STDOUT:
 STDERR:
 ERROR_UNDEFINED_TYPE_VARIABLE:
 Error type: Y
+  Type from source: <unknown>:5:28
 Undefined type variable 'Y'
 
 EXIT_CODE: 1

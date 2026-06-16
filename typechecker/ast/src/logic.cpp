@@ -5,6 +5,10 @@
 namespace stella {
 namespace ast {
 
+TypeBool::TypeBool(const NodeBase* origin_node,
+                   std::shared_ptr<const SourceInfo> source_info)
+    : Type(origin_node, std::move(source_info)) {}
+
 NodeExprIf::NodeExprIf(std::shared_ptr<SourceInfo> source_info,
                        std::shared_ptr<const NodeExpr> condition,
                        std::shared_ptr<const NodeExpr> then_branch,

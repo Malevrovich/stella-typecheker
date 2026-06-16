@@ -50,8 +50,10 @@ public:
     struct SentinelTag {};
 
     // Concrete variant type.
-    explicit TypeVariant(std::vector<Field> fields,
-                         std::optional<std::string> duplicate_label = std::nullopt);
+    TypeVariant(std::vector<Field> fields,
+                std::optional<std::string> duplicate_label = std::nullopt,
+                const NodeBase* origin_node = nullptr,
+                std::shared_ptr<const SourceInfo> source_info = nullptr);
     // Family sentinel: "some variant, labels unknown".
     explicit TypeVariant(SentinelTag) {}
     static std::shared_ptr<TypeVariant> MakeSentinel();

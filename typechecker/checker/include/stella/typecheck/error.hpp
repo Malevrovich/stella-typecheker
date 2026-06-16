@@ -45,6 +45,9 @@ public:
 class TypeCheckTypeError : public TypeCheckError {
 public:
     TypeCheckTypeError(ErrorCode code, const ast::Type& type, std::string_view message = "");
+
+private:
+    static std::string BuildErrorMessage(const ast::Type& type, std::string_view message);
 };
 
 void OnError(TypeCheckError&& error);
